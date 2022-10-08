@@ -1,12 +1,10 @@
 from neo4j import GraphDatabase
 
-class GDBSaver():
+class GDBSaver:
 
-    driver = GraphDatabase.driver()
-    
-    def __init__(self) -> None:
+    def __init__(self):
         self.driver = GraphDatabase.driver(database['neo4j']['server'], auth=(database['neo4j']['username'], database['neo4j']['password']))
-    
+
     def _exec(self, tx, query):
         result = tx.run(query)
         try:
@@ -49,3 +47,8 @@ class GDBSaver():
         query = "MATCH (n) DETACH DELETE n RETURN 1"
         with self.driver.session() as session:
             session.write_transaction(self._exec, query)
+
+    def sendQuery(self, query):
+        with self.driver.session() as session:
+            res = session.write_transaction(self._exec, query)
+        return res

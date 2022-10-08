@@ -1,7 +1,11 @@
 import spacy
 
 nlp = spacy.load('./data/v1\output\model-best')
-txt = "vRealize Operations (7.x before 7.0.0.11287810, 6.7.x before 6.7.0.11286837 and 6.6.x before 6.6.1.11286876) contains a local privilege escalation vulnerability due to improper permissions of support scripts"
+txt = "A flaw exists in Trading Technologies Messaging 7.1.28.3 (ttmd.exe) due to improper validation of user-supplied data when processing a type 8 message sent to default TCP RequestPort 10200. An unauthenticated, remote attacker can exploit this issue, via a specially crafted message, to terminate ttmd.exe."
 tmp = nlp(txt)
 for ent in tmp.ents:
         print(ent.text, ent.label_)
+
+# nlp_en = spacy.load('en_core_web_lg')
+# print (nlp_en.vocab['cat'].vector)
+
