@@ -1,0 +1,13 @@
+{
+    "neo4j": {
+        "server": "bolt://<ip>:7687",
+        "username": "neo4j",
+        "password": "test"
+    },
+
+    "redis": {
+        "server": "<ip>",
+        "port": 6379,
+        "password": "password"
+    }
+}

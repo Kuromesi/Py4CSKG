@@ -1,8 +1,11 @@
 from neo4j import GraphDatabase
 
+from service.ConfReader import ConfReader
+
 class GDBSaver:
 
     def __init__(self):
+        database = ConfReader.readConf()
         self.driver = GraphDatabase.driver(database['neo4j']['server'], auth=(database['neo4j']['username'], database['neo4j']['password']))
 
     def _exec(self, tx, query):
