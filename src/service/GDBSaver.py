@@ -15,12 +15,28 @@ class GDBSaver:
         except:
             return 0
 
+    def _punc_remove(self, query):
+        query = query.replace("'", "")
+        query = query.replace("-", " ")
+        query = query.replace("(", " ")
+        query = query.replace(")", " ")
+        query = query.strip()
+        query = query.replace("\\", "")
+        return query
+    
+    def _result(self, tx, query):
+        result = tx.run(query)
+        try:
+            return result.values()
+        except:
+            return 0
+
     def addNode(self, kvpairs):
         driver = self.driver
         query = "CREATE (a:%s) "%kvpairs['prop']
         del kvpairs['prop']
         for (key, value) in kvpairs.items():
-            query += "SET a.%s = '%s' "%(key, value)
+            query += "SET a.%s = '%s' "%(key, self._punc_remove(value))
         query += "RETURN id(a)"
         with driver.session() as session:
             nodeid = session.write_transaction(self._exec, query)
@@ -35,7 +51,7 @@ class GDBSaver:
                     session.write_transaction(self._exec, query)
         
     def checkRelation(self, src, dest, relation):
-        query = "MATCH(a) WHERE id(a)=%d MATCH(b) WHERE id(b)=%d RETURN EXISTS(()-[:%s]->(b))"%(src, dest, relation)
+        query = "MATCH(a) WHERE id(a)=%d MATCH(b) WHERE id(b)=%d RETURN EXISTS((a)-[:%s]->(b))"%(src, dest, relation)
         with self.driver.session() as session:
             isExist = session.write_transaction(self._exec, query)
         return isExist
@@ -53,5 +69,9 @@ class GDBSaver:
 
     def sendQuery(self, query):
         with self.driver.session() as session:
-            res = session.write_transaction(self._exec, query)
+            res = session.write_transaction(self._result, query)
         return res
+
+if __name__=="__main__":
+    gdb = GDBSaver()
+    print (gdb.sendQuery("MATCH (n) RETURN n"))

@@ -5,7 +5,7 @@ class RDBSaver():
 
     def __init__(self):
         database = ConfReader.readConf()
-        self.r = redis.StrictRedis(host=database['redis']['server'], port=database['redis']['port'], db=0)
+        self.r = redis.StrictRedis(host=database['redis']['server'], port=database['redis']['port'], password=database['redis']['password'], db=2)
 
     def saveNodeId(self, name, id):
         self.r.set(name, id)
@@ -18,3 +18,22 @@ class RDBSaver():
 
     def flushDatabase(self):
         self.r.flushall()
+        
+    def select_database(self, num):
+        self.r.select(num)
+    
+    def appendList(self, key, value):
+        self.r.lpush(key, value)
+        
+    def addSet(self, key, value):
+        self.r.sadd(key, value)
+        
+    def checkSet(self, key, value):
+        return self.r.sismember(key, value)
+        
+    def removeKey(self, key):
+        self.r.delete(key)
+    
+if __name__=="__main__":
+    rdb = RDBSaver()
+    print (rdb)
