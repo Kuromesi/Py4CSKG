@@ -14,15 +14,6 @@ class GDBSaver:
             return result.single()[0]
         except:
             return 0
-
-    def _punc_remove(self, query):
-        query = query.replace("'", "")
-        query = query.replace("-", " ")
-        query = query.replace("(", " ")
-        query = query.replace(")", " ")
-        query = query.strip()
-        query = query.replace("\\", "")
-        return query
     
     def _result(self, tx, query):
         result = tx.run(query)
@@ -36,7 +27,7 @@ class GDBSaver:
         query = "CREATE (a:%s) "%kvpairs['prop']
         del kvpairs['prop']
         for (key, value) in kvpairs.items():
-            query += "SET a.%s = '%s' "%(key, self._punc_remove(value))
+            query += "SET a.%s = '%s' "%(key, value)
         query += "RETURN id(a)"
         with driver.session() as session:
             nodeid = session.write_transaction(self._exec, query)

@@ -3,12 +3,14 @@ import re
 import spacy
 from service.GDBSaver import GDBSaver
 from service.RDBSaver import RDBSaver
+from sklearn.cluster import DBSCAN
+from sklearn import datasets
 
 class NLP:
 
     def __init__(self):
         # self.nlp = spacy.load('./data/v1\output\model-best')
-        self.gdb = GDBSaver()
+        self.gdb = NLPGDBSaver()
         self.rdb = RDBSaver()
         spacy.prefer_gpu()
         # Self trained model
@@ -19,11 +21,21 @@ class NLP:
     def process(self, txt):
         return self.nlp(txt)
 
+    def _punc_remove(self, query):
+        query = query.replace("'", "")
+        query = query.replace("-", " ")
+        query = query.replace("(", " ")
+        query = query.replace(")", " ")
+        query = query.strip()
+        query = query.replace("\\", "")
+        return query
+    
     def node_extractor(self):
         query = "MATCH (n:Vulnerability) RETURN n"
         nodes = self.gdb.sendQuery(query)
         for node in nodes:
             des = node[0].get('des')
+            des = des.split("CVSS 3.1 Base Score")[0]
             src_id = node[0].id
             txt = self.nlp(des)
             for ent in txt.ents:
@@ -35,10 +47,14 @@ class NLP:
                         tmp += token.lemma_.lower() + " "
                 tmp = tmp.strip()
                 node_des = tmp
+                node_des = self._punc_remove(node_des)
+                if (len(node_des) <= 2 or node_des == " "):
+                    continue
                 if not self.rdb.checkNode(node_des):
                     node_dict['des'] = node_des
-                    node_dict['prop'] = ent.label_
                     node_dict['type'] = ent.label_
+                    node_dict['ori'] = ent.text
+                                        
                     dest_id = self.gdb.addNode(node_dict)
                     self.rdb.saveNodeId(node_des, dest_id)
                 else:
@@ -48,39 +64,7 @@ class NLP:
                     self.gdb.addRelation(src_id, dest_id, rel)
                 print(tmp)
         return nodes
-    
-    def cluster(self):
-        query = "MATCH (n:cons) RETURN n"
-        nodes = self.gdb.sendQuery(query)
-        self.rdb.select_database(4)
-        for node in nodes:
-            des = node[0].get('des')
-            id = node[0].id
-            if (self.rdb.checkSet('visited', id)):
-                continue
-            self.rdb.addSet('visited', id)
-            query = "MATCH (n:cons) WHERE "
-            words = des.split(" ")
-            if (len(words) < 2):
-                continue
-            for word in words:
-                query += "n.des CONTAINS \"%s\" AND "%word
-            query = query.strip("AND ")
-            query += " RETURN n"
-            related_nodes = self.gdb.sendQuery(query)
-            if len(related_nodes) == 1:
-                continue
-            for related_node in related_nodes:
-                related_id = related_node[0].id
-                if (self.rdb.checkNode(related_id)):
-                    for temp in self.rdb.getNode(related_id):
-                        self.rdb.appendList(id, temp)
-                    self.rdb.removeKey(related_id)
-                self.rdb.addSet('visited', related_id)
-                self.rdb.appendList(id, related_id)
-                
-            
-    
+
     def test(self):
         query = "MATCH (n:Vulnerability) WHERE n.id=\"CVE-2021-0215\" RETURN n"
         node = self.gdb.sendQuery(query)
@@ -88,6 +72,26 @@ class NLP:
         text = self.nlp(des)
         for ent in text.ents:
             print(ent.text, ent.label_)
+
+class NLPGDBSaver(GDBSaver):
+    
+    def __init__(self):
+        super().__init__()
+        
+    def _exec(self, tx, kvpairs):
+        result = tx.run("CREATE (n) WHERE "
+                        "SET n.type = $type "
+                        "SET n.des = $des "
+                        "SET n.ori = $ori "
+                        "RETURN id(n)", type=kvpairs['type'], des=kvpairs['des'], ori=kvpairs['ori'])
+        try:
+            return result.single()[0]
+        except:
+            return 0
+        
+    def addNode(self, kvpairs):
+        with self.driver.session() as session:
+            nodeid = session.write_transaction(self._exec, kvpairs)
 
 if __name__=="__main__":
     nlp = NLP()
