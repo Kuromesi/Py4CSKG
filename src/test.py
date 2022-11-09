@@ -1,19 +1,20 @@
 import spacy
 from utils.NLP import NLP
 import numpy as np
+from utils.PathFinder import PathFinder
 
 spacy.prefer_gpu()
 
 def cosine_distance(x, y):
     return np.dot(x, y.T) / (np.linalg.norm(x) * np.linalg.norm(y))
 
-nlp = spacy.load('./data/v3\output\model-best')
-txt = "	A format string vulnerability in mpv through 0.33.0 allows user-assisted remote attackers to achieve code execution via a crafted m3u playlist file."
+# nlp = spacy.load('./data/v3/output/model-best')
+# txt = "In Django 2.2 MultiPartParser, UploadedFile, and FieldFile allowed directory traversal via uploaded files with suitably crafted file name"
 
 
-tmp = nlp(txt)
-for ent in tmp.ents:
-    print(ent.text, ent.label_)
+# tmp = nlp(txt)
+# for ent in tmp.ents:
+#     print(ent.text, ent.label_)
 
 
 # nlp = spacy.load('en_core_web_lg')
@@ -50,3 +51,6 @@ for ent in tmp.ents:
 
 # nlp = NLP()
 # nlp.cluster()
+
+pf = PathFinder()
+pf.find()
