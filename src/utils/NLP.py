@@ -14,12 +14,9 @@ class NLP:
         self.rdb = RDBSaver()
         spacy.prefer_gpu()
         # Self trained model
-        self.nlp = spacy.load('./data/v1\output\model-best')
+        self.nlp = spacy.load('./data/v3/output/model-best')
         # Official model
         self.nlpo = spacy.load('en_core_web_trf')
-
-    def process(self, txt):
-        return self.nlp(txt)
 
     def _punc_remove(self, query):
         query = query.replace("'", "")
@@ -31,6 +28,9 @@ class NLP:
         return query
     
     def node_extractor(self):
+        '''
+        Extract consequences and vulnerabilities from CVE descriptions.
+        '''
         query = "MATCH (n:Vulnerability) RETURN n"
         nodes = self.gdb.sendQuery(query)
         for node in nodes:
@@ -73,13 +73,21 @@ class NLP:
         for ent in text.ents:
             print(ent.text, ent.label_)
 
+    def proc(self, text):
+        text = self.nlp(text)
+        line = ""
+        for ent in text.ents:
+            line += ent.text + " "
+        return line.strip()
+
 class NLPGDBSaver(GDBSaver):
     
     def __init__(self):
         super().__init__()
         
-    def _exec(self, tx, kvpairs):
-        result = tx.run("CREATE (n) WHERE "
+    def _exec1(self, tx, kvpairs):
+        query = "CREATE(n:%s) "%kvpairs['type']
+        result = tx.run(query +
                         "SET n.type = $type "
                         "SET n.des = $des "
                         "SET n.ori = $ori "
@@ -91,7 +99,8 @@ class NLPGDBSaver(GDBSaver):
         
     def addNode(self, kvpairs):
         with self.driver.session() as session:
-            nodeid = session.write_transaction(self._exec, kvpairs)
+            nodeid = session.write_transaction(self._exec1, kvpairs)
+        return nodeid
 
 if __name__=="__main__":
     nlp = NLP()

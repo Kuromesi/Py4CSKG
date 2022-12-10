@@ -1,5 +1,5 @@
 import spacy
-from gensim.models import Word2Vec
+# from gensim.models import Word2Vec
 from utils.NLP import NLP
 from utils.Cluster import Cluster
 import numpy as np
@@ -18,4 +18,5 @@ import numpy as np
 # nlp.createCluster()
 
 cls = Cluster()
-cls.node2vec()
+cls.findCluster()
+cls.createCluster()
