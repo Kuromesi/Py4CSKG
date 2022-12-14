@@ -77,7 +77,8 @@ class NLP:
         text = self.nlp(text)
         line = ""
         for ent in text.ents:
-            line += ent.text + " "
+            if ent.label_ == "vul":
+                line += ent.text + " "
         return line.strip()
 
 class NLPGDBSaver(GDBSaver):

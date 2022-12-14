@@ -1,6 +1,9 @@
 # Configuration files
 .idea
 
+# Saved models
+ckpts
+
 # Data
 data
 

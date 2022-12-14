@@ -1,0 +1,21 @@
+Information from these scans may reveal opportunities for other forms of reconnaissance (ex: [MASK] or [MASK]), establishing operational resources (ex: [MASK] or [MASK]), and/or initial access (ex: [MASK] or [MASK]).
+Adversaries may gather this information in various ways, such as direct collection actions via [MASK] or [MASK] for Information. 
+Information about hosts may also be exposed to adversaries via online or other accessible data sets (ex: [MASK] or [MASK]). 
+Gathering this information may reveal opportunities for other forms of reconnaissance (ex: [MASK] or [MASK]), establishing operational resources (ex: [MASK] or [MASK]), and/or initial access (ex: [MASK] or [MASK]).
+Alternatively, adversaries may choose to find and target vulnerable binaries with the setuid or setgid bits already enabled (i.e. [MASK]). 
+Instead of creating an entry in the sudoers file, which must be done by root, any user can specify the setuid or setgid flag to be set for their own applications (i.e. [MASK]).
+Additionally, an adversary may be able to exploit a compromised container with a mounted container management socket, such as docker.sock, to break out of the container via a [MASK].
+Adversaries may also escape via [MASK], such as exploiting vulnerabilities in global symbolic links in order to access the root directory of a host machine.
+Depending on the permissions level of the vulnerable remote service an adversary may achieve [MASK] as a result of lateral movement exploitation as well.
+An adversary may need to determine if the remote system is in a vulnerable state, which may be done through [MASK] or other Discovery methods looking for common, vulnerable software that may be deployed in the network, the lack of certain patches that may indicate vulnerabilities, or security software that may be used to detect or contain remote exploitation.
+Adversaries may copy files between internal victim systems to support lateral movement using inherent file sharing protocols such as file sharing over [MASK] to connected network shares or with authenticated connections via [MASK].
+Once brought into the victim environment (i.e. [MASK]) files may then be copied from one system to another to stage adversary tools or other files over the course of an operation.
+It uses [MASK] of directory .LNK files that use [MASK] to look like the real directories, which are hidden through [MASK].
+When scheduled exfiltration is used, other exfiltration techniques likely apply as well to transfer the information out of the network, such as [MASK] or [MASK].
+Once present, adversaries may also transfer/spread tools between victim devices within a compromised environment (i.e. [MASK]).
+Files can also be transferred using various [MASK] as well as native or otherwise present tools on the victim system.
+To maximize impact on the target organization in operations where network-wide availability interruption is the goal, malware designed for destroying data may have worm-like features to propagate across a network by leveraging additional techniques like [MASK], [MASK], and [MASK].
+This behavior is distinct from [MASK] and [MASK] because individual files are destroyed rather than sections of a storage disk or the disk's logical structure.
+In this scenario, adversaries attach a file to the spearphishing email and usually rely upon [MASK] to gain execution.
+Adversaries may also execute commands through interactive terminals/shells, as well as utilize various [MASK] in order to achieve remote Execution.
+These token can then be applied to an existing process (i.e. [MASK]) or used to spawn a new process (i.e. [MASK]).
