@@ -1,0 +1,502 @@
+7|10|6|9|0 , not properly validate session IDs in http URLs obtain sensitive session information crafted URL
+6|7|0 , Array index error execute arbitrary code crafted Publisher file incorrect handling of values in memory Publisher Out-of-bounds Array Index
+7|10|6|9|0 , discover the installation path invalid csrf_token_value field
+6|7|0 , write to arbitrary files NULL byte in a file name in a serialized
+6|7|0 , denial of service (out-of-bounds read application crash crafted DV file
+6|7|0 , arbitrary code execution
+6|7|0 , point to file paths create arbitrary symlinks pointing anywhere on the server execute arbitrary code
+6|7|0 , restrict the use of classes available on the classpath send messages deserialize arbitrary objects execute arbitrary code crafted serialized object
+6|0|7|9 , hijack the configuration traffic controlling the server associated with that hostname
+7|10|6|9|0 , information disclosure
+7|10|6|9|0 , obtain sensitive information direct request to a .php file error message webservice / xmlrpc / locallib.php
+10 , escalate privileges weak permissions on the installation directory
+7|10|6|9|0 , obtain sensitive information reading detailed error messages
+7|3|1|6|9|0 , bypass authentication on an affected system
+6|7|0 , execute arbitrary programs message containing a file: URL incomplete fix
+7|6|10|9|0 , ( CSP comparisons against those paths cross-origin information leak
+6|0|7|9 , compromise Oracle FLEXCUBE Private Banking unauthorized access complete access
+6|7|0 , ( SPF bypass the configured user filters sending a custom SPF packet to an affected device bypass the configured header filters malicious content to pass through the device
+6|7|0 , Untrusted search path execute arbitrary code specially crafted executable file in an unspecified directory
+7|10|6|9|0 , Microsoft Server Block Message ( SMB ) information disclosure vulnerability
+7|10|6|9|0 , discover mail credentials
+6|7|0 , packaging of inn escalate from user inn to root symlink attacks
+6|7|0 , clickable hyperlinks for " javascript : " malicious JavaScript script javascript:" links clicking and running this code theft of cookies authorization tokens
+6|7|0 , not properly sanitize a specially crafted request
+6|7|0 , ( DCNM ) path traversal attack insufficient validation of user-supplied input to the API sending a crafted request to the API overwrite arbitrary files
+6|7|0 , DLL injection attack incorrect handling of directory paths inserting a configuration file in a specific path on the system malicious DLL file execute arbitrary code
+6|7|0 , denial of service (Traffic Management Microkernel ( TMM ) restart) crafted ICMP packets PMTU )
+6|7|0 , a denial of service long heartbeat message
+7|3|1|6|9|0 , admin / bypass authentication gain administrative access arbitrary links_cookie cookie
+7|10|6|9|0 , timing attacks unspecified vectors
+6|7|0 , Untrusted search path gain privileges Trojan horse DLL in an unspecified directory
+7|10|6|9|0 , read arbitrary files Editor or Admin permissions
+7|10|6|9|0 , Invalid json_populate_recordset or crash the server disclose a few bytes of server memory
+6|7|0 , validate strings argument-injection attacks crafted URL
+6|7|0 , not properly process NAT rules a denial of service (device reload ) crafted packets
+7|10|6|9|0 , read the title, author, and pages of an arbitrary thread personal sticky.
+7|10|6|9|0 , insecure direct object reference reveal the protected branch name crafted API call with the ID of the protected branch
+6|7|0 , heap-based buffer over not properly validate the width and height
+6|7|0 , a denial of service (crash ) delete operation Broken pipe"
+7|3|1|6|9|0 , denial-of- triggering AP to send IAPP location updates for stations different denial-of- CAM table attacks traffic flapping forge Authentication and Association Request packets
+7|3|1|6|9|0 , shared secret login as an arbitrary user modified cookie
+6|7|0 , page_alloc_lock grant_table.lock denial of service (host deadlock )
+7|10|6|9|0 , obtain sensitive information from process memory crafted packets
+6|7|0 , remote share attempts DNS pollution
+6|7|0 , Command Execution insufficient sanitization of fwrite to conf.php execute arbitrary code
+7|10|6|9|0 , disclosure of sensitive information
+6|7|0 , Improper input validation in a subsystem denial of service local access
+6|7|0 , ( IPS ) a denial of service (MainApp process outage ) malformed SNMP packets
+7|10|6|9|0 , bypass intended access restrictions obtain sensitive information
+7|10|6|9|0 , obtain system information direct request to info.php phpinfo
+7|10|6|9|0 , list running containers obtain sensitive information
+6|7|0 , transactional state denial of service system crash
+7|3|1|6|9|0 , local code execution ability tamper with the micro-service API
+6|7|0 , remotely deny service
+7|10|6|9|0 , discover the PHP JSESSIONID value unspecified vectors
+5 , memory corruption out-of-memory condition arbitrary code execution open the malicious file
+7|10|6|9|0 , not authenticate the station device spoof devices obtain sensitive information reading cleartext packet data lack of SSL support
+7|10|6|9|0 , obtain sensitive information crafted web site PDF Library Information
+6|7|0 , CE command injections insufficient input validation submitting malicious input to a specific command execute previously staged code
+6|7|0 , write to arbitrary files gain privileges symlink attack on /tmp/
+6|0|7|9 , a denial of service (management tool confusion ) manipulating information in the backend directories in xenstore
+6|7|0 , execute arbitrary code crafted XSLT document " resource injection "
+7|10|6|9|0 , information exposure %p usage
+10 , weak permissions for certain files obtain password hashes other unspecified sensitive information reading etc / dbdump.db
+6|7|0 , parse certain inputs craft a markdown table denial of service
+6|7|0 , a denial of service NULL pointer dereference daemon crash ) crafted content get_target_ocx_param or send_target_ocx_param command
+6|7|0|4 , reveal credentials
+6|7|0|4 , hard-coded credentials gain unauthorized access permit the execution of arbitrary code
+6|7|0 , not sufficiently lockdown access control sandbox escape
+6|7|0 , DNS request resolve any hostname create DNS query strings
+6|7|0 , crash the PCP Broker preventing commands from being sent to agents
+7|10|6|9|0 , Information Exposure Timing Discrepancy
+6|7|0 , a denial of service (crash ) crafted HTML memory corruption assert errors
+6|7|0 , restart the Traffic Management Microkernel ( TMM
+6|7|0 , not properly sanitized. not properly sanitized some fields not properly sanitize the fields in the `Chart.yaml` file send deceptive information to a terminal screen obscure or alter information on the screen send codes that terminals execute higher-order logic clearing a terminal screen
+7|3|4|6|0 , Improper Restriction of Excessive Authentication Attempts unauthorized command execution
+6|7|0 , Format string a denial of service format string specifiers
+7|10|6|9|0 , remote code execution information disclosure information disclosure
+6|7|0 , join a password-protected meeting improper validation of input to API requests sending an API request to the application join the password-protected meeting
+6|7|0|4 , hard-coded key enable information disclosure local access
+7|10|6|9|0 , obtain highly sensitive information
+6|7|0 , send invalid or malformed headers messages to no longer be transmitted
+7|10|6|9|0 , secure text entry obtain potentially sensitive information from process memory local process
+3|1 , load URLs for the panels load a URL privileged pages
+6|7|0 , Untrusted Search Path environment variables automatic elevation of an attacker process launch
+6|7|0 , bypass intended memory-read restrictions denial of service (system crash ) .
+7|10|6|9|0 , obtain sensitive configuration information
+10 , denial of service (server crash ) execute arbitrary code
+6|7|0 , access file: URLs URL drag crafted web site
+7|10|6|9|0 , take screen shots of credit card information crafted HTML page
+7|10|6|9|0 , compromise PeopleSoft Enterprise PeopleTools. unauthorized access to critical data complete access
+6|7|0 , not properly sanitize the input provided by the user code execution
+7|10|6|9|0 , obtain sensitive information from kernel memory crafted application Information Disclosure
+6|7|0 , execute arbitrary commands unsafe search paths convincing a targeted user to follow a malicious link load libraries from the directory execute arbitrary commands place a crafted library in a directory
+7|3|1|6|9|0 , blank password
+7|10|6|9|0 , information disclosure ( GDI ) retrieve information from a targeted system Information Disclosure
+6|7|0 , HTTP Host header injection resultant wkhtml2pdf PDF printing
+6|7|0 , not properly validate arguments to generic methods bypass generic constraints execute arbitrary code crafted method call
+7|10|6|9|0 , activate disabled meeting attributes obtain sensitive information crafted parameters
+7|10|6|9|0 , buffer over confidential information to be leaked
+7|10|6|9|0 , information-leakage show you the device's serial number remotely factory reset the device
+7|10|6|9|0 , information leak
+6|10|7|0 , bypass a configured file action drop the Server Message Block ( SMB ) large file transfer crafted SMB file transfer request pass an SMB file that contains malware
+7|3|1|6|9|0 , bypass authentication gain privileges system user account
+7|3|1|6|9|0 , detects http content execute arbitrary web script ( HPIHSL )
+6|7|0 , bypass a code-signing protection mechanism crafted Mach-O file
+6|7|0|4 , hard-coded credentials gain access to the Docker container or database
+6|7|0 , execute arbitrary code crafted app
+6|7|0 , execute arbitrary commands ssh URL with an initial dash character in the hostname ssh://-eProxyCommand= URL
+6|7|0 , xenbaked xenmon.py truncate arbitrary files symlink attack xenq - shm
+7|10|6|9|0 , obtain sensitive information reading the error page
+7|10|6|9|0 , obtain sensitive information mishandling of failed PAM authentication
+7|3|1|6|9|0 , validate certificates clear the trust flag bypass authentication
+10 , privileged operations file name concatenation of a runtime log file runtime log information create a file in an unintended directory
+7|10|6|9|0 , remote.php remote.php enumerate the registered users
+7|10|6|9|0 , handling of credit card details obtain potentially sensitive information from process memory crafted HTML page
+7|10|6|9|0 , become root
+7|3|1|6|9|0 , bypass authentication obtain administrative access kulladi cookie to a valid username
+6|7|0 , execute arbitrary commands shell metacharacters in a request to a cgi-bin/ URI
+7|10|6|9|0 , obtain sensitive information direct request to a .php file error message themes / Odyssey / theme.php
+6|0|7|9 , bypass a sandbox protection mechanism access unintended telephone capabilities crafted app
+7|3|1|6|9|0 , unauthenticated remote code execution /RestAPI URLs
+6|7|0 , not properly serialize input data execute arbitrary code crafted XAML browser application ( XBAP ) crafted .NET Framework application
+7|10|6|9|0 , not properly handle certain errors obtain hypervisor stack memory port or memory mapped I/O write other unspecified operations
+6|7|0 , command injection
+7|3|4|6|9|0 , SQL injection lateral movement access to monitored network devices
+7|3|1|6|9|0 , Session fixation hijack web sessions crafted link and administrator section
+6|0|7|9 , not properly interact with XrayWrapper property filtering bypass intended DOM object restrictions
+6|7|0 , local vulnerability local symlink attack follow symlinks if additional chown of the file create a symlink in place of the PID file rewrite any file Denial of Service point through the symlink to a critical file on the system
+7|3|1|6|9|0 , Insecure authentication session management manipulate session validation setting insecure authentication and session management
+6|0|7|9 , gain access to basic information about users of a server public link
+7|10|6|9|0 , obtain sensitive information
+7|3|1|6|9|0 , access the CGE account management execute arbitrary commands or files
+7|10|6|9|0 , read private information on a participant share the private part of their screen see contents of other application windows short exposure of screen contents
+7|3|1|6|9|0 , bypass authentication obtain administrative access crafted URL
+7|3|1|6|9|0 , enable and disable Issue Collectors Improper Authentication vulnerability /secure/ViewCollectors endpoint
+7|3|1|6|9|0 , authentication bypass read the CCS users database
+6|7|0 , Remote Code Execution
+7|10|6|9|0 , wireless passwords administrative usernames and passwords
+7|10|6|9|0 , sensitive information disclosure compromise an affected system
+7|3|1|6|9|0 , password reset
+6|7|0 , attacker controlled INSERT statement improper input validation local escalation of privilege
+6|7|0 , compromise MySQL Cluster takeover of MySQL Cluster
+7|10|6|9|0 , stores pre-boot authentication passwords clear this buffer after use obtain sensitive information reading the physical memory locations
+6|7|0 , denial of service
+6|7|0 , no-autoload-config elevate to the privileges of the running process placing a specially crafted dll in a build configuration directory
+7|10|6|9|0 , exposure of the fully qualified Base Resource directory name
+7|10|6|9|0 , access sensitive information username disclosure attacks
+7|10|6|9|0 , obtain path information direct request for sdk / blanks / formcontrol.php sdk / blanks / file_modules.php
+6|7|0 , write files to an arbitrary location path traversal execute arbitrary code
+6|7|0 , Unrestricted file upload upload arbitrary files uploads / upload_file destination filenames unspecified vectors to upload.cgi upload.html
+6|7|0 , not properly handle the return value from an unspecified function denial of service (service outage ) crafted packet
+6|7|0 , validate the names of pages Denial of Service ( DoS )
+6|7|0|4 , download a copy of the installer decompile it discover a hardcoded IV encrypt the username and userid in comment POST request decrypt the encrypted encryption key encrypt another user's ID and username spoof the user
+5 , partial denial-of-
+7|3|1|6|9|0 , unauthenticated POST requests to the /Forms/ directory manager or admin password
+7|3|1|6|9|0 , bypass SIP authentication maddr parameter
+6|7|0 , execute arbitrary commands shell metacharacters BF OF EF
+7|10|6|9|0 , obtain secret URLs object name timing side-channel attack
+7|10|6|9|0 , Command Line Interface ( ) obtain the database name direct request
+6|7|0|4 , default credentials remote root access
+7|3|4|6|9|0 , discover admin credentials in the backup file backupsettings.conf
+6|7|0 , get personal information of all registered students
+9|0 , permanent denial of service retrieves signed firmware binaries plain HTTP requests check the kind of firmware image flashing any signed firmware permanent brick condition impersonate the remote server " serve a signed firmware image
+6|7|0 , browser/WebsiteSettingsPopup.java not properly restrict use of a URL's fragment identifier page-info popup spoof the URL bar deliver misleading popup content crafted text
+6|7|0 , a denial of service (interface shutdown ) crafted TCP packet
+7|10|6|9|0 , access control issue bypass of the protected branches restriction rules Incorrect Access Control
+7|10|6|9|0 , information leak out-of-bounds read enter a particular string out-of-bounds read
+6|7|0 , unused delete routes GET requests bypass the protect_from_forgery XSRF protection cross-site scripting
+7|10|6|9|0 , obtain potentially sensitive information unspecified JSP diagnostic page
+7|10|6|9|0 , gain access to sensitive information improper validation of message contents sending specially crafted messages Universal Naming Convention (UNC) links to a targeted user access a remote system gain access to sensitive information use in additional attacks
+7|10|6|9|0 , bypass intended memory-read restrictions crafted app
+6|7|0 , accomplish an unauthorized transfer of digital assets logic error boolean judgment stop execution ignore the allowance underflow because transfer any amount of FuturXe tokens
+6|7|0 , pre-auth server side template injection Bean validation message tampering validation interpolation
+6|7|0 , inaccurate frame deduplication uplink Denial of Service malformed frequency attributes
+6|7|0 , overwrite arbitrary files symlink attack /tmp/pscal##### temporary file
+6|7|0|4 , hardcoded password of admin hardcoded password of support hardcoded password of user
+7|10|6|9|0 , leak user local file data crafted Chrome Extension
+6|7|0 , generate and display arbitrary URLs crafted username and password Host header values
+7|3|1|6|9|0 , not properly enforce authentication requirements read ELM files direct request to a URL
+6|7|0 , not correctly handle requests for byte sequences amplify the response size requesting the entire response body HTTP Range header value
+10 , elevation of privileges modify the existing executable file improper permissions world-writable
+7|10|6|9|0 , bypass a readOnly policy temporary 'mc share upload disable uploads form - proxy in front of MinIO
+6|7|0 , a denial of service (crash ) JOIN command channel argument
+6|7|0 , not validate the number of sections and the number of segments a denial of service (memory consumption ) crafted ELF file
+7|10|6|9|0 , obtain sensitive information from INI configuration files extra-opts flag
+7|10|6|9|0 , not properly handle onLocationChange events spoof the X.509 certificate information crafted web page
+7|10|6|9|0 , access the loopback interface Download URL localhost
+6|7|0 , code execution ( BCEL ) .
+7|3|1|6|9|0 , manipulate cookies to access other accounts trade in the stock market
+2 , ( SAS transmit the token and state snapshot
+7|10|6|9|0 , correct user authentication /deviceIP information internal network information disclosure
+7|10|6|9|0 , obtain sensitive information user_login, user_pass, user_email values direct request for the wp-content/uploads tmm_db_migrate wp_users.dat
+7|10|6|9|0 , change the user profile of any user proper authorization. change the password of any user in the affected system
+6|7|0 , trick gnupg to decrypt other ciphertext than Improper Input Validation
+7|10|6|9|0 , read sensitive cleartext information about e-mail project accounts unspecified vectors
+6|7|0 , Arbitrary File Deletion affect portions of or the whole affected parameter
+7|10|6|9|0 , DRM key
+6|7|0 , regular expression denial of service ( ReDoS )
+5 , memory leak
+6|7|0 , Untrusted search path gain privileges Trojan horse DLL in an unspecified directory
+6|7|0 , overwrite arbitrary files symlink attack /tmp/aptoncd temporary file
+6|7|0 , ( OSPF ) erase or alter the routing tables of one or many routers, switches
+6|7|0 , a denial of service (infinite loop ) converting a circularly defined SVG file
+3|10 , gain access to sensitive cookies
+6|7|0 , not properly determine whether there is remaining packet data denial of service (application crash ) crafted packet
+6|7|0 , Arbitrary File Deletion
+7|10|6|9|0 , cross-origin loading of CSS stylesheets incorrect MIME type obtain sensitive information crafted document
+6|7|0 , overwrite arbitrary files symlink attack /tmp/muttprint.log temporary file
+6|7|0 , not properly validate IODataQueue object metadata fields execute arbitrary code crafted app
+7|10|6|9|0 , sets headers in the request strip the headers from the request
+6|0|7|9 , bypass intended access restrictions modify directory entries crafted ldapmodrdn call
+6|7|0 , create a specially crafted DLL file load the remote user's DLL execute arbitrary code
+2 , inadequate encryption strength inadequate encryption strength
+7|3|1|6|9|0 , rss / not properly implement the use of RSS tokens obtain sensitive block information reading an RSS feed
+6|0|7|9 , elevation of privilege local malicious application record audio local bypass of user interaction requirements access to functionality
+6|7|0 , bypass intended network-traffic restrictions
+7|10|6|9|0 , obtain sensitive information listing the processes
+7|10|6|9|0 , obtain sensitive information unspecified vectors
+6|7|0 , escalation of privilege physical access
+6|7|0 , cgi execute arbitrary commands shell metacharacters in
+6|7|0 , read or modify arbitrary resumes changing a job-search intention index.php?c=Personal&a=ajax_save_basic pid parameter
+7|10|6|9|0 , overwrite the root directory of the server denial of service HTTP POST request
+7|10|6|9|0 , information disclosure local malicious application access data outside of its compromising a privileged process
+7|10|6|9|0 , not set the secure flag for the session cookie capture this cookie
+6|7|0 , Local File Inclusion ( LFI ) call any php file /pandora_console/ajax.php ajax endpoint
+6|7|0 , elevate privileges to Administrator insufficient input validation crafted request to an affected system gain administrative privileges
+6|7|0 , decode_entities a denial of service (infinite loop ) incomplete SGML numeric character reference generation of an invalid UTF-8 character
+7|10|6|9|0 , obtain sensitive information about user email addresses failure in e-mail auto configuration
+6|7|0 , URL parameter externalLoginKey, pass valid Freemarker directives to the Template Engine remote code execution
+7|10|6|9|0 , obtain sensitive information crafted request error message
+7|10|6|9|0 , affect confidentiality
+9|0 , Session fixation hijack web sessions unspecified vectors
+6|7|0 , gain file ownership escalate privileges replacing a temporary file with a symlink to an arbitrary file target
+6|7|0 , not properly determine the amount of remaining denial of service (application crash ) crafted packet
+3|1|9|0 , bypass intended challenge requirements modifying the client-server data stream login/findpass page
+6|7|0 , Denial of Service ( DoS ) send a malicious packet to the Common Gateway Interface ( CGI ) make it fail DoS attack
+7|10|6|9|0 , trigger use of an arbitrary MIME type for a file a "%00." sequence followed by a new extension reading PHP source code requests for .php%00.txt files Mime Type Injection
+6|7|0 , not properly implement the dequoting of collation-sequence names a denial of service ( uninitialized memory access application crash ) unspecified other impact crafted COLLATE clause
+6|7|0 , Improper Input Validation command injection code execution specially crafted file names
+7|3|1|6|9|0 , escalation of privilege adjacent access
+7|10|6|9|0 , /var/log/ovirt-engine/engine.log file
+7|10|6|9|0 , MaDDash direct request to /lib/
+6|7|0 , overlap the fullscreen notification obscure the full screen warning crafted HTML page
+6|7|0 , denial of service ( BSOD ) unspecified other impact not validating input values
+6|7|0 , denial of service (daemon hang crash) message flood
+6|7|0 , denial of service (daemon crash ) attempted cross-realm referral
+6|7|0 , Improper Input Validation make the server stop accepting new connections
+6|7|0 , ( POS ) execute arbitrary commands crafted request to TCP opening the cash drawer
+7|10|6|9|0 , view sensitive database information absence of authentication for sensitive information sending crafted curl commands to an affected device view sensitive database information
+7|10|6|9|0 , read arbitrary files crafted parameters
+6|7|0 , escape the bubblewrap sandbox push characters into the input buffer of the thumbnailer escape the sandbox improper filtering of the TIOCSTI
+7|10|6|9|0 , obtain sensitive information (entry password history vulnerable hidden service
+6|7|0 , execute arbitrary commands crafted HTTP request
+6|7|0 , # (number sign) character in a data: URI spoof web sites
+7|10|6|9|0 , obtain cleartext data birthday attack HTTP-over-OpenVPN session Sweet32"
+6|7|0 , clickjacking attacks unspecified vectors
+7|10|6|9|0 , Data Loss Prevention ( NDLP obtain sensitive information
+6|7|0 , install an arbitrary APK in faulty validation of a package signature and package name
+6|7|0 , Improper input validation of the rawData.size heap-based buffer overflow crafted JPG image malicious EXIF data
+7|10|6|9|0 , chmod and chown entire server from client interface
+6|7|0 , submit a malicious IGS request over a network insufficient input validation internal memory corruption crash and rendering viewed or modified
+6|7|0 , execute arbitrary code crafted packets
+6|7|0 , not properly validate user accounts bypass security restrictions access sensitive information
+6|7|0 , local privilege escalation read any root file from the file system
+6|7|0 , denial of service (stack consumption segmentation fault ) unspecified other impact PDF document with a deep data structure
+7|10|6|9|0 , specially crafted application obtain kernel information Information Disclosure
+6|7|0|4 , random API Key
+7|10|6|9|0 , Incorrect Permission Assignment modified by
+6|7|0 , search path gain privileges Trojan horse DLL in an unspecified directory
+7|10|6|9|0 , obtain sensitive information direct request to a .php file error message
+3 , use of one-way hash predictable salt decrypt the passwords precomputed tables
+6|7|0 , not verify tokens for requests with certain content types bypass cross-site request forgery ( CSRF ) protection for requests to applications text
+7|10|6|9|0 , obtain sensitive information reading database fields
+6|7|0 , assertion failure a denial of service
+6|7|0 , execute arbitrary commands shell metacharacters in the sFileName argument
+6|7|0 , changes to the confirmation e-mail address old_email field arbitrary address changes
+6|7|0 , not properly validate the message owner matches the submitting user impersonate arbitrary users UserId and Owner tags
+7|3|4|6|9|0 , obtain database credentials
+6|7|0 , uncontrolled search path element ( DLL Hijacking ) attacker access to the system
+6|7|0 , not properly validate fields in an SMB request execute arbitrary code crafted SMB packet Pool Overflow
+9|0 , spoof the contents of the Omnibox ( URL bar crafted HTML page
+7|3|1|6|9|0 , bypass authentication , execute arbitrary code unspecified vectors
+2 , exchange messages with other apps send auth tokens to Vibease servers obtain user credentials, messages
+6|7|0 , a denial of service crafted packet to
+6|7|0 , enable escalation of privilege physical access
+7|10|6|9|0 , enumerate bridges
+6|7|0 , not validate the SSH host key of requests unspecified impact man-in-the- middle (MITM ) attack.
+6|7|0 , denial of service properly validate input from a privileged user on a guest operating system Denial of Service
+10 , Incorrect Default Permissions ( CWE-276 ) unauthorized access to SoMachine Basic resource files
+6|7|0 , Open redirect vulnerability redirect users to arbitrary web sites phishing attacks URL in the a parameter
+6|7|0 , overwrite arbitrary files symlink attack shm / defkeymap.map
+7|3|4|6|9|0 , bypass intended access control
+7|10|6|9|0 , gain remote access to administrator privileges discovering the admin password in the vgn admin HTML source code
+6|7|0 , execute arbitrary commands crafted serialized Java object
+7|10|6|9|0 , information disclosure
+7|10|6|9|0 , ( aka RBD obtain sensitive information process listing
+6|7|0 , Untrusted search path gain privileges Trojan horse DLL in an unspecified directory
+6|7|0 , execute code with root privileges insufficient input sanitization during user authentication processing sending a crafted response to the Cisco SD-WAN vManage Software access the software execute commands
+7|10|6|9|0 , not properly restrict cookie transmission for report requests obtain sensitive information cross-origin request private-browsing request
+6|7|0 , custom image execute arbitrary scripts
+7|3|4|6|9|0 , prompt passwords expanding them from templates templates trigger exposing them
+6|0|7|9 , obtain credentials
+6|7|0 , ( OAM ) denial of service ( DoS ) condition on an affected device improper input validation echo-reply packet sending malicious MPLS echo-request echo-reply packets crash and restart reload and resulting DoS condition
+7|10|6|9|0 , processing project files tampering with the value of an offset force the application to read a value outside of an array
+7|10|6|9|0 , not properly perform caching obtain sensitive information unspecified vectors
+7|10|6|9|0 , obtain sensitive information direct request to a .php file error message admin / create_acct.php
+5 , a denial of service (memory leak ) crafted file
+7|3|4|6|9|0 , password disclosure reading an "if(pwd ==" line in the HTML source code
+6|7|0 , a denial of service (buffer over-read crash) crafted padding length incorrect fix
+6|7|0 , a denial of service (core dump service restart ) malformed UDP packets ISIC
+7|10|6|9|0 , identity verification execute the management function access members’ information modify and delete the courses in system fail to access the learning content
+7|10|6|9|0 , not properly implement the WebView class obtain sensitive stored information crafted application
+7|3|1|6|9|0 , remotely unlock any safe in this valid PIN code field to supply the PIN code obtain authorization Bluetooth Low Energy ( BLE ) write a BLE characteristic enable notifications crafted getAuthor packet
+6|0|7|9 , spoof IP addresses written to the Security Audit Log vectors related to the network landscape
+7|10|6|9|0 , not place the expected '\0' character at the end of string data in the values of certain structure members obtain potentially sensitive information kernel memory crafted request reading the argument to the resulting modprobe
+6|7|0 , argument injection execute arbitrary code UNC share pathname in the LoadModule argument synacast Play pplsv ppvod URI
+6|7|0 , improper input validation insert and run arbitrary code
+6|7|0|4 , hard-coded password attackers to log in with a hard-coded password
+2 , wrap them as sub-parts crafted multipart email encrypted part(s HTML/CSS or ASCII newline characters modified multipart email leaks the plaintext of the encrypted message part(s
+7|3|1|6|9|0 , root terminal on a serial interface execute arbitrary commands root privileges
+7|3|4|6|9|0 , credential disclosure
+6|7|0 , a denial of service (daemon crash ) invalid Version field denial of service (CPU consumption daemon termination invalid or partial message
+7|10|6|9|0 , obtain sensitive information (memory contents userspace interruption of an internal function access of previously-
+7|10|6|9|0 , information disclosure libstagefright
+7|10|6|9|0 , obtain information compromise the user's system objects in memory Scripting Engine Information
+7|10|6|9|0 , information disclosure vulnerability exposed WAN replication credentials
+6|0|7|9 , communicate using a not properly implement authentication or authorization modify and/or intercept data change pump settings control insulin delivery
+6|7|0 , not validate string length fields in SDP packets denial of service crafted length field excessive memory allocation buffer over -read
+6|7|0 , shm_get_stat misinterprets the data type of an inode denial of service (system hang ) SHM_INFO shmctl call
+7|10|6|9|0 , information disclosure to properly handle objects in memory Information Disclosure
+5 , resource starvation denial of service
+6|7|0 , a denial of service ( memory corruption service crash ) execute arbitrary code long input data
+6|7|0 , download an unintended Cisco program onto a client machine execute this program identifying a Cisco program with a Cisco digital signature inst.exe
+7|10|6|9|0 , obtain sensitive information from process memory crafted web site
+6|7|0 , hash values trigger hash collisions a denial of service (CPU consumption ) sending many crafted parameters
+6|7|0 , denial of service (daemon crash ) crafted ALTER TABLE statement
+7|3|1|6|9|0 , gain administrative access to the web server unknown attack vectors
+6|0|7|9 , elevation of privilege execute arbitrary code compromising a privileged process
+6|7|0 , a denial of service outage and CPU consumption malformed DNP3 traffic
+6|7|0 , denial of service ( BSOD ) unspecified other impact not validating input values
+3|1|4|6|9|0 , signature TTL check sniff the Authorization header reissue an OpenStack token
+6|7|0 , a denial of service segmentation fault daemon crash ) crafted cookie
+7|3|1|6|9|0 , view the video stream
+6|7|0 , denial of service
+6|7|0 , execute arbitrary code crafted lModule parameter arbitrary memory address as a function pointer
+7|10|6|9|0 , read the configuration file discover credentials direct request
+7|10|6|9|0 , execute commands expose sensitive information
+6|7|0 , audit log injections user input validation forge audit log lines interpretation of audit log files hindered or misdirected interpretation of audit log files hindered or misdirected
+6|7|0 , Integer overflow denial of service (crash ) crafted SNMP GETBULK request heap-based buffer overflow
+2 , Cleartext Transmission of Sensitive Information view the unencrypted password of the McAfee Insights Server
+7|3|1|6|9|0 , bypass authentication gain administrative access
+6|7|0 , execute arbitrary code crafted string copied to clipboard
+6|7|0 , execute arbitrary code a denial of service (application crash malformed PRE file User Mode Write AV
+7|3|1|6|9|0 , execute arbitrary Lua code RunLua action in a request to upnp/control/ execute arbitrary Lua code RunLua action upnp / control hag
+6|7|0 , input validation Full Path Disclosure Web request
+5 , Memory leak consume memory a denial of service
+7|10|6|9|0 , not properly restrict anonymous access read hidden files path name
+6|7|0 , execute arbitrary code improper loading of Dynamic Link Libraries open a specially-crafted .DLL file execute arbitrary code
+7|10|6|9|0 , not properly protected. grant user’s credential
+7|10|6|9|0 , obtain sensitive information search interface encrypted passwords
+7|10|6|9|0 , not initialize a certain data structure obtain sensitive information from kernel stack memory crafted recvmsg or recvfrom
+7|3|1|6|9|0 , access network resources
+7|3|1|6|9|0 , Improper Authentication issue accessing a specific uniform resource locator (URL) on the web server access the application
+7|10|6|9|0 , get a file outputs meta-data about the file HTTP-like headers send the wrong buffer to the user other private data from the heap inadvertently displayed continue and display the data
+7|3|1|6|9|0 , bypass intended authentication requirements crafted password
+6|7|0 , DLL hijacking
+7|10|6|9|0 , bypass intended access restrictions read arbitrary profiles unspecified vectors discovering usernames for use brute-force attacks
+7|10|6|9|0 , determine if an IP Change block"
+6|7|0 , internal_dump function overwrite arbitrary files symlink attack on dump files
+5 , settings flood denial of service empty SETTINGS frame ping. consume excess CPU, memory
+7|3|1|6|9|0 , Authentication Bypass ( CWE-287 ) view and alter configuration information alter the state of the running
+7|10|6|9|0 , view Kubernetes cluster token
+6|7|9|0 , removal of the bot kick/kickban command remove users from other channels
+6|7|0 , uninitialized variable disclose arbitrary memory information
+6|7|0 , Insecure method overwrite arbitrary files a full pathname to the savePageAsBitmap method
+5 , specially crafted file memory leak DoS)
+7|3|4|6|9|0 , compromise user accounts
+7|10|6|9|0 , web pages containing external links GET requests with query strings Client / frmViewReports.aspx UserControls / Popups / frmHelp.aspx obtain sensitive information cross-domain Referer leakage "
+6|7|0 , obtain sensitive information (full path invalid integer in the version parameter to the default URI under attach
+6|7|0 , set arbitrary HTTP headers XSS attacks a %0d%0a in a URI
+6|7|0 , /tmp for a socket file a denial of service (menu unavailability ) .
+7|10|6|9|0 , gain privileges failure to properly enforce authorization checks
+6|7|0 , unchecked value of the IP payload size compute the ICMP checksum read out of bounds Denial-of-
+5 , malformed UDP packet
+6|0|7|9 , Use-after- free vulnerability execute arbitrary code crafted remerge call
+6|7|0 , a denial of service ( ntpd crash) mode configuration directive
+6|7|0 , a denial of service (device reload ) HTTPS packets tower processing
+6|7|0 , not properly validate the argument to the "-p" option to swcons create an arbitrary file enable world writability of this file symlink attack incomplete fix
+6|7|0 , denial of service unhandled exception process crash unspecified vectors
+6|0|7|9 , vaconfig/ execute arbitrary commands shell metacharacters in the ntpServer parameter
+6|7|0 , hijack DLL or executable files execute arbitrary code
+7|10|6|9|0 , ( PEAP not validate server certificates steal hashed passwords man-in-the- middle (MITM) attacks.
+7|10|6|9|0 , obtain sensitive information direct request to a .php file error message templates / newspaper / layout.php
+2 , compromise MySQL Server unauthorized access to critical data complete access man-in-the- hijack the authentication of users incorrect ordering of security parameter verification
+6|7|0 , Live Photo audio and video data
+6|7|0 , a denial of service ( DoS ) of the web-based management interface of an affected system insufficient validation of user-supplied input click a malicious link web-based management interface become unreachable DoS condition
+7|10|6|9|0 , random numbers with insufficient entropy generate self-signed certificates discover private keys knowledge of a certificate
+10 , browse a URL read the password gain administrative privileges
+7|3|1|6|9|0 , bypass authentication auth parameter to a
+6|7|0 , denial of service properly validate specific malicious data specially crafted application Denial of Service
+6|7|0 , not properly validate some fields when manipulating ( PATCH requests get or register a user account modify the file resource
+7|3|1|6|9|0 , Authentication Bypass
+7|3|1|6|9|0 , bypass intended access restrictions replaying api.stripe.com /v1 parsing the response under the object card reading the cvc_check information
+6|7|0 , validate strings argument-injection attacks crafted URL
+6|7|0 , denial-of- weak input validation
+6|7|0 , execute arbitrary code manipulation of memory
+7|10|6|9|0 , compromise Oracle FLEXCUBE Universal Banking unauthorized read access
+10 , privilege escalation gluster cli --remote-host command add it self to trusted storage pool privileged gluster operations adding other machines to trusted storage pool start, stop, and delete volumes
+7|10|6|9|0 , limited sensitive user information information disclosure
+10 , local privilege escalation writes logs entries to a file symbolic link point the log file to a privileged location adopts the file permissions replaced and renamed
+7|3|1|6|9|0 , request-validation crafted HTTP API request create, read, update, or delete entries in the subscriber database
+6|7|0 , authentication bypass access the remote management login page manipulate the POST request access some administrator-only pages tools_admin.asp
+6|7|0 , not properly validate requests query and obtain sensitive information
+7|10|6|9|0 , obtain the database password reading /logs/ sql-error.log
+6|7|0 , mishandles tainting execute arbitrary code denial of service (application crash ) crafted string
+6|7|0 , Improper Input Validation cause DoS by specifying crafted request IDs
+7|10|6|9|0 , use the connection leaking any information
+7|10|6|9|0 , bypass security perform actions
+6|7|0 , search path gain privileges Trojan horse DLL in an unspecified directory
+3|1|9|0 , fake their email address
+6|0|7|9 , bypass intended auth.conf access incorrect URL decoding
+6|7|0 , improper conditional logic
+6|7|0 , ( NDP ) validate the origin of Neighbor Discovery messages a denial of service (loss of connectivity ) read private network traffic spoofed message modifies the Forward Information Base ( FIB
+7|10|6|9|0 , obtain sensitive process memory information crafted tIME chunk data in an image file out-of-bounds read
+6|0|7|9 , send AT commands
+7|3|1|6|9|0 , lack of authentication revert the device to a factory default configuration SMS command RESET
+7|10|6|9|0 , authentication bypass insufficient access controls information disclosure
+6|7|0 , a denial of service (application crash ) ziparchive stream stream_get_contents function
+6|7|0 , display a spoofed location bar
+6|7|0 , input validation insufficient validation on the URL used control app access load malicious websites created code in webpages loaded and run
+7|10|6|9|0 , user-readable permissions bypass intended access restrictions discover a shared secret standard filesystem operations
+6|7|0 , header extension length field overflow. increment the current data pointer infinite loop Denial-of-
+6|7|0 , incorrect pointer chain a denial of service (application crash ) crafted packet
+7|10|6|9|0 , rw - rw - rw- modified by other users disrupt the kubectl invocation
+7|10|6|9|0 , read the available sudo rules read the sudo rules
+6|7|0 , unprotected XPC service update the underlying OpenVPN configuration the arguments passed to the OpenVPN binary load a malicious dynamic library
+6|7|0 , DNS-over- denial of service (device reload ) crafted IPv4 DNS TCP stream
+6|7|0 , execute arbitrary code insufficient validation of certain elements ( ARF ) ( WRF sending a malicious ARF or WRF file link or email attachment open the file execute arbitrary code
+7|10|6|9|0 , obtain the organizational information and statistics direct object reference
+6|7|0 , denial of service (system crash ) crafted ioctl call
+6|7|0 , denial of service (dropped session ) crafted BGP UPDATE messages route flapping
+6|7|0 , overwrite arbitrary files symlink attack /var/cache/cups/remote.cache or /var/cache/cups/ job.cache
+7|3|4|6|9|0 , discover Wi-Fi credentials
+6|7|0 , server-provided filename instead of the original URL determine the destination filename of a download create or overwrite arbitrary files 3xx redirect to a URL with a .wgetrc filename redirect to a URL with a crafted filename execute arbitrary code writing to a dotfile in a home directory
+6|7|0 , upload arbitrary HTML documents crafted image file
+7|10|6|9|0 , arbitrary files on the system
+6|7|0|4 , log into the database with admin-privileges complete compromise of the confidentiality and integrity of the stored data high availability impact execute arbitrary commands
+7|3|1|6|9|0 , redirect to the web browser bypass authentication base_main.php base_qry_alert.php
+7|3|1|6|9|0 , not verify peer associations of symmetric keys impersonation attacks arbitrary trusted key skeleton key
+6|7|0 , command injection attack valid administrator credentials insufficient input validation of command arguments injecting crafted command arguments into a vulnerable CLI command execute arbitrary commands as root
+5 , Memory leak a denial of service (memory consumption
+6|10|7|0 , remote attack Head Unit reboot
+7|3|1|6|9|0 , bypass authentication gain administrative access
+6|7|0 , not validate the hostname when redirect requests to arbitrary domains crafted DNS SRV record with a domain DNS hijack attack
+7|10|6|9|0 , compromised the confidentiality and integrity of the service
+6|7|0 , a denial of service (system hang crafted file
+7|10|6|9|0 , read system properties bypass the SecurityManager and read system properties
+6|7|0 , execute programs on an affected end-user system improper validation of input that is supplied to application URLs execute other programs execute arbitrary code
+6|7|0 , execute arbitrary commands shell metacharacters in a certain string
+6|7|0 , phreaking attack commands and functions record these frequencies service activations request-forgery activation request
+6|7|0 , change the permissions of arbitrary files symlink attack on an unspecified file
+0|7|3|4|6|9|2 , HTTP Basic Authentication
+6|0|7|9 , bypass intended access restrictions execute arbitrary IAPI/IDQL commands
+6|7|0 , denial of service (daemon exit ) crafted BOOTP packet
+6|7|0 , not properly validate objects in memory execute arbitrary code crafted file Move Around the Block
+7|10|6|9|0 , read sent e-mail messages
+6|7|0 , Administration Server denial of service invalid MIME e-mail message multipart/* Content-Type header
+7|3|4|6|9|0 , local file inclusion read arbitrary files from the operating system a /searchblox/servlet/FileServlet?col=url= request read the contents of the SearchBlox configuration file
+9|0 , session fixation attacks
+7|10|6|9|0 , internal hidden fields
+6|7|0 , CRLF inject arbitrary HTTP headers HTTP response splitting unspecified vectors
+6|7|0 , Buffer overflow DoS via HTTP GET request requesting a long URI with only '/' and '.' characters
+6|7|0 , kernel command injection missing command sanitization local elevation of privilege
+5 , missing rate limit submit a large number of email addresses identify valid ones enumerate a large number of valid users' Email addresses
+6|7|0 , uncontrolled search path arbitrary code execution open a malicious file
+7|10|6|9|0 , API calls
+6|7|0 , denial of service properly validate input from a privileged user on a guest operating system Denial of Service
+7|10|6|9|0 , exposure of sensitive information view a Jenkins administrator's web browser output control the browser retrieve the configured client secret
+7|10|6|9|0 , use the Java URL class checking the specified protocol handler read arbitrary files upload a file
+7|3|1|6|9|0 , accept and use a minion config file subvert the proper behaviour of the given minion software
+6|0|7|9 , ACL bypass IPC communication with various daemons
+7|10|6|9|0 , information disclosure improperly discloses the contents of its memory
+3|10 , not encrypt or protect in any way the intellectual property artifacts retrieve and easily exfiltrate all installed intellectual property and data
+7|10|6|9|0 , import/export project " export and then re-import their projects tape archive files ( tar ) . not properly check for symbolic links in user-provided archives retrieve the contents of any file
+6|0|7|9 , bypass authentication execute arbitrary code unspecified vectors incomplete fix
+6|0|7|9 , bypass cross-origin restrictions crafted HTML pages
+6|7|0 , input validation issue to read restricted memory
+7|10|6|9|0 , not properly perform node access checks bypass intended access restrictions obtain sensitive PDF certificate information vectors related to " showing (and creating) the PDF certificates
+5 , high CPU load prevent any further updates to any slave zone sending a large number of NOTIFY messages
+6|7|0 , execute arbitrary code a denial of service malicious L2CAP configuration requests crafted SDP communication send raw L2CAP frames
+6|7|0|4 , hard-coded password
+5 , memory leak a denial of service crafted MAT image file
+6|7|0 , a denial of service (program exit ) creating the appropriate tmp.XXXXXXXXXX temporary file Jasper to exit
+7|10|6|9|0 , read local files interaction error reading stored cookies
+6|7|0 , a denial of service (no new connections crafted read request
+7|10|6|9|0 , not properly manage memory in kernel-extension obtain sensitive memory-layout information crafted app
+6|7|0 , not properly interact with the clone and fork system calls denial of service (Program Check system crash )
+6|7|0 , Arbitrary File Overwrite overwrite the system's file with the contents
+7|10|6|9|0 , plain-text password storage exposed password gain access with the privileges
+5 , run perpetually monitor activity by users
+6|7|0 , execution of any wiki page as a widget {{#widget:}} parser function

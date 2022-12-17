@@ -17,3 +17,6 @@ CVE-2021-0109 Insecure inherited permissions
 ### FIND RELATED ATTACK PATTERNS
 CVE-2021-36758
 CVE-2021-21482
+
+## FIND RELATED WEAKNESSES
+CVE-2021-0056 Insecure inherited permissions

@@ -13,7 +13,7 @@ class MultiLabelScorer():
                 y = batch[0].cuda()
             else:
                 x = batch[1]
-            y_pred = model(x)
+            y_pred = model((x, attention_mask))
             y_pred = y_pred.cpu().data
             predicted = torch.where(y_pred >= 0.3, 1, y_pred)
             predicted = torch.where(predicted < 0.3, 0, predicted)
@@ -39,10 +39,10 @@ class MultiClassScorer():
             if torch.cuda.is_available():
                 x = batch[1].cuda()
                 attention_mask = batch[2].cuda()
-                y = batch[0].cuda()
+                attention_mask = batch[2].cuda()
             else:
                 x = batch[1]
-            y_pred = model(x)
+            y_pred = model((x, attention_mask))
             # predicted = torch.max(y_pred.cpu().data, 1)[1] + 1
             y_pred = y_pred.cpu().data
             predicted = torch.max(y_pred, 1)[1]

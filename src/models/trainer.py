@@ -21,6 +21,14 @@ class Trainer():
             self.run(MultiLabelBiLSTM(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
         elif self.model == 'MultiClassBiLSTM':
             self.run(MultiClassBiLSTM(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
+        elif self.model == 'MultiClassBertBiLSTM':
+            self.run(MultiClassBertBiLSTM(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
+        elif self.model == 'MultiLabelGru':
+            self.run(MultiLabelGru(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
+        elif self.model == 'MultiLabelRNN':
+            self.run(MultiLabelRNN(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
+        elif self.model == 'MultiLabelTransformer':
+            self.run(MultiLabelTransformer(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
 
     def run(self, model, model_type):
         self.dataset.load_data(self.train_file, self.test_file)
@@ -49,10 +57,9 @@ class Trainer():
             val_accuracies.append(val_accuracy)
 
         print("##########FINAL RESULTS##########")
-        train_acc = model.scorer.evaluate_model(model, self.dataset.train_iterator, "Train", labels)
+        train_acc = model.scorer.evaluate_model(model, self.dataset.train_iterator, "Train")
         print("#################################")
-        val_acc = model.scorer.evaluate_model(model, self.dataset.val_iterator, "Validation", labels)
+        val_acc = model.scorer.evaluate_model(model, self.dataset.val_iterator, "Validation")
         print("#################################")
-        test_acc = model.scorer.evaluate_model(model, self.dataset.test_iterator, "Test", labels)
+        test_acc = model.scorer.evaluate_model(model, self.dataset.test_iterator, "Test")
         print("#################################")
-        save_model(model, self.model_path)
