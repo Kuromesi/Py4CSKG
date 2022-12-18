@@ -1,6 +1,7 @@
 from models.utils.utils import *
 from models.MultiLabel import *
 from models.MutiClass import *
+from models.NER import *
 import torch.optim as optim
 from torch import nn
 from models.utils.metric import *
@@ -29,17 +30,12 @@ class Trainer():
             self.run(MultiLabelRNN(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
         elif self.model == 'MultiLabelTransformer':
             self.run(MultiLabelTransformer(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
+        elif self.model == 'NERBiLSTMCRF':
+            self.run(NERBiLSTMCRF(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
 
     def run(self, model, model_type):
         self.dataset.load_data(self.train_file, self.test_file)
         labels = loadLabels(self.label_path)
-
-        if model_type == 'MultiLabel':
-            model.scorer = MultiLabelScorer()
-            model.add_loss_op(nn.BCELoss())
-        elif model_type == 'MultiClass':
-            model.scorer = MultiClassScorer()
-            model.add_loss_op(nn.CrossEntropyLoss())
         model.model_path = self.model_path
         model.labels = labels
         model.cuda()

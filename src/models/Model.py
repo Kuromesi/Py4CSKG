@@ -31,16 +31,17 @@ class Model(nn.Module):
             if torch.cuda.is_available():
                 x = batch[1].cuda()
                 # y = (batch[0] - 1).type(torch.cuda.LongTensor)
-                if self.config.model_type == 'MultiLabel':
-                    y = batch[0].cuda()
-                elif self.config.model_type == 'MultiClass':
-                    y = batch[0].cuda().type(torch.cuda.LongTensor)
+                y = batch[0].cuda()
             else:
                 x = batch[1].type(torch.LongTensor)
                 # y = (batch[0] - 1).type(torch.LongTensor)
                 y = batch[0]
-            y_pred = self.__call__((x, batch[2].cuda()))
-            loss = self.loss_op(y_pred, y)
+            data = {'data': x,
+                    'label': y,
+                    'attention_mask': batch[2].cuda()}
+            y_pred = self.__call__(data)
+            data['predict'] = y_pred
+            loss = self.loss_op(data)
             loss.backward()
             losses.append(loss.data.cpu().numpy())
             self.optimizer.step()

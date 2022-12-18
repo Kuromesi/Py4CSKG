@@ -11,7 +11,15 @@ from models.utils.metric import MultiLabelScorer, MultiClassScorer
 import abc
 from models.Model import Model
 
-class MultiLabelBiLSTM(Model):
+class MultiLabel(Model):
+    scorer = MultiLabelScorer()
+    def loss_op(self, data):
+        y = data['label']
+        y_pred = data['predict']
+        loss = nn.BCELoss()(y_pred, y)
+        return loss
+
+class MultiLabelBiLSTM(MultiLabel):
     def __init__(self, config, src_vocab):
         super(MultiLabelBiLSTM, self).__init__()
         self.config = config
@@ -35,12 +43,12 @@ class MultiLabelBiLSTM(Model):
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        logits = self.src_embed(x[0]) # shape = (batch_size, sen_len, d_model)
+        logits = self.src_embed(x['data']) # shape = (batch_size, sen_len, d_model)
         logits = self.bilstm(logits)[0][:, 0, :]
         logits = self.classifier(logits)
         return self.sigmoid(logits)
         
-class MultiLabelGru(Model):
+class MultiLabelGru(MultiLabel):
     def __init__(self, config, src_vocab):
         super(MultiLabelGru, self).__init__()
         self.config = config
@@ -59,12 +67,12 @@ class MultiLabelGru(Model):
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        logits = self.src_embed(x[0]) # shape = (batch_size, sen_len, d_model)
+        logits = self.src_embed(x['data']) # shape = (batch_size, sen_len, d_model)
         logits = self.gru(logits)[0][:, 0, :]
         logits = self.classifier(logits)
         return self.sigmoid(logits) 
 
-class MultiLabelRNN(Model):
+class MultiLabelRNN(MultiLabel):
     def __init__(self, config, src_vocab):
         super(MultiLabelRNN, self).__init__()
         self.config = config
@@ -83,12 +91,12 @@ class MultiLabelRNN(Model):
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        logits = self.src_embed(x[0]) # shape = (batch_size, sen_len, d_model)
+        logits = self.src_embed(x['data']) # shape = (batch_size, sen_len, d_model)
         logits = self.rnn(logits)[0][:, 0, :]
         logits = self.classifier(logits)
         return self.sigmoid(logits) 
 
-class MultiLabelTransformer(Model):
+class MultiLabelTransformer(MultiLabel):
     def __init__(self, config, src_vocab):
         super(MultiLabelTransformer, self).__init__()
         self.config = config
@@ -111,7 +119,7 @@ class MultiLabelTransformer(Model):
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        embedded_sents = self.src_embed(x[0]) # shape = (batch_size, sen_len, d_model)
+        embedded_sents = self.src_embed(x['data']) # shape = (batch_size, sen_len, d_model)
         encoded_sents = self.encoder(embedded_sents)
         # all_out = self.bilstm(encoded_sents)[0][:, 0, :]
         final_out = self.classifier(encoded_sents[:, 0, :])

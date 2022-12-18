@@ -11,6 +11,16 @@ import numpy as np
 from models.utils.utils import *
 from transformers import BertModel, BertConfig
 from models.Model import Model
+from models.utils.metric import MultiClassScorer
+
+class MultiClass(Model):
+    scorer = MultiClassScorer()
+    def loss_op(self, data):
+        y = data['label']
+        y_pred = data['predict']
+        y = y.type(torch.cuda.LongTensor)
+        loss = nn.CrossEntropyLoss(y_pred, y)
+        return loss
 
 class MultiClassTransformer(nn.Module):
     def __init__(self, config, src_vocab):
@@ -138,7 +148,7 @@ class MultiClassTransformer(nn.Module):
                 self.train()       
         return train_losses, val_accuracies
 
-class MultiClassBiLSTM(Model):
+class MultiClassBiLSTM(MultiClass):
     def __init__(self, config, src_vocab):
         super(MultiClassBiLSTM, self).__init__()
         self.config = config
@@ -159,12 +169,13 @@ class MultiClassBiLSTM(Model):
         self.softmax = nn.Softmax(dim=1)
 
     def forward(self, x):
-        logits = self.src_embed(x[0]) # shape = (batch_size, sen_len, d_model)
+        logits = self.src_embed(x['data']) # shape = (batch_size, sen_len, d_model)
         logits = self.bilstm(logits)[0][:, 0, :]
         logits = self.classifier(logits)
         return logits
     
-class MultiClassBertBiLSTM(Model):
+    
+class MultiClassBertBiLSTM(MultiClass):
     def __init__(self, config, src_vocab):
         super(MultiClassBertBiLSTM, self).__init__()
         self.config = config
@@ -189,7 +200,12 @@ class MultiClassBertBiLSTM(Model):
 
     def forward(self, x):
         with torch.no_grad():
-            logits = self.src_embed(x[0], attention_mask=x[1]).last_hidden_state # shape = (batch_size, sen_len, d_model)
+            logits = self.src_embed(x['data'], attention_mask=x['attention_mask']).last_hidden_state # shape = (batch_size, sen_len, d_model)
         logits = self.bilstm(logits)[0][:, 0, :]
         logits = self.classifier(logits)
         return logits
+    
+    def loss_op(self, y_pred, y):
+        y = y.type(torch.cuda.LongTensor)
+        loss = nn.CrossEntropyLoss(y_pred, y)
+        return loss
