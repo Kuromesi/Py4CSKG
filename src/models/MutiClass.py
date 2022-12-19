@@ -19,7 +19,8 @@ class MultiClass(Model):
         y = data['label']
         y_pred = data['predict']
         y = y.type(torch.cuda.LongTensor)
-        loss = nn.CrossEntropyLoss(y_pred, y)
+        loss = nn.CrossEntropyLoss()
+        loss = loss(y_pred, y)
         return loss
 
 class MultiClassTransformer(nn.Module):

@@ -43,7 +43,7 @@ class MultiClassScorer():
             if torch.cuda.is_available():
                 x = batch[1].cuda()
                 attention_mask = batch[2].cuda()
-                y = batch[0].cuda().type(torch.cuda.LongTernsor)
+                y = batch[0].cuda()
             else:
                 x = batch[1]
             data = {'data': x,
@@ -54,7 +54,7 @@ class MultiClassScorer():
             y_pred = y_pred.cpu().data
             predicted = torch.max(y_pred, 1)[1]
             all_preds.extend(predicted.numpy())
-            all_y.extend(y.numpy())
+            all_y.extend(y.cpu().data.numpy())
         preds = np.array(all_preds)
         accuracy = accuracy_score(all_y, preds, normalize=True)
         precision = precision_score(all_y, preds, average='micro')
