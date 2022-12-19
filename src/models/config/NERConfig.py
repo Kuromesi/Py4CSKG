@@ -1,4 +1,4 @@
-class MultiClassBiLSTMConfig(object):
+class NERBiLSTMConfig(object):
     class model_config:
         model_type = 'NER'
         d_model = 256 #512 in Transformer Paper

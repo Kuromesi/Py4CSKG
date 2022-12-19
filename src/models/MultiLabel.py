@@ -16,7 +16,8 @@ class MultiLabel(Model):
     def loss_op(self, data):
         y = data['label']
         y_pred = data['predict']
-        loss = nn.BCELoss()(y_pred, y)
+        loss = nn.BCELoss()
+        loss = loss(y_pred, y)
         return loss
 
 class MultiLabelBiLSTM(MultiLabel):

@@ -5,6 +5,7 @@ from models.NER import *
 import torch.optim as optim
 from torch import nn
 from models.utils.metric import *
+from models.utils.Dataset import *
 
 
 class Trainer():
@@ -15,7 +16,10 @@ class Trainer():
         self.label_path = trainer_config.label_path
         self.model_path = trainer_config.model_path
         self.model_config = model_config
-        self.dataset = Dataset(model_config)
+        if model_config.model_type == 'NER':
+            self.dataset = NERDataset(model_config)
+        else:
+            self.dataset = Dataset(model_config)
 
     def train(self):
         if self.model == 'MultiLabelBiLSTM':

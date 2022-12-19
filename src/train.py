@@ -10,11 +10,12 @@ def train():
     # config = MultiLabelBiLSTMConfig()
     # config = MultiLabelGruConfig()
     # config = MultiLabelRNNConfig()
-    config = MultiClassBiLSTMConfig()
+    # config = MultiClassBiLSTMConfig()
     # config = MultiClassBertBiLSTMConfig()
     # config = MultiLabelBiLSTMConfigTactic()
     # config = MultiLabelTransformerTacticConfig()
     # config = MultiClassBiLSTMProcedureConfig()
+    config = MultiClassBiLSTMNLPConfig()
     trainer_config = config.trainer_config
     model_config = config.model_config
     trainer = Trainer(trainer_config=trainer_config, model_config=model_config)
