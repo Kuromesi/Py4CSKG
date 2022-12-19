@@ -12,6 +12,7 @@ import torch
 import numpy as np
 import pickle
 from transformers import AutoTokenizer
+import pandas as pd
 
 class BlockShuffleDataLoader(DataLoader):
     def __init__(self, dataset: Dataset, sort_key, sort_bs_num=None, is_shuffle=True, **kwargs):
@@ -63,12 +64,6 @@ class BlockShuffleDataLoader(DataLoader):
 class Dataset():
     def __init__(self, config):
         self.config = config
-        self.train_iterator = None
-        self.test_iterator = None
-        self.val_iterator = None
-        
-        self.word_embeddings = {}
-
         self.tokenizer = AutoTokenizer.from_pretrained(self.config.model_name)
         self.vocab = self.tokenizer.vocab
 
@@ -98,50 +93,41 @@ class Dataset():
         for (_label, _text) in batch:
             label_list.append(_label)
             text_list.append(_text)
-            # processed_text = torch.tensor(self.text_pipeline(_text), dtype=torch.int64)
-            # text_list.append(processed_text.tolist())
-            # offsets.append(processed_text.size(0))
-        text_list = self.tokenizer(text_list, padding=True, truncation=True, return_tensors="pt", max_length=self.config.max_sen_len)
+        text_list = self.tokenizer(text_list, padding=True, truncation=True, 
+                                    return_tensors="pt", max_length=self.config.max_sen_len) # padding='max_length'
         text_vec = text_list['input_ids']
         attention_mask = text_list['attention_mask']
         label_list = torch.tensor(label_list, dtype=torch.float32)
-        # offsets = torch.tensor(offsets[:-1]).cumsum(dim=0)
-        # text_list = to_tensor(text_list, padding_value=1.0).t()
         return label_list, text_vec, attention_mask
 
-    def load_data(self, train_file, test_file=None, val_file=None):
-        # tokenizer = lambda sent: [x.lemma_.lower() for x in NLP(sent) if x.lemma_.lower() != " "]
-        # tokenizer = get_tokenizer('basic_english')
-        with open(train_file, 'r') as datafile:     
-                    data = [line.strip().split(',', maxsplit=1) for line in datafile if len(line.strip().split(',', maxsplit=1)) > 1]
-                    data_text = list(map(lambda x: x[1], data))
-                    data_label = list(map(lambda x: self.parse_label(x[0]), data))
-        train = list(zip(data_label, data_text))
-        train_iter = to_map_style_dataset(iter(train))
-        self.label_pipeline = lambda x: int(x) - 1
+    def df2iter(self, df:pd.DataFrame):
+        text = df['text'].tolist()
+        label = df['label'].tolist()
+        label = list(map(lambda x: self.parse_label(x), label))
+        _iter = to_map_style_dataset(iter(list(zip(label, text))))
+        return _iter
 
-        # Load test data
-        with open(test_file, 'r') as datafile:     
-            data = [line.strip().split(',', maxsplit=1) for line in datafile]
-            data_text = list(map(lambda x: x[1], data))
-            data_label = list(map(lambda x: self.parse_label(x[0]), data))
-        test = list(zip(data_label, data_text))
-        test_dataset = to_map_style_dataset(iter(test))
+    def load_data(self, train_file, test_file):
+        train_df = pd.read_csv(train_file)
+        test_df = pd.read_csv(test_file)
+        train_iter = self.df2iter(train_df)
+        test_iter = self.df2iter(test_df)
 
         num_train = int(len(train_iter) * 0.9)
         train_dataset, valid_dataset = random_split(train_iter, [num_train, len(train_iter) - num_train])
         train_dataset = to_map_style_dataset(train_dataset)
         valid_dataset = to_map_style_dataset(valid_dataset)
+
         sort_key=lambda x: len(x[1])
         self.train_iterator = BlockShuffleDataLoader(train_dataset, batch_size=self.config.batch_size,
                                     shuffle=True, collate_fn=self.collate_batch, sort_key=sort_key)
         self.val_iterator = BlockShuffleDataLoader(valid_dataset, batch_size=self.config.batch_size,
                                     shuffle=True, collate_fn=self.collate_batch, sort_key=sort_key)
-        self.test_iterator = BlockShuffleDataLoader(test_dataset, batch_size=self.config.batch_size,
+        self.test_iterator = BlockShuffleDataLoader(test_iter, batch_size=self.config.batch_size,
                                     shuffle=True, collate_fn=self.collate_batch, sort_key=sort_key)
 
         print ("Loaded {} training examples".format(len(train_dataset)))
-        print ("Loaded {} test examples".format(len(test_dataset)))
+        print ("Loaded {} test examples".format(len(test_iter)))
         print ("Loaded {} validation examples".format(len(valid_dataset)))
 
     def text2vec(self, text):
@@ -150,16 +136,9 @@ class Dataset():
 class NERDataset():
     def __init__(self, config, labels):
         self.config = config
-        self.train_iterator = None
-        self.test_iterator = None
-        self.val_iterator = None
-        
-        self.word_embeddings = {}
-
         self.tokenizer = AutoTokenizer.from_pretrained(self.config.model_name)
         self.labels = labels
         self.label_pipe = lambda x: self.labels.index(x)
-        # self.vocab = self.tokenizer.vocab
 
     def parse_label(self, label):
         '''

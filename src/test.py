@@ -6,7 +6,7 @@ from utils.CVEExtractor import *
 from utils.utils import *
 from models.trainer import Trainer
 
-spacy.prefer_gpu()
+# spacy.prefer_gpu()
 
 def cosine_distance(x, y):
     return np.dot(x, y.T) / (np.linalg.norm(x) * np.linalg.norm(y))
@@ -78,3 +78,4 @@ trainer = Trainer()
 # doNlp('myData/CVE2CWE', 'classification.train')
 
 # doNlp('myData/CVE2Technique', 'classification.train')
+toML('myData/learning/CVE2CWE/cve.train', 'myData/learning/CVE2CWE/cve.csv')

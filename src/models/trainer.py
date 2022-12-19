@@ -36,6 +36,8 @@ class Trainer():
             self.run(MultiLabelTransformer(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
         elif self.model == 'NERBiLSTMCRF':
             self.run(NERBiLSTMCRF(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
+        elif self.model == 'MultiClassCNN':
+            self.run(MultiClassCNN(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
 
     def run(self, model, model_type):
         self.dataset.load_data(self.train_file, self.test_file)

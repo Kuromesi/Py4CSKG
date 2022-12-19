@@ -85,3 +85,48 @@ class MultiClassBiLSTMNLPConfig(object):
         test_file = './myData/learning/CVE2CWE/cve_nlp.test'
         label_path = './myData/learning/CVE2CWE/classification.labels'
         model_path = './ckpts/CVE2CWE/MultiClassBiLSTMNLP.pkl'
+
+class MultiClassCNNConfig(object):
+    class model_config:
+        model_type = 'MultiClass'
+        d_model = 256 #512 in Transformer Paper
+        dropout = 0.2
+        output_size = 295
+        lr = 0.001
+        max_epochs = 60
+        batch_size = 256
+        max_sen_len = 100
+        gamma = 0.5
+        model_name = "bert-base-uncased" #bert-base-uncased jackaduma/SecBERT
+        num_channels = 100
+        kernel_size = [3,4,5]
+
+    class trainer_config:
+        model = "MultiClassBiLSTM"
+        train_file = './myData/learning/CVE2CWE/cve.train'
+        test_file = './myData/learning/CVE2CWE/cve.test'
+        label_path = './myData/learning/CVE2CWE/classification.labels'
+        model_path = './ckpts/CVE2CWE/MultiClassCNN.pkl'
+
+class MultiClassTransformerConfig(object):
+    class model_config:
+        model_type = 'MultiLabel'
+        N = 6 #6 in Transformer Paper
+        d_model = 512 #512 in Transformer Paper
+        d_ff = 2048 #2048 in Transformer Paper
+        h = 8
+        dropout = 0.2
+        output_size = 295
+        lr = 0.001
+        max_epochs = 60
+        batch_size = 256
+        max_sen_len = 100
+        gamma = 0.5
+        model_name = "bert-base-uncased" #bert-base-uncased jackaduma/SecBERT
+
+    class trainer_config:
+        model = "MultiLabelTransformer"
+        train_file = './myData/learning/CVE2CWE/cve.train'
+        test_file = './myData/learning/CVE2CWE/cve.test'
+        label_path = './myData/learning/CVE2CWE/classification.labels'
+        model_path = './ckpts/CVE2CWE/MultiClassTransformer.pkl'

@@ -15,7 +15,9 @@ def train():
     # config = MultiLabelBiLSTMConfigTactic()
     # config = MultiLabelTransformerTacticConfig()
     # config = MultiClassBiLSTMProcedureConfig()
-    config = MultiClassBiLSTMNLPConfig()
+    # config = MultiClassCNNConfig()
+    config = MultiClassTransformerConfig()
+    # config = MultiClassBiLSTMNLPConfig()
     trainer_config = config.trainer_config
     model_config = config.model_config
     trainer = Trainer(trainer_config=trainer_config, model_config=model_config)

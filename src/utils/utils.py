@@ -114,4 +114,23 @@ def doNlp(rootPath, subPath):
         for line in text:
             f.write(line + "\n")
             
-    
+def toML(path, save_path):
+    '''
+    Convert current tain file to Machine Learning format
+    '''
+    text = ["label,text\n"]
+    i, j = 0
+    with open(path, 'r') as f:
+        for line in f:
+            i += 1
+            line = line.split(' , ')
+            if len(line[0].split('|')) == 1:
+                text.append(line[0] + "," + line[1] + "\n")
+                j += 1
+
+    with open(save_path, 'w') as f:
+        for line in text:
+            f.write(line)
+
+    print("Number of full dataset: %d"%i)
+    print("Number of used dataset: %d"%j)
