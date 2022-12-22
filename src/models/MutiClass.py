@@ -39,8 +39,8 @@ class MultiClassTransformer(MultiClass):
 
         # Fully-Connected Layer
         self.classifier = nn.Sequential(
-            nn.Linear(d_model, d_model),
-            nn.Linear(d_model, d_model),
+            # nn.Linear(d_model, d_model),
+            # nn.Linear(d_model, d_model),
             nn.Linear(d_model, config.output_size))
 
         self.sigmoid = nn.Sigmoid()
@@ -59,13 +59,14 @@ class MultiClassBiLSTM(MultiClass):
 
         # Bilstm layer
         self.bilstm = nn.LSTM(input_size=config.d_model, hidden_size=config.lstm_hiddens, num_layers=config.lstm_layers,
-                        bidirectional=True, batch_first=True, bias=True)
+                        bidirectional=config.bidirectional, batch_first=True, bias=True)
 
+        lstm_hiddens = config.lstm_hiddens * 2 if config.bidirectional else config.lstm_hiddens
         # Fully-Connected Layer
         self.classifier = nn.Sequential(
-            nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
-            nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
-            nn.Linear(config.lstm_hiddens * 2, config.output_size))
+            # nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
+            # nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
+            nn.Linear(lstm_hiddens, config.output_size))
         
         # Softmax non-linearity
         self.softmax = nn.Softmax(dim=1)
@@ -89,13 +90,14 @@ class MultiClassBertBiLSTM(MultiClass):
 
         # Bilstm layer
         self.bilstm = nn.LSTM(input_size=bertConfig.hidden_size, hidden_size=config.lstm_hiddens, num_layers=config.lstm_layers,
-                        bidirectional=True, batch_first=True, bias=True)
+                        bidirectional=config.bidirectional, batch_first=True, bias=True)
 
+        lstm_hiddens = config.lstm_hiddens * 2 if config.bidirectional else config.lstm_hiddens
         # Fully-Connected Layer
         self.classifier = nn.Sequential(
-            nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
-            nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
-            nn.Linear(config.lstm_hiddens * 2, config.output_size))
+            # nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
+            # nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
+            nn.Linear(lstm_hiddens, config.output_size))
         
         # Softmax non-linearity
         self.softmax = nn.Softmax(dim=1)
@@ -109,7 +111,7 @@ class MultiClassBertBiLSTM(MultiClass):
 
 class MultiClassCNN(MultiClass):
     def __init__(self, config, src_vocab):
-        super(MultiClassBertBiLSTM, self).__init__()
+        super(MultiClassCNN, self).__init__()
         self.config = config
         self.best = 0
         bertConfig = BertConfig.from_pretrained(config.model_name)
@@ -136,17 +138,63 @@ class MultiClassCNN(MultiClass):
 
         # Fully-Connected Layer
         self.classifier = nn.Sequential(
-            nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
-            nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
-            nn.Linear(config.lstm_hiddens * 2, config.output_size))
+            # nn.Linear(config.num_channels*len(self.config.kernel_size), config.num_channels*len(self.config.kernel_size)),
+            # nn.Linear(config.num_channels*len(self.config.kernel_size), config.num_channels*len(self.config.kernel_size)),
+            nn.Linear(config.num_channels*len(self.config.kernel_size), config.output_size))
 
     def forward(self, x):
-        logits = self.src_embed(x['data']).permute(1,2,0)
+        logits = self.src_embed(x['data']).permute(0, 2, 1)
         # embedded_sent.shape = (batch_size=64,d_model=300,max_sen_len=20)
-        
+        a = logits.size()
         conv_out1 = self.conv1(logits).squeeze(2) #shape=(64, num_channels, 1) (squeeze 1)
         conv_out2 = self.conv2(logits).squeeze(2)
         conv_out3 = self.conv3(logits).squeeze(2)
         logits = torch.cat((conv_out1, conv_out2, conv_out3), 1)
+        logits = self.classifier(logits)
+        return logits
+
+class MultiClassGru(MultiClass):
+    def __init__(self, config, src_vocab):
+        super(MultiClassGru, self).__init__()
+        self.config = config
+        # Embedding layer
+        self.src_embed = Embeddings(config.d_model, src_vocab)
+
+        # Bilstm layer
+        self.gru = nn.GRU(config.d_model, config.hidden_dim, config.layer_dim, batch_first=True, bidirectional=config.bidirectional)
+
+        hidden_dim = config.hidden_dim * 2 if config.bidirectional else config.hidden_dim
+        # Fully-Connected Layer
+        self.classifier = nn.Sequential(
+            # nn.Linear(hidden_dim, hidden_dim),
+            # nn.Linear(hidden_dim, hidden_dim),
+            nn.Linear(hidden_dim, config.output_size))
+
+    def forward(self, x):
+        logits = self.src_embed(x['data']) # shape = (batch_size, sen_len, d_model)
+        logits = self.gru(logits)[0][:, 0, :]
+        logits = self.classifier(logits)
+        return logits
+
+class MultiClassRNN(MultiClass):
+    def __init__(self, config, src_vocab):
+        super(MultiClassRNN, self).__init__()
+        self.config = config
+        # Embedding layer
+        self.src_embed = Embeddings(config.d_model, src_vocab)
+
+        # Bilstm layer
+        self.rnn = nn.RNN(config.d_model, config.hidden_dim, config.layer_dim, batch_first=True, bidirectional=config.bidirectional)
+
+        hidden_dim = config.hidden_dim * 2 if config.bidirectional else config.hidden_dim
+        # Fully-Connected Layer
+        self.classifier = nn.Sequential(
+            # nn.Linear(hidden_dim, hidden_dim),
+            # nn.Linear(hidden_dim, hidden_dim),
+            nn.Linear(hidden_dim, config.output_size))
+
+    def forward(self, x):
+        logits = self.src_embed(x['data']) # shape = (batch_size, sen_len, d_model)
+        logits = self.rnn(logits)[0][:, 0, :]
         logits = self.classifier(logits)
         return logits

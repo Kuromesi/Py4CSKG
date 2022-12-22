@@ -1,0 +1,40 @@
+----------GRU----------
+##########FINAL RESULTS##########
+        Train Accuracy: 0.0000
+        Train Precision: 0.5015
+        Train F1: 0.4571
+        Train Recall: 0.5683
+#################################
+        Validation Accuracy: 0.0000
+        Validation Precision: 0.4987
+        Validation F1: 0.4518
+        Validation Recall: 0.5611
+#################################
+        Test Accuracy: 0.0000
+        Test Precision: 0.5027
+        Test F1: 0.4599
+        Test Recall: 0.5735
+#################################
+
+class MultiLabelGruConfig(object):
+    class model_config:
+        model_type = 'MultiLabel'
+        N = 6 #6 in Transformer Paper
+        d_model = 256 #512 in Transformer Paper
+        dropout = 0.2
+        output_size = 48
+        lr = 0.0005
+        max_epochs = 60
+        batch_size = 256
+        max_sen_len = 100
+        gamma = 0.5
+        model_name = "bert-base-uncased" #bert-base-uncased jackaduma/SecBERT
+        hidden_dim = 128
+        layer_dim = 2
+
+    class trainer_config:
+        model = "MultiLabelGru"
+        train_file = './myData/learning/CVE2Technique/cve.train'
+        test_file = './myData/learning/CVE2Technique/cve.test'
+        label_path = './myData/learning/CVE2Technique/classification.labels'
+        model_path = './ckpts/CVE2Technique/MultiLabelGru.pkl'

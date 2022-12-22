@@ -18,7 +18,7 @@ def cosine_distance(x, y):
 # tmp = nlp(txt)
 # for ent in tmp.ents:
 #     print(ent.text, ent.label_)
-trainer = Trainer()
+# trainer = Trainer()
 
 # nlp = spacy.load('en_core_web_lg')
 # text = nlp("this is a test")
@@ -78,4 +78,7 @@ trainer = Trainer()
 # doNlp('myData/CVE2CWE', 'classification.train')
 
 # doNlp('myData/CVE2Technique', 'classification.train')
-toML('myData/learning/CVE2CWE/cve.train', 'myData/learning/CVE2CWE/cve.csv')
+# toML('myData/learning/CVE2CWE/cve.train', 'myData/learning/CVE2CWE/cve.csv')
+res = pd.read_csv('./myData/learning/result.csv')
+res.loc[len(res.index)] = ['1', '2', '3', '4', '5']
+print(1)

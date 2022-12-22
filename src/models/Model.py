@@ -54,8 +54,8 @@ class Model(nn.Module):
                 
                 # Evalute Accuracy on validation set
                 report = self.scorer.evaluate_model(self, val_iterator, "Validation")
-                if (epoch  > 4 * self.config.max_epochs / 5 and self.best < report[1]):
+                if (epoch  > 4 * self.config.max_epochs / 5 and self.best < report['precision']):
                     save_model(self, self.model_path)
-                    self.best = report[1]
+                    self.best = report['precision']
                 self.train()       
         return train_losses, val_accuracies

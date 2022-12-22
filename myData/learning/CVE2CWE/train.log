@@ -1,0 +1,159 @@
+----------BiLSTM NLP----------
+##########FINAL RESULTS##########
+        Train Accuracy: 0.9549
+        Train Precision: 0.9549
+        Train F1: 0.9549
+        Train Recall: 0.9549
+#################################
+        Validation Accuracy: 0.6709
+        Validation Precision: 0.6709
+        Validation F1: 0.6709
+        Validation Recall: 0.6709
+#################################
+        Test Accuracy: 0.6664
+        Test Precision: 0.6664
+        Test F1: 0.6664
+        Test Recall: 0.6664
+#################################
+
+class MultiClassBiLSTMNLPConfig(object):
+    class model_config:
+        model_type = 'MultiClass'
+        d_model = 256 #512 in Transformer Paper
+        dropout = 0.2
+        output_size = 295
+        lr = 0.001
+        max_epochs = 60
+        batch_size = 256
+        max_sen_len = 100
+        gamma = 0.5
+        model_name = "bert-base-uncased" #bert-base-uncased jackaduma/SecBERT
+        lstm_hiddens = 768
+        lstm_layers = 2
+
+    class trainer_config:
+        model = "MultiClassBiLSTM"
+        train_file = './myData/learning/CVE2CWE/cve_nlp.train'
+        test_file = './myData/learning/CVE2CWE/cve_nlp.test'
+        label_path = './myData/learning/CVE2CWE/classification.labels'
+        model_path = './ckpts/CVE2CWE/MultiClassBiLSTMNLP.pkl'
+
+----------BERT + BiLSTM----------
+##########FINAL RESULTS##########
+        Train Accuracy: 0.9560
+        Train Precision: 0.9560
+        Train F1: 0.9560
+        Train Recall: 0.9560
+#################################
+        Validation Accuracy: 0.7001
+        Validation Precision: 0.7001
+        Validation F1: 0.7001
+        Validation Recall: 0.7001
+#################################
+        Test Accuracy: 0.6961
+        Test Precision: 0.6961
+        Test F1: 0.6961
+        Test Recall: 0.6961
+################################
+
+class MultiClassBertBiLSTMConfig(object):
+    class model_config:
+        model_type = 'MultiClass'
+        d_model = 256 #512 in Transformer Paper
+        dropout = 0.2
+        output_size = 295
+        lr = 0.001
+        max_epochs = 60
+        batch_size = 256
+        max_sen_len = 100
+        gamma = 0.5
+        model_name = "jackaduma/SecBERT" #bert-base-uncased jackaduma/SecBERT
+        lstm_hiddens = 768
+        lstm_layers = 2
+
+    class trainer_config:
+        model = "MultiClassBertBiLSTM"
+        train_file = './myData/learning/CVE2CWE/cve.train'
+        test_file = './myData/learning/CVE2CWE/cve.test'
+        label_path = './myData/learning/CVE2CWE/classification.labels'
+        model_path = './ckpts/CVE2CWE/MultiClassBertBiLSTM.pkl'
+
+----------BiLSTM----------
+##########FINAL RESULTS##########
+        Train Accuracy: 0.9845
+        Train Precision: 0.9845
+        Train F1: 0.9845
+        Train Recall: 0.9845
+#################################
+        Validation Accuracy: 0.7152
+        Validation Precision: 0.7152
+        Validation F1: 0.7152
+        Validation Recall: 0.7152
+#################################
+        Test Accuracy: 0.7154
+        Test Precision: 0.7154
+        Test F1: 0.7154
+        Test Recall: 0.7154
+#################################
+
+class MultiClassBiLSTMConfig(object):
+    class model_config:
+        model_type = 'MultiClass'
+        d_model = 256 #512 in Transformer Paper
+        dropout = 0.2
+        output_size = 295
+        lr = 0.001
+        max_epochs = 60
+        batch_size = 512
+        max_sen_len = 100
+        gamma = 0.5
+        model_name = "bert-base-uncased" #bert-base-uncased jackaduma/SecBERT
+        lstm_hiddens = 768
+        lstm_layers = 2
+
+    class trainer_config:
+        model = "MultiClassBiLSTM"
+        train_file = './myData/learning/CVE2CWE/cve.train'
+        test_file = './myData/learning/CVE2CWE/cve.test'
+        label_path = './myData/learning/CVE2CWE/classification.labels'
+        model_path = './ckpts/CVE2CWE/MultiClassBiLSTM.pkl'
+
+----------CNN----------
+##########FINAL RESULTS##########
+        Train Accuracy: 0.9937
+        Train Precision: 0.9937
+        Train F1: 0.9937
+        Train Recall: 0.9937
+#################################
+        Validation Accuracy: 0.7109
+        Validation Precision: 0.7109
+        Validation F1: 0.7109
+        Validation Recall: 0.7109
+#################################
+        Test Accuracy: 0.7222
+        Test Precision: 0.7222
+        Test F1: 0.7222
+        Test Recall: 0.7222
+#################################
+
+class MultiClassCNNConfig(object):
+    class model_config:
+        model_type = 'MultiClass'
+        d_model = 256 #512 in Transformer Paper
+        dropout = 0.2
+        output_size = 295
+        lr = 0.001
+        max_epochs = 20
+        batch_size = 256
+        max_sen_len = 100
+        gamma = 0.5
+        model_name = "bert-base-uncased" #bert-base-uncased jackaduma/SecBERT
+        num_channels = 100
+        kernel_size = [3,4,5]
+
+    class trainer_config:
+        model = "MultiClassCNN"
+        train_file = './myData/learning/CVE2CWE/cve.train'
+        test_file = './myData/learning/CVE2CWE/cve.test'
+        label_path = './myData/learning/CVE2CWE/classification.labels'
+        model_path = './ckpts/CVE2CWE/MultiClassCNN.pkl'

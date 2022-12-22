@@ -1,0 +1,83 @@
+----------BiLSTM----------
+##########FINAL RESULTS##########
+        Train Accuracy: 0.9934
+        Train Precision: 0.9985
+        Train F1: 0.9988
+        Train Recall: 0.9993
+#################################
+        Validation Accuracy: 0.7498
+        Validation Precision: 0.9142
+        Validation F1: 0.9046
+        Validation Recall: 0.9158
+#################################
+        Test Accuracy: 0.7190
+        Test Precision: 0.8981
+        Test F1: 0.8918
+        Test Recall: 0.9118
+#################################
+
+class MultiLabelBiLSTMConfigTactic(object):
+    class model_config:
+        model_type = 'MultiLabel'
+        N = 6 #6 in Transformer Paper
+        d_model = 256 #512 in Transformer Paper
+        d_ff = 512 #2048 in Transformer Paper
+        h = 8
+        dropout = 0.2
+        output_size = 11
+        lr = 0.0005
+        max_epochs = 60
+        batch_size = 256
+        max_sen_len = 100
+        gamma = 0.5
+        model_name = "bert-base-uncased" #bert-base-uncased jackaduma/SecBERT
+        lstm_hiddens = 768
+        lstm_layers = 2
+
+    class trainer_config:
+        model = "MultiLabelBiLSTM"
+        train_file = './myData/learning/CVE2Tactic/cve.train'
+        test_file = './myData/learning/CVE2Tactic/cve.test'
+        label_path = './myData/learning/CVE2Tactic/classification.labels'
+        model_path = './ckpts/CVE2Tactic/MultiLabelBiLSTM.pkl'
+
+----------Transformer----------
+##########FINAL RESULTS##########
+        Train Accuracy: 0.9734
+        Train Precision: 0.9734
+        Train F1: 0.9734
+        Train Recall: 0.9734
+#################################
+        Validation Accuracy: 0.6853
+        Validation Precision: 0.6853
+        Validation F1: 0.6853
+        Validation Recall: 0.6853
+#################################
+        Test Accuracy: 0.6867
+        Test Precision: 0.6867
+        Test F1: 0.6867
+        Test Recall: 0.6867
+#################################
+
+class MultiClassTransformerConfig(object):
+    class model_config:
+        model_type = 'MultiClass'
+        N = 6 #6 in Transformer Paper
+        d_model = 512 #512 in Transformer Paper
+        d_ff = 2048 #2048 in Transformer Paper
+        h = 8
+        dropout = 0.2
+        output_size = 295
+        lr = 0.001
+        max_epochs = 60
+        batch_size = 256
+        max_sen_len = 100
+        gamma = 0.5
+        model_name = "bert-base-uncased" #bert-base-uncased jackaduma/SecBERT
+
+    class trainer_config:
+        model = "MultiClassTransformer"
+        train_file = './myData/learning/CVE2CWE/cve.train'
+        test_file = './myData/learning/CVE2CWE/cve.test'
+        label_path = './myData/learning/CVE2CWE/classification.labels'
+        model_path = './ckpts/CVE2CWE/MultiClassTransformer.pkl'

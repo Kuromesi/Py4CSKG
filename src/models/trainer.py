@@ -5,11 +5,13 @@ from models.NER import *
 import torch.optim as optim
 from torch import nn
 from models.utils.metric import *
-from models.utils.Dataset import *
+import pandas as pd
+# from models.utils.Dataset import *
 
 
 class Trainer():
     def __init__(self, trainer_config, model_config):
+        self.name = trainer_config.name
         self.model = trainer_config.model
         self.train_file = trainer_config.train_file
         self.test_file = trainer_config.test_file
@@ -38,6 +40,12 @@ class Trainer():
             self.run(NERBiLSTMCRF(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
         elif self.model == 'MultiClassCNN':
             self.run(MultiClassCNN(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
+        elif self.model == 'MultiClassTransformer':
+            self.run(MultiClassTransformer(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
+        elif self.model == 'MultiClassRNN':
+            self.run(MultiClassRNN(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
+        elif self.model == 'MultiClassGru':
+            self.run(MultiClassGru(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
 
     def run(self, model, model_type):
         self.dataset.load_data(self.train_file, self.test_file)
@@ -65,3 +73,6 @@ class Trainer():
         print("#################################")
         test_acc = model.scorer.evaluate_model(model, self.dataset.test_iterator, "Test")
         print("#################################")
+        res = pd.read_csv('./myData/learning/result.csv')
+        res.loc[len(res.index)] = [self.name, test_acc['accuracy'], test_acc['precision'], test_acc['f1'], test_acc['recall']]
+        res.to_csv('./myData/learning/result.csv', index=False)

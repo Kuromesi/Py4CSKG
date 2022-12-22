@@ -28,12 +28,17 @@ class MultiLabelScorer():
         precision = precision_score(all_y, preds, average='samples')
         f1 = f1_score(all_y, preds, average='samples')
         recall = recall_score(all_y, preds, average='samples')
-        report = classification_report(all_y, preds, target_names=model.labels)
+        report = classification_report(all_y, preds, target_names=model.labels, labels=range(len(model.labels)))
         print("\t{name} Accuracy: {score:.4f}".format(name=name, score=accuracy))
         print("\t{name} Precision: {score:.4f}".format(name=name, score=precision))
         print("\t{name} F1: {score:.4f}".format(name=name, score=f1))
         print("\t{name} Recall: {score:.4f}".format(name=name, score=recall))
-        return accuracy, precision, f1, recall, report
+        result = {'accuracy': accuracy,
+                  'precision': precision,
+                  'f1': f1,
+                  'recall': recall,
+                  'report': report}
+        return result
 
 class MultiClassScorer():
     def evaluate_model(self, model, iterator, name):
@@ -60,11 +65,17 @@ class MultiClassScorer():
         precision = precision_score(all_y, preds, average='micro')
         f1 = f1_score(all_y, preds, average='micro')
         recall = recall_score(all_y, preds, average='micro')
+        report = classification_report(all_y, preds, target_names=model.labels, labels=range(len(model.labels)))
         print("\t{name} Accuracy: {score:.4f}".format(name=name, score=accuracy))
         print("\t{name} Precision: {score:.4f}".format(name=name, score=precision))
         print("\t{name} F1: {score:.4f}".format(name=name, score=f1))
         print("\t{name} Recall: {score:.4f}".format(name=name, score=recall))
-        return accuracy, precision, f1, recall
+        result = {'accuracy': accuracy,
+                  'precision': precision,
+                  'f1': f1,
+                  'recall': recall,
+                  'report': report}
+        return result
 
 class NERScorer():
     def __init__(self, labels):
