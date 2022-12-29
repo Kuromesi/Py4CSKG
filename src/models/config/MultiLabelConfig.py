@@ -119,4 +119,4 @@ class MultiLabelBiLSTMConfigTactic(object):
         train_file = './myData/learning/CVE2Tactic/cve.train'
         test_file = './myData/learning/CVE2Tactic/cve.test'
         label_path = './myData/learning/CVE2Tactic/classification.labels'
-        model_path = './ckpts/CVE2Tactic/MultiLabelLSTM.pkl'
+        model_path = './ckpts/CVE2Tactic/MultiLabelLSTMCNN.pkl'

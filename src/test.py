@@ -79,6 +79,9 @@ def cosine_distance(x, y):
 
 # doNlp('myData/CVE2Technique', 'classification.train')
 # toML('myData/learning/CVE2CWE/cve.train', 'myData/learning/CVE2CWE/cve.csv')
-res = pd.read_csv('./myData/learning/result.csv')
-res.loc[len(res.index)] = ['1', '2', '3', '4', '5']
-print(1)
+# res = pd.read_csv('./myData/learning/result.csv')
+# res.loc[len(res.index)] = ['1', '2', '3', '4', '5']
+# print(1)
+
+# summarize_cve2cwe()
+find_weakness()

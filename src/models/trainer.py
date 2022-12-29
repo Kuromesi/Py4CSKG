@@ -46,6 +46,10 @@ class Trainer():
             self.run(MultiClassRNN(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
         elif self.model == 'MultiClassGru':
             self.run(MultiClassGru(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
+        elif self.model == 'MultiClassBiLSTMCNN':
+            self.run(MultiClassBiLSTMCNN(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
+        elif self.model == 'MultiClassBert':
+            self.run(MultiClassBert(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
 
     def run(self, model, model_type):
         self.dataset.load_data(self.train_file, self.test_file)
@@ -61,7 +65,7 @@ class Trainer():
         for i in range(self.model_config.max_epochs):
             print ("Epoch: {}".format(i))
             print("\t Learning Rate: {:.5f}".format(model.optimizer.state_dict()['param_groups'][0]['lr']))
-            train_loss,val_accuracy = model.run_epoch(self.dataset.train_iterator, self.dataset.val_iterator, i)
+            train_loss, val_accuracy = model.run_epoch(self.dataset.train_iterator, self.dataset.val_iterator, i)
             model.attenuation.step()
             train_losses.append(train_loss)
             val_accuracies.append(val_accuracy)

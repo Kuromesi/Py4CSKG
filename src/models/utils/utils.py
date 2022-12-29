@@ -14,7 +14,7 @@ import torch
 import numpy as np
 import pickle
 from transformers import AutoTokenizer
-
+PADDING = 'max_length'
 class BlockShuffleDataLoader(DataLoader):
     def __init__(self, dataset: Dataset, sort_key, sort_bs_num=None, is_shuffle=True, **kwargs):
         """
@@ -103,7 +103,7 @@ class Dataset():
             # processed_text = torch.tensor(self.text_pipeline(_text), dtype=torch.int64)
             # text_list.append(processed_text.tolist())
             # offsets.append(processed_text.size(0))
-        text_list = self.tokenizer(text_list, padding=True, truncation=True, return_tensors="pt", max_length=self.config.max_sen_len)
+        text_list = self.tokenizer(text_list, padding=PADDING, truncation=True, return_tensors="pt", max_length=self.config.max_sen_len)
         text_vec = text_list['input_ids']
         attention_mask = text_list['attention_mask']
         label_list = torch.tensor(label_list, dtype=torch.float32)

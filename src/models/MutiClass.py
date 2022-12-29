@@ -43,12 +43,11 @@ class MultiClassTransformer(MultiClass):
             # nn.Linear(d_model, d_model),
             nn.Linear(d_model, config.output_size))
 
-        self.sigmoid = nn.Sigmoid()
-
     def forward(self, x):
         embedded_sents = self.src_embed(x['data']) # shape = (batch_size, sen_len, d_model)
         encoded_sents = self.encoder(embedded_sents)
         final_out = self.classifier(encoded_sents[:, 0, :])
+        # final_out = self.classifier(encoded_sents.mean(1))
         return final_out
 
 class MultiClassBiLSTM(MultiClass):
@@ -67,9 +66,6 @@ class MultiClassBiLSTM(MultiClass):
             # nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
             # nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
             nn.Linear(lstm_hiddens, config.output_size))
-        
-        # Softmax non-linearity
-        self.softmax = nn.Softmax(dim=1)
 
     def forward(self, x):
         logits = self.src_embed(x['data']) # shape = (batch_size, sen_len, d_model)
@@ -77,7 +73,28 @@ class MultiClassBiLSTM(MultiClass):
         logits = self.classifier(logits)
         return logits
     
-    
+class MultiClassBert(MultiClass):
+    def __init__(self, config, src_vocab):
+        super(MultiClassBert, self).__init__()
+        self.config = config
+        self.best = 0
+        bertConfig = BertConfig.from_pretrained(config.model_name)
+
+        # Embedding layer
+        self.src_embed = BertModel.from_pretrained(config.model_name, config=bertConfig)
+
+        # Fully-Connected Layer
+        self.classifier = nn.Sequential(
+            # nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
+            # nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
+            nn.Linear(bertConfig.hidden_size, config.output_size))
+
+    def forward(self, x):
+        with torch.no_grad():
+            logits = self.src_embed(x['data'], attention_mask=x['attention_mask'])[1] # shape = (batch_size, sen_len, d_model)
+        logits = self.classifier(logits)
+        return logits
+
 class MultiClassBertBiLSTM(MultiClass):
     def __init__(self, config, src_vocab):
         super(MultiClassBertBiLSTM, self).__init__()
@@ -98,9 +115,6 @@ class MultiClassBertBiLSTM(MultiClass):
             # nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
             # nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
             nn.Linear(lstm_hiddens, config.output_size))
-        
-        # Softmax non-linearity
-        self.softmax = nn.Softmax(dim=1)
 
     def forward(self, x):
         with torch.no_grad():
@@ -196,5 +210,57 @@ class MultiClassRNN(MultiClass):
     def forward(self, x):
         logits = self.src_embed(x['data']) # shape = (batch_size, sen_len, d_model)
         logits = self.rnn(logits)[0][:, 0, :]
+        logits = self.classifier(logits)
+        return logits
+
+class MultiClassBiLSTMCNN(MultiClass):
+    def __init__(self, config, src_vocab):
+        super(MultiClassBiLSTMCNN, self).__init__()
+        self.config = config
+        # Embedding layer
+        self.src_embed = Embeddings(config.d_model, src_vocab)
+
+        # Bilstm layer
+        self.bilstm = nn.LSTM(input_size=config.d_model, hidden_size=config.lstm_hiddens, num_layers=config.lstm_layers,
+                        bidirectional=config.bidirectional, batch_first=True, bias=True)
+
+        lstm_hiddens = config.lstm_hiddens * 2 if config.bidirectional else config.lstm_hiddens
+
+        cnn_input = config.d_model + lstm_hiddens
+
+        # CNN layer
+        self.conv1 = nn.Sequential(
+            nn.Conv1d(in_channels=cnn_input, out_channels=self.config.num_channels, kernel_size=self.config.kernel_size[0]),
+            nn.ReLU(),
+            nn.MaxPool1d(self.config.max_sen_len - self.config.kernel_size[0]+1)
+        )
+        self.conv2 = nn.Sequential(
+            nn.Conv1d(in_channels=cnn_input, out_channels=self.config.num_channels, kernel_size=self.config.kernel_size[1]),
+            nn.ReLU(),
+            nn.MaxPool1d(self.config.max_sen_len - self.config.kernel_size[1]+1)
+        )
+        self.conv3 = nn.Sequential(
+            nn.Conv1d(in_channels=cnn_input, out_channels=self.config.num_channels, kernel_size=self.config.kernel_size[2]),
+            nn.ReLU(),
+            nn.MaxPool1d(self.config.max_sen_len - self.config.kernel_size[2]+1)
+        )
+
+        # Dropout layer
+        self.dropout = nn.Dropout(config.dropout)
+
+        # Fully-Connected Layer
+        self.classifier = nn.Sequential(
+            nn.Linear(config.num_channels*len(self.config.kernel_size), config.output_size))
+
+    def forward(self, x):
+        embedding = self.src_embed(x['data'])
+        # embedded_sent.shape = (batch_size=64,d_model=300,max_sen_len=20)
+        lstm_output, _ = self.bilstm(embedding)
+        logits = torch.cat((embedding, lstm_output), 2)
+        logits = logits.permute(0, 2, 1)
+        conv_out1 = self.conv1(logits).squeeze(2) #shape=(64, num_channels, 1) (squeeze 1)
+        conv_out2 = self.conv2(logits).squeeze(2)
+        conv_out3 = self.conv3(logits).squeeze(2)
+        logits = torch.cat((conv_out1, conv_out2, conv_out3), 1)
         logits = self.classifier(logits)
         return logits

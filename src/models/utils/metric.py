@@ -2,6 +2,19 @@ import torch
 import numpy as np
 from sklearn.metrics import accuracy_score, precision_score, f1_score, recall_score, classification_report
 from collections import defaultdict
+from models.utils.utils import *
+import pandas as pd
+
+def report2csv(report:str) -> pd.DataFrame:
+    report = report.split('\n')
+    header = ['name']
+    header.extend(report[0].split())
+    df = pd.DataFrame(columns=header)
+    for i in range(1, len(report)):
+        if len(report[i]) != 0 and len(report[i].split()) == len(header):
+            df.loc[len(df.index)] = report[i].split()
+    return df
+
 
 class MultiLabelScorer():
     def evaluate_model(self, model, iterator, name):
@@ -65,7 +78,9 @@ class MultiClassScorer():
         precision = precision_score(all_y, preds, average='micro')
         f1 = f1_score(all_y, preds, average='micro')
         recall = recall_score(all_y, preds, average='micro')
-        report = classification_report(all_y, preds, target_names=model.labels, labels=range(len(model.labels)))
+        report = classification_report(all_y, preds, target_names=model.labels, labels=range(len(model.labels)), digits=4)
+        report = report2csv(report)
+        report = report.sort_values(by='precision', ascending=False)
         print("\t{name} Accuracy: {score:.4f}".format(name=name, score=accuracy))
         print("\t{name} Precision: {score:.4f}".format(name=name, score=precision))
         print("\t{name} F1: {score:.4f}".format(name=name, score=f1))
@@ -346,3 +361,12 @@ class NERScorer():
                                 width=width, digits=digits)
 
         return report
+
+class Scorer():
+    def __init__(self, config):
+        self.dataset = Dataset(config.model_config)
+        self.dataset.load_data(config.trainer_config.train_file, config.trainer_config.test_file)
+    def evaluate(self, model):
+        result = model.scorer.evaluate_model(model, self.dataset.test_iterator, 'Test')
+        print(result['report'])
+        return result['report']

@@ -24,14 +24,16 @@ def train():
     # config = MultiLabelGruConfig()
     # config = MultiLabelRNNConfig()
     # config = MultiClassBiLSTMConfig()
-    # config = MultiClassBertBiLSTMConfig()
+    config = MultiClassBertBiLSTMConfig()
     # config = MultiLabelBiLSTMConfigTactic()
     # config = MultiLabelTransformerTacticConfig()
     # config = MultiClassBiLSTMProcedureConfig()
     # config = MultiClassCNNConfig()
-    config = MultiClassGruConfig()
+    # config = MultiClassGruConfig()
+    # config = MultiClassBiLSTMCNNConfig()
     # config = MultiClassRNNConfig()
     # config = MultiClassTransformerConfig()
+    # config = MultiClassBertConfig()
     # config = MultiClassBiLSTMNLPConfig()
     trainer_config = config.trainer_config
     model_config = config.model_config
@@ -56,19 +58,34 @@ def multiLabelPredict():
             print("Label: %s, P: %f"%(labels[i], pred[i]))
 
 def multiClassPredict():
-    model = load_model('ckpts/CVE2Tactic/MultiClassBiLSTMProcedure.pkl')
+    model = load_model('ckpts/CVE2CWE/MultiClassBiLSTM.pkl')
     config = model.config
     dataset = Dataset(config)
-    text = "Possible system denial of service in case of arbitrary changing Firefox browser parameters. An attacker could change specific Firefox browser parameters file in a certain way and then reboot the system to make the system unbootable."
+    text = "An adversary consumes the resources of a target by rapidly engaging in a large number of interactions with the target. This type of attack generally exposes a weakness in rate limiting or flow. When successful this attack prevents legitimate users from accessing the service and can cause the target to crash. This attack differs from resource depletion through leaks or allocations in that the latter attacks do not rely on the volume of requests made to the target but instead focus on manipulation of the target's operations. The key factor in a flooding attack is the number of requests the adversary can make in a given period of time. The greater this number, the more likely an attack is to succeed against a given target."
     text_vec = dataset.text2vec(text)
-    pred = model((text_vec['input_ids'].cuda(), text_vec['attention_mask'].cuda()))
+    data = {'data': text_vec['input_ids'].cuda(), 'attention_mask': text_vec['attention_mask'].cuda()}
+    pred = model(data)
     pred = pred.cpu().data
     pred = torch.max(pred, 1)[1]
     labels = model.labels
     print(labels[pred[0]])
 
+def evaluate():
+    config = [MultiClassBiLSTMConfig(),
+              MultiClassBertBiLSTMConfig(),
+              MultiClassCNNConfig(),
+              MultiClassGruConfig(),
+              MultiClassRNNConfig(),
+              MultiClassTransformerConfig()]
+    for conf in config:
+        scorer = Scorer(conf)
+        model = load_model(conf.trainer_config.model_path)
+        report = scorer.evaluate(model)
+        report.to_csv('./myData/learning/evaluation/%s.csv'%conf.trainer_config.name, index=False)
+
 if __name__=='__main__':
-    # train()
-    multi_train()
+    train()
+    # multi_train()
     # multiClassPredict()
     # multiLabelPredict()
+    # evaluate()
