@@ -22,6 +22,30 @@ class MultiClassBiLSTMConfig(object):
         label_path = './myData/learning/CVE2CWE/classification.labels'
         model_path = './ckpts/CVE2CWE/MultiClassBiLSTM.pkl'
 
+class MultiClassBiLSTMBaseConfig(object):
+    class model_config:
+        model_type = 'MultiClass'
+        d_model = 256 #512 in Transformer Paper
+        dropout = 0.2
+        output_size = 38
+        lr = 0.001
+        max_epochs = 10
+        batch_size = 256
+        max_sen_len = 100
+        gamma = 0.5
+        model_name = "bert-base-uncased" #bert-base-uncased jackaduma/SecBERT
+        lstm_hiddens = 768
+        lstm_layers = 2
+        bidirectional = True
+
+    class trainer_config:
+        name = "MultiClassBiLSTMBase"
+        model = "MultiClassBiLSTM"
+        train_file = './myData/learning/CVE2CWE/base/cve.train'
+        test_file = './myData/learning/CVE2CWE/base/cve.test'
+        label_path = './myData/learning/CVE2CWE/base/classification_base.labels'
+        model_path = './ckpts/CVE2CWE/MultiClassBiLSTMBase.pkl'
+
 class MultiClassBertBiLSTMConfig(object):
     class model_config:
         model_type = 'MultiClass'

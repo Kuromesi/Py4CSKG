@@ -5,6 +5,7 @@ from utils.PathFinder import *
 from utils.CVEExtractor import *
 from utils.utils import *
 from models.trainer import Trainer
+from utils.cweTree import *
 
 # spacy.prefer_gpu()
 
@@ -84,4 +85,7 @@ def cosine_distance(x, y):
 # print(1)
 
 # summarize_cve2cwe()
-find_weakness()
+# find_weakness()
+# traverseCWE()
+label2id_base('./myData/learning/CVE2CWE', 'original.txt')
+# id2label('./myData/learning/CVE2CWE', 'cve.train')

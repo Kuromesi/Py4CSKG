@@ -4,6 +4,75 @@ import pandas as pd
 import numpy as np
 from service.GDBSaver import *
 from utils.NLP import *
+import json
+
+def id2label(rootPath, subPath):
+    path = os.path.join(rootPath, 'classification.labels')
+    with open(path, 'r') as f:
+        labels = f.readlines()
+    
+    path = os.path.join(rootPath, subPath)
+    with open(path, 'r') as f:
+        lines = f.readlines()
+    text = []
+    for line in lines:
+        line = line.split(' , ')
+        la = line[0].split('|')
+        txt = ""
+        for l in la:
+            txt += labels[int(l)].strip() + "|"
+        txt = txt.strip('|')
+        txt = txt.strip()
+        txt += " , " + line[1]
+        txt = txt.strip()
+        text.append(txt)
+    
+    path = os.path.join(rootPath, 'original.txt')
+    with open(path, 'w') as f:
+        for line in text:
+            f.write(line + "\n")
+
+def label2id_base(rootPath, subPath):
+    '''
+    Only train base abstaction level data.
+    '''
+    df = pd.read_csv('./myData/thesis/cwe_count_base.csv')
+    df = df[df['count'].astype(int) > 100]['name']
+    label = df.tolist()
+    with open('./myData/thesis/base_dict.json', 'r') as f:
+        cwe_dict = json.load(f)
+
+    path = os.path.join(rootPath, subPath)
+    with open(path, 'r') as f:
+        print("------Reading files------")
+        lines = f.readlines()
+    text = []
+    for line in lines:
+        t = line.split(' , ')
+        la = t[0].split('|')
+        if len(la) > 1:
+            continue
+        des = t[1]
+        txt = ""
+        if la[0] not in cwe_dict:
+            continue
+        id = cwe_dict[la[0]]
+        if id not in label:
+            continue    
+        txt += str(label.index(id))
+        txt += " , " + des
+        txt = txt.strip()
+        text.append(txt)
+    path = os.path.join(rootPath, 'classification.train')
+    with open(path, 'w') as f:
+        print("------Writing files------")
+        for line in text:
+            f.write(line + "\n")
+    path = os.path.join(rootPath, 'classification_base.labels')
+    with open(path, 'w') as f:
+        print("------Writing labels------")
+        for la in label:
+            f.write(la + "\n")
 
 def label2id(rootPath, subPath):
     path = os.path.join(rootPath, subPath)

@@ -226,7 +226,7 @@ class WeaknessPathFinder():
         print("------Generating Summary------")
         self.rdb.select_database(5)
         keys = self.rdb.r.keys()
-        with open('myData/CVE2CWE/classification.txt', 'w') as f:
+        with open('myData/learning/CVE2CWE/classification.txt', 'w') as f:
             i = 0
             for key in keys:
                 i += 1
