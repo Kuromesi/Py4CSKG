@@ -7,7 +7,7 @@ from utils.utils import *
 from models.trainer import Trainer
 from utils.cweTree import *
 
-# spacy.prefer_gpu()
+spacy.prefer_gpu()
 
 def cosine_distance(x, y):
     return np.dot(x, y.T) / (np.linalg.norm(x) * np.linalg.norm(y))
@@ -77,7 +77,7 @@ def cosine_distance(x, y):
 # label2id("myData/CVE2Technique", "classification.proc")
 # label2id("myData/CVE2CWE", "classification.txt")
 # doNlp('myData/CVE2CWE', 'classification.train')
-
+doNlp('./myData/learning/CVE2CWE/base', 'cve.test')
 # doNlp('myData/CVE2Technique', 'classification.train')
 # toML('myData/learning/CVE2CWE/cve.train', 'myData/learning/CVE2CWE/cve.csv')
 # res = pd.read_csv('./myData/learning/result.csv')
@@ -87,5 +87,6 @@ def cosine_distance(x, y):
 # summarize_cve2cwe()
 # find_weakness()
 # traverseCWE()
-label2id_base('./myData/learning/CVE2CWE', 'original.txt')
+# label2id_base('./myData/learning/CVE2CWE', 'original.txt')
 # id2label('./myData/learning/CVE2CWE', 'cve.train')
+# toML('myData/learning/CVE2CWE/base/cve.train', 'myData/learning/CVE2CWE/base/cve.csv')
