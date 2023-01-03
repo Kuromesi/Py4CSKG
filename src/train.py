@@ -13,6 +13,12 @@ def multi_train():
               MultiClassGruConfig(),
               MultiClassRNNConfig(),
               MultiClassTransformerConfig()]
+    config = [MultiClassBiLSTMBaseConfig(),
+              MultiClassBertBiLSTMBaseConfig(),
+              MultiClassCNNBaseConfig(),
+              MultiClassGruBaseConfig(),
+              MultiClassRNNBaseConfig(),
+              MultiClassTransformerBaseConfig()]
     for conf in config:
         trainer_config = conf.trainer_config
         model_config = conf.model_config
@@ -23,7 +29,9 @@ def train():
     # config = MultiLabelBiLSTMConfig()
     # config = MultiLabelGruConfig()
     # config = MultiLabelRNNConfig()
-    config = MultiClassBiLSTMBaseConfig()
+    # config = MultiClassBiLSTMBaseConfig()
+    # config = MultiClassBiLSTMBaseNLPConfig()
+    config = MultiClassBiLSTMCNNBaseConfig()
     # config = MultiClassBiLSTMConfig()
     # config = MultiClassBertBiLSTMConfig()
     # config = MultiLabelBiLSTMConfigTactic()
@@ -59,10 +67,10 @@ def multiLabelPredict():
             print("Label: %s, P: %f"%(labels[i], pred[i]))
 
 def multiClassPredict():
-    model = load_model('ckpts/CVE2CWE/MultiClassBiLSTMBase.pkl')
+    model = load_model('ckpts/CVE2CWE/MultiClassBiLSTMBaseNLP.pkl')
     config = model.config
     dataset = Dataset(config)
-    text = "Magento versions 2.4.1 (and earlier), 2.4.0-p1 (and earlier) and 2.3.6 (and earlier) are affected by an improper authorization vulnerability in the integrations module. Successful exploitation could lead to unauthorized access to restricted resources by an unauthenticated attacker. Access to the admin console is required for successful exploitation."
+    text = "The FTP (aka \"Implementation of a simple FTP client and server\") project through 96c1a35 allows remote attackers to cause a denial of service (memory consumption) by engaging in client activity, such as establishing and then terminating a connection. This occurs because malloc is used but free is not."
     text_vec = dataset.text2vec(text)
     data = {'data': text_vec['input_ids'].cuda(), 'attention_mask': text_vec['attention_mask'].cuda()}
     pred = model(data)
@@ -79,6 +87,12 @@ def evaluate():
               MultiClassRNNConfig(),
               MultiClassTransformerConfig()]
     config = [MultiClassBiLSTMBaseConfig]
+    config = [MultiClassBiLSTMBaseConfig(),
+              MultiClassBertBiLSTMBaseConfig(),
+              MultiClassCNNBaseConfig(),
+              MultiClassGruBaseConfig(),
+              MultiClassRNNBaseConfig(),
+              MultiClassTransformerBaseConfig()]
     for conf in config:
         scorer = Scorer(conf)
         model = load_model(conf.trainer_config.model_path)
@@ -86,8 +100,8 @@ def evaluate():
         report.to_csv('./myData/learning/evaluation/%s.csv'%conf.trainer_config.name, index=False)
 
 if __name__=='__main__':
-    # train()
+    train()
     # multi_train()
-    multiClassPredict()
+    # multiClassPredict()
     # multiLabelPredict()
     # evaluate()
