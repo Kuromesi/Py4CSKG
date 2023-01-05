@@ -100,8 +100,8 @@ def evaluate():
         report.to_csv('./myData/learning/evaluation/%s.csv'%conf.trainer_config.name, index=False)
 
 if __name__=='__main__':
-    train()
+    # train()
     # multi_train()
     # multiClassPredict()
     # multiLabelPredict()
-    # evaluate()
+    evaluate()
