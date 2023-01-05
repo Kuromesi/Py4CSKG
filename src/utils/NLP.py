@@ -81,6 +81,15 @@ class NLP:
                 line += ent.text + " "
         return line.strip()
 
+    def remove_stopwords(self, text):
+        text = self.nlpo(text)
+        tmp = ""
+        for token in text:
+            if token.lemma_.lower() not in self.nlpo.Defaults.stop_words:
+                tmp += token + " "
+        return text
+
+
 class NLPGDBSaver(GDBSaver):
     
     def __init__(self):
