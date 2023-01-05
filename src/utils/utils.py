@@ -182,6 +182,24 @@ def doNlp(rootPath, subPath):
     with open(path, 'w') as f:
         for line in text:
             f.write(line + "\n")
+    
+def remove_stopwords(rootPath, subPath):
+    path = os.path.join(rootPath, subPath)
+    text = []
+    nlp = NLP()
+    with open(path, 'r') as f:
+        ftqdm = tqdm(f)
+        for line in ftqdm:
+            line = line.split(' , ')
+            label = line[0]
+            des = nlp.remove_stopwords(line[1])
+            if des:
+                line = label + " , " + des
+                text.append(line)
+    path = os.path.join(rootPath, "classfication.nostopwords")
+    with open(path, 'w') as f:
+        for line in text:
+            f.write(line + "\n")
             
 def toML(path, save_path):
     '''
