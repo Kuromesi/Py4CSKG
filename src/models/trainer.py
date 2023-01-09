@@ -50,6 +50,11 @@ class Trainer():
             self.run(MultiClassBiLSTMCNN(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
         elif self.model == 'MultiClassBert':
             self.run(MultiClassBert(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
+        elif self.model == 'MultiClassRobertaBiLSTM':
+            self.run(MultiClassRobertaBiLSTM(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
+        elif self.model == 'MultiClassGPT2BiLSTM':
+            self.run(MultiClassGPT2BiLSTM(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
+            
 
     def run(self, model, model_type):
         self.dataset.load_data(self.train_file, self.test_file)

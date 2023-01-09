@@ -9,7 +9,7 @@ from models.layers.encoder import EncoderLayer, Encoder
 from models.layers.feed_forward import PositionwiseFeedForward
 import numpy as np
 from models.utils.utils import *
-from transformers import BertModel, BertConfig
+from transformers import BertModel, BertConfig, RobertaModel, RobertaConfig, GPT2Config, GPT2Model
 from models.Model import Model
 from models.utils.metric import MultiClassScorer
 
@@ -85,8 +85,8 @@ class MultiClassBert(MultiClass):
 
         # Fully-Connected Layer
         self.classifier = nn.Sequential(
-            # nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
-            # nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
+            # nn.Linear(bertConfig.hidden_size, bertConfig.hidden_size),
+            # nn.ReLU(),
             nn.Linear(bertConfig.hidden_size, config.output_size))
 
     def forward(self, x):
@@ -104,6 +104,62 @@ class MultiClassBertBiLSTM(MultiClass):
 
         # Embedding layer
         self.src_embed = BertModel.from_pretrained(config.model_name, config=bertConfig)
+
+        # Bilstm layer
+        self.bilstm = nn.LSTM(input_size=bertConfig.hidden_size, hidden_size=config.lstm_hiddens, num_layers=config.lstm_layers,
+                        bidirectional=config.bidirectional, batch_first=True, bias=True)
+
+        lstm_hiddens = config.lstm_hiddens * 2 if config.bidirectional else config.lstm_hiddens
+        # Fully-Connected Layer
+        self.classifier = nn.Sequential(
+            # nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
+            # nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
+            nn.Linear(lstm_hiddens, config.output_size))
+
+    def forward(self, x):
+        with torch.no_grad():
+            logits = self.src_embed(x['data'], attention_mask=x['attention_mask']).last_hidden_state # shape = (batch_size, sen_len, d_model)
+        logits = self.bilstm(logits)[0][:, 0, :]
+        logits = self.classifier(logits)
+        return logits
+    
+class MultiClassRobertaBiLSTM(MultiClass):
+    def __init__(self, config, src_vocab):
+        super(MultiClassRobertaBiLSTM, self).__init__()
+        self.config = config
+        self.best = 0
+        bertConfig = RobertaConfig.from_pretrained(config.model_name)
+
+        # Embedding layer
+        self.src_embed = RobertaModel.from_pretrained(config.model_name, config=bertConfig)
+
+        # Bilstm layer
+        self.bilstm = nn.LSTM(input_size=bertConfig.hidden_size, hidden_size=config.lstm_hiddens, num_layers=config.lstm_layers,
+                        bidirectional=config.bidirectional, batch_first=True, bias=True)
+
+        lstm_hiddens = config.lstm_hiddens * 2 if config.bidirectional else config.lstm_hiddens
+        # Fully-Connected Layer
+        self.classifier = nn.Sequential(
+            # nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
+            # nn.Linear(config.lstm_hiddens * 2, config.lstm_hiddens * 2),
+            nn.Linear(lstm_hiddens, config.output_size))
+
+    def forward(self, x):
+        with torch.no_grad():
+            logits = self.src_embed(x['data'], attention_mask=x['attention_mask']).last_hidden_state # shape = (batch_size, sen_len, d_model)
+        logits = self.bilstm(logits)[0][:, 0, :]
+        logits = self.classifier(logits)
+        return logits
+
+class MultiClassGPT2BiLSTM(MultiClass):
+    def __init__(self, config, src_vocab):
+        super(MultiClassGPT2BiLSTM, self).__init__()
+        self.config = config
+        self.best = 0
+        bertConfig = GPT2Config.from_pretrained(config.model_name)
+
+        # Embedding layer
+        self.src_embed = GPT2Model.from_pretrained(config.model_name, config=bertConfig)
 
         # Bilstm layer
         self.bilstm = nn.LSTM(input_size=bertConfig.hidden_size, hidden_size=config.lstm_hiddens, num_layers=config.lstm_layers,

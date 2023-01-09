@@ -10,8 +10,9 @@ from collections import defaultdict
 from nltk.corpus import wordnet as wn
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn import model_selection, naive_bayes, svm
-from sklearn.metrics import accuracy_score, f1_score, recall_score
+from sklearn.metrics import accuracy_score, f1_score, recall_score, precision_score
 from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
 
 #Set Random seed
 np.random.seed(500)
@@ -22,7 +23,7 @@ nltk.download('omw-1.4')
 nltk.download('averaged_perceptron_tagger')
 
 # Add the Data using pandas
-train_corpus = pd.read_csv(r"myData/learning/CVE2CWE/base/cve.csv",encoding='latin-1',engine='python')
+train_corpus = pd.read_csv(r"myData/learning/CVE2CWE/cve.csv",encoding='latin-1',engine='python')
 
 # Step - 1: Data Pre-processing - This will help in getting better results through the classification algorithms
 
@@ -69,7 +70,7 @@ Train_Y = Encoder.fit_transform(Train_Y)
 Test_Y = Encoder.fit_transform(Test_Y)
 
 # Step - 4: Vectorize the words by using TF-IDF Vectorizer - This is done to find how important a word in document is in comaprison to the train_corpus
-Tfidf_vect = TfidfVectorizer(max_features=5000)
+Tfidf_vect = TfidfVectorizer(max_features=20000)
 Tfidf_vect.fit(train_corpus['text_final'])
 
 Train_X_Tfidf = Tfidf_vect.transform(Train_X)
@@ -88,8 +89,9 @@ predictions_NB = Naive.predict(Test_X_Tfidf)
 
 # Use accuracy_score function to get the accuracy
 print("Naive Bayes Accuracy Score -> ",accuracy_score(predictions_NB, Test_Y)*100)
-# print("Naive Bayes F1 Score -> ", f1_score(predictions_NB, Test_Y)*100)
-# print("Naive Bayes Recall Score -> ", recall_score(predictions_NB, Test_Y)*100)
+print("Naive Bayes Precision Score -> ", precision_score(predictions_NB, Test_Y, average='weighted')*100)
+print("Naive Bayes F1 Score -> ", f1_score(predictions_NB, Test_Y, average='weighted')*100)
+print("Naive Bayes Recall Score -> ", recall_score(predictions_NB, Test_Y, average='weighted')*100)
 
 # Classifier - Algorithm - SVM
 # fit the training dataset on the classifier
@@ -101,8 +103,9 @@ predictions_SVM = SVM.predict(Test_X_Tfidf)
 
 # Use accuracy_score function to get the accuracy
 print("SVM Accuracy Score -> ",accuracy_score(predictions_SVM, Test_Y)*100)
-# print("SVM F1 Score -> ", f1_score(predictions_SVM, Test_Y)*100)
-# print("SVM Recall Score -> ", recall_score(predictions_SVM, Test_Y)*100)
+print("SVM Precision Score -> ", precision_score(predictions_SVM, Test_Y, average='weighted')*100)
+print("SVM F1 Score -> ", f1_score(predictions_SVM, Test_Y, average='weighted')*100)
+print("SVM Recall Score -> ", recall_score(predictions_SVM, Test_Y, average='weighted')*100)
 
 # predict the labels on validation dataset
 lr = LogisticRegression()
@@ -111,5 +114,15 @@ predictions_lr = lr.predict(Test_X_Tfidf)
 
 # Use accuracy_score function to get the accuracy
 print("Logistic Regression Accuracy Score -> ",accuracy_score(predictions_lr, Test_Y)*100)
-# print("Logistic Regression F1 Score -> ", f1_score(predictions_lr, Test_Y)*100)
-# print("Logistic Regression Recall Score -> ", recall_score(predictions_lr, Test_Y)*100)
+print("Logistic Regression Precision Score -> ", precision_score(predictions_lr, Test_Y, average='weighted')*100)
+print("Logistic Regression F1 Score -> ", f1_score(predictions_lr, Test_Y, average='weighted')*100)
+print("Logistic Regression Recall Score -> ", recall_score(predictions_lr, Test_Y, average='weighted')*100)
+
+rf = RandomForestClassifier()
+rf.fit(Train_X_Tfidf, Train_Y)
+predictions_rf = rf.predict(Test_X_Tfidf)
+
+print("Random Forest Accuracy Score -> ",accuracy_score(predictions_rf, Test_Y)*100)
+print("Random Forest Precision Score -> ", precision_score(predictions_rf, Test_Y, average='weighted')*100)
+print("Random Forest F1 Score -> ", f1_score(predictions_rf, Test_Y, average='weighted')*100)
+print("Random Forest Recall Score -> ", recall_score(predictions_rf, Test_Y, average='weighted')*100)

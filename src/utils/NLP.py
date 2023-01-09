@@ -85,9 +85,9 @@ class NLP:
         text = self.nlpo(text)
         tmp = ""
         for token in text:
-            if token.lemma_.lower() not in self.nlpo.Defaults.stop_words:
-                tmp += token + " "
-        return text
+            if token.lemma_.lower() not in self.nlpo.Defaults.stop_words and not bool(re.search(r'\d', token.lemma_)) and not (token.is_punct or token.is_space):
+                tmp += token.lemma_.lower() + " "
+        return tmp
 
 
 class NLPGDBSaver(GDBSaver):

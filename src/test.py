@@ -69,7 +69,7 @@ def cosine_distance(x, y):
 # pf = WeaknessPathFinder()
 # pf.find()
 # pf.summary()
-
+label2id('./myData/learning/CVE2CWE/base', 'classification.txt')
 # pandsConvert("myData/attack2cve", "Att&ckToCveMappings.csv")
 # preProcess("myData/attack2cve", "cve.train")
 # label2id("myData/attack2cve", "classification.proc")
@@ -77,7 +77,8 @@ def cosine_distance(x, y):
 # label2id("myData/CVE2Technique", "classification.proc")
 # label2id("myData/CVE2CWE", "classification.txt")
 # doNlp('myData/CVE2CWE', 'classification.train')
-doNlp('./myData/learning/CVE2CWE/base', 'cve.test')
+# doNlp('./myData/learning/CVE2CWE/base', 'cve.test')
+# remove_stopwords('./myData/learning/CVE2CWE', 'cve.test')
 # doNlp('myData/CVE2Technique', 'classification.train')
 # toML('myData/learning/CVE2CWE/cve.train', 'myData/learning/CVE2CWE/cve.csv')
 # res = pd.read_csv('./myData/learning/result.csv')

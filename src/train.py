@@ -12,13 +12,17 @@ def multi_train():
               MultiClassCNNConfig(),
               MultiClassGruConfig(),
               MultiClassRNNConfig(),
-              MultiClassTransformerConfig()]
+              MultiClassTransformerConfig(),
+              MultiClassBiLSTMCNNConfig()]
     config = [MultiClassBiLSTMBaseConfig(),
               MultiClassBertBiLSTMBaseConfig(),
               MultiClassCNNBaseConfig(),
               MultiClassGruBaseConfig(),
               MultiClassRNNBaseConfig(),
-              MultiClassTransformerBaseConfig()]
+              MultiClassTransformerBaseConfig(),
+              MultiClassBiLSTMCNNBaseConfig()]
+    config = [MultiClassGPT2BiLSTMBaseConfig(),
+              MultiClassRobertaBiLSTMBaseConfig()]
     for conf in config:
         trainer_config = conf.trainer_config
         model_config = conf.model_config
@@ -31,9 +35,13 @@ def train():
     # config = MultiLabelRNNConfig()
     # config = MultiClassBiLSTMBaseConfig()
     # config = MultiClassBiLSTMBaseNLPConfig()
-    config = MultiClassBiLSTMCNNBaseConfig()
+    # config = MultiClassBiLSTMCNNBaseConfig()
+    # config = MultiClassBiLSTMNSConfig(
+    # config = MultiClassBiLSTMCNNNSConfig()
     # config = MultiClassBiLSTMConfig()
     # config = MultiClassBertBiLSTMConfig()
+    config = MultiClassGPT2BiLSTMConfig()
+    # config = MultiClassRobertaBiLSTMConfig()
     # config = MultiLabelBiLSTMConfigTactic()
     # config = MultiLabelTransformerTacticConfig()
     # config = MultiClassBiLSTMProcedureConfig()
@@ -67,10 +75,10 @@ def multiLabelPredict():
             print("Label: %s, P: %f"%(labels[i], pred[i]))
 
 def multiClassPredict():
-    model = load_model('ckpts/CVE2CWE/MultiClassBiLSTMBaseNLP.pkl')
+    model = load_model('ckpts/CVE2CWE/MultiClassGruBase.pkl')
     config = model.config
     dataset = Dataset(config)
-    text = "The FTP (aka \"Implementation of a simple FTP client and server\") project through 96c1a35 allows remote attackers to cause a denial of service (memory consumption) by engaging in client activity, such as establishing and then terminating a connection. This occurs because malloc is used but free is not."
+    text = "An inherited permissions issue was addressed with additional restrictions. This issue is fixed in macOS Monterey 12.0.1, Security Update 2021-007 Catalina, macOS Big Sur 11.6.1. A malicious application may be able to modify protected parts of the file system."
     text_vec = dataset.text2vec(text)
     data = {'data': text_vec['input_ids'].cuda(), 'attention_mask': text_vec['attention_mask'].cuda()}
     pred = model(data)
@@ -86,13 +94,16 @@ def evaluate():
               MultiClassGruConfig(),
               MultiClassRNNConfig(),
               MultiClassTransformerConfig()]
-    config = [MultiClassBiLSTMBaseConfig]
+    # config = [MultiClassBiLSTMBaseConfig]
     config = [MultiClassBiLSTMBaseConfig(),
               MultiClassBertBiLSTMBaseConfig(),
               MultiClassCNNBaseConfig(),
               MultiClassGruBaseConfig(),
               MultiClassRNNBaseConfig(),
-              MultiClassTransformerBaseConfig()]
+              MultiClassTransformerBaseConfig(),
+              MultiClassBiLSTMCNNBaseConfig()]
+    config = [MultiClassGPT2BiLSTMBaseConfig(),
+              MultiClassRobertaBiLSTMBaseConfig()]
     for conf in config:
         scorer = Scorer(conf)
         model = load_model(conf.trainer_config.model_path)
@@ -102,6 +113,6 @@ def evaluate():
 if __name__=='__main__':
     # train()
     # multi_train()
-    # multiClassPredict()
+    multiClassPredict()
     # multiLabelPredict()
-    evaluate()
+    # evaluate()

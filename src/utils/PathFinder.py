@@ -214,7 +214,7 @@ class WeaknessPathFinder():
 
     def __find_weakness(self):
         print("------Finding CWE -> CVE------")
-        query = "MATCH path=(a:Weakness)-[]-(b:Vulnerability) RETURN path"
+        query = "MATCH (a:Weakness) WHERE a.type=\"Base\" MATCH path=(a)-[]-(b:Vulnerability) RETURN path"
         results = self.gdb.sendQuery(query)
         for res in results:
             start_id = res[0].start_node.get('id')

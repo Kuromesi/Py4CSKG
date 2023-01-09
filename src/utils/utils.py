@@ -195,7 +195,7 @@ def remove_stopwords(rootPath, subPath):
             des = nlp.remove_stopwords(line[1])
             if des:
                 line = label + " , " + des
-                text.append(line)
+                text.append(line.strip())
     path = os.path.join(rootPath, "classfication.nostopwords")
     with open(path, 'w') as f:
         for line in text:

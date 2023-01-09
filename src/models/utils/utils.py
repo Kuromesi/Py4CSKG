@@ -71,7 +71,7 @@ class Dataset():
         
         self.word_embeddings = {}
 
-        self.tokenizer = AutoTokenizer.from_pretrained(self.config.model_name)
+        self.tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
         self.vocab = self.tokenizer.vocab
 
     def parse_label(self, label):
