@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from sklearn.metrics import accuracy_score, precision_score, f1_score, recall_score, classification_report
+from sklearn.metrics import accuracy_score, precision_score, f1_score, recall_score, classification_report, confusion_matrix
 from collections import defaultdict
 from models.utils.utils import *
 import pandas as pd
@@ -81,15 +81,19 @@ class MultiClassScorer():
         report = classification_report(all_y, preds, target_names=model.labels, labels=range(len(model.labels)), digits=4)
         report = report2csv(report)
         report = report.sort_values(by='precision', ascending=False)
+        confusion = confusion_matrix(all_y, preds)
         print("\t{name} Accuracy: {score:.4f}".format(name=name, score=accuracy))
         print("\t{name} Precision: {score:.4f}".format(name=name, score=precision))
         print("\t{name} F1: {score:.4f}".format(name=name, score=f1))
         print("\t{name} Recall: {score:.4f}".format(name=name, score=recall))
+        # df = pd.DataFrame(confusion)
+        # df.to_csv('myData/thesis/confusion.csv')
         result = {'accuracy': accuracy,
                   'precision': precision,
                   'f1': f1,
                   'recall': recall,
-                  'report': report}
+                  'report': report,
+                  'confusion': confusion}
         return result
 
 class NERScorer():

@@ -23,7 +23,7 @@ nltk.download('omw-1.4')
 nltk.download('averaged_perceptron_tagger')
 
 # Add the Data using pandas
-train_corpus = pd.read_csv(r"myData/learning/CVE2CWE/cve.csv",encoding='latin-1',engine='python')
+train_corpus = pd.read_csv(r"myData/learning/CVE2CWE/base/cve_test.csv",encoding='latin-1',engine='python')
 
 # Step - 1: Data Pre-processing - This will help in getting better results through the classification algorithms
 

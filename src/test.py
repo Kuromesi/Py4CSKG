@@ -69,7 +69,7 @@ def cosine_distance(x, y):
 # pf = WeaknessPathFinder()
 # pf.find()
 # pf.summary()
-label2id('./myData/learning/CVE2CWE/base', 'classification.txt')
+# label2id('./myData/learning/CVE2CWE/base', 'classification.txt')
 # pandsConvert("myData/attack2cve", "Att&ckToCveMappings.csv")
 # preProcess("myData/attack2cve", "cve.train")
 # label2id("myData/attack2cve", "classification.proc")
@@ -84,7 +84,7 @@ label2id('./myData/learning/CVE2CWE/base', 'classification.txt')
 # res = pd.read_csv('./myData/learning/result.csv')
 # res.loc[len(res.index)] = ['1', '2', '3', '4', '5']
 # print(1)
-
+toML('myData/learning/CVE2CWE/base/cve.test', 'myData/learning/CVE2CWE/base/cve_test.csv')
 # summarize_cve2cwe()
 # find_weakness()
 # traverseCWE()

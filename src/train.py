@@ -78,7 +78,7 @@ def multiClassPredict():
     model = load_model('ckpts/CVE2CWE/MultiClassGruBase.pkl')
     config = model.config
     dataset = Dataset(config)
-    text = "An inherited permissions issue was addressed with additional restrictions. This issue is fixed in macOS Monterey 12.0.1, Security Update 2021-007 Catalina, macOS Big Sur 11.6.1. A malicious application may be able to modify protected parts of the file system."
+    text = "A remote script injection vulnerability was discovered in HPE 3PAR StoreServ Management and Core Software Media version(s): prior to 3.5.0.1."
     text_vec = dataset.text2vec(text)
     data = {'data': text_vec['input_ids'].cuda(), 'attention_mask': text_vec['attention_mask'].cuda()}
     pred = model(data)
@@ -104,6 +104,7 @@ def evaluate():
               MultiClassBiLSTMCNNBaseConfig()]
     config = [MultiClassGPT2BiLSTMBaseConfig(),
               MultiClassRobertaBiLSTMBaseConfig()]
+    config = [MultiClassGruBaseConfig()]
     for conf in config:
         scorer = Scorer(conf)
         model = load_model(conf.trainer_config.model_path)
@@ -113,6 +114,6 @@ def evaluate():
 if __name__=='__main__':
     # train()
     # multi_train()
-    multiClassPredict()
+    # multiClassPredict()
     # multiLabelPredict()
-    # evaluate()
+    evaluate()
