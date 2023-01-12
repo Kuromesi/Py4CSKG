@@ -320,3 +320,54 @@ class MultiClassBiLSTMCNN(MultiClass):
         logits = torch.cat((conv_out1, conv_out2, conv_out3), 1)
         logits = self.classifier(logits)
         return logits
+    
+class MultiClassGruCNN(MultiClass):
+    def __init__(self, config, src_vocab):
+        super(MultiClassGruCNN, self).__init__()
+        self.config = config
+        # Embedding layer
+        self.src_embed = Embeddings(config.d_model, src_vocab)
+
+        # Bilstm layer
+        self.gru = nn.GRU(config.d_model, config.hidden_dim, config.layer_dim, batch_first=True, bidirectional=config.bidirectional)
+
+        lstm_hiddens = config.lstm_hiddens * 2 if config.bidirectional else config.lstm_hiddens
+
+        cnn_input = config.d_model + lstm_hiddens
+
+        # CNN layer
+        self.conv1 = nn.Sequential(
+            nn.Conv1d(in_channels=cnn_input, out_channels=self.config.num_channels, kernel_size=self.config.kernel_size[0]),
+            nn.ReLU(),
+            nn.MaxPool1d(self.config.max_sen_len - self.config.kernel_size[0]+1)
+        )
+        self.conv2 = nn.Sequential(
+            nn.Conv1d(in_channels=cnn_input, out_channels=self.config.num_channels, kernel_size=self.config.kernel_size[1]),
+            nn.ReLU(),
+            nn.MaxPool1d(self.config.max_sen_len - self.config.kernel_size[1]+1)
+        )
+        self.conv3 = nn.Sequential(
+            nn.Conv1d(in_channels=cnn_input, out_channels=self.config.num_channels, kernel_size=self.config.kernel_size[2]),
+            nn.ReLU(),
+            nn.MaxPool1d(self.config.max_sen_len - self.config.kernel_size[2]+1)
+        )
+
+        # Dropout layer
+        self.dropout = nn.Dropout(config.dropout)
+
+        # Fully-Connected Layer
+        self.classifier = nn.Sequential(
+            nn.Linear(config.num_channels*len(self.config.kernel_size), config.output_size))
+
+    def forward(self, x):
+        embedding = self.src_embed(x['data'])
+        # embedded_sent.shape = (batch_size=64,d_model=300,max_sen_len=20)
+        lstm_output, _ = self.gru(embedding)
+        logits = torch.cat((embedding, lstm_output), 2)
+        logits = logits.permute(0, 2, 1)
+        conv_out1 = self.conv1(logits).squeeze(2) #shape=(64, num_channels, 1) (squeeze 1)
+        conv_out2 = self.conv2(logits).squeeze(2)
+        conv_out3 = self.conv3(logits).squeeze(2)
+        logits = torch.cat((conv_out1, conv_out2, conv_out3), 1)
+        logits = self.classifier(logits)
+        return logits

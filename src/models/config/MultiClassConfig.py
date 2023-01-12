@@ -288,6 +288,7 @@ class MultiClassBiLSTMCNNConfig(object):
         label_path = './myData/learning/CVE2CWE/classification.labels'
         model_path = './ckpts/CVE2CWE/MultiClassCNN.pkl'
 
+
 class MultiClassBertConfig(object):
     class model_config:
         model_type = 'MultiClass'
@@ -433,6 +434,32 @@ class MultiClassBiLSTMCNNBaseConfig(object):
         test_file = './myData/learning/CVE2CWE/base/cve.test'
         label_path = './myData/learning/CVE2CWE/base/classification_base.labels'
         model_path = './ckpts/CVE2CWE/MultiClassBiLSTMCNNBase.pkl'
+
+class MultiClassGruCNNBaseConfig(object):
+    class model_config:
+        model_type = 'MultiClass'
+        d_model = 256 #512 in Transformer Paper
+        dropout = 0.2
+        output_size = 158
+        lr = 0.001
+        max_epochs = 30
+        batch_size = 256
+        max_sen_len = 150
+        gamma = 0.5
+        model_name = "bert-base-uncased" #bert-base-uncased jackaduma/SecBERT
+        num_channels = 100
+        kernel_size = [3,4,5]
+        hidden_dim = 768
+        layer_dim = 2
+        bidirectional = True
+
+    class trainer_config:
+        name = "MultiClassGruCNNBase"
+        model = "MultiClassGruCNN"
+        train_file = './myData/learning/CVE2CWE/base/cve.train'
+        test_file = './myData/learning/CVE2CWE/base/cve.test'
+        label_path = './myData/learning/CVE2CWE/base/classification_base.labels'
+        model_path = './ckpts/CVE2CWE/MultiClassGruCNNBase.pkl'
 
 class MultiClassCNNBaseConfig(object):
     class model_config:

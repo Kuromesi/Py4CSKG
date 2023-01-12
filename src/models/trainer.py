@@ -54,6 +54,9 @@ class Trainer():
             self.run(MultiClassRobertaBiLSTM(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
         elif self.model == 'MultiClassGPT2BiLSTM':
             self.run(MultiClassGPT2BiLSTM(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
+        elif self.model == 'MultiClassGruCNN':
+            self.run(MultiClassGruCNN(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
+
             
 
     def run(self, model, model_type):
