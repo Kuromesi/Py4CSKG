@@ -77,7 +77,8 @@ class Trainer():
             model.attenuation.step()
             train_losses.append(train_loss)
             val_accuracies.append(val_accuracy)
-
+            
+        model = load_model(self.model_path)
         print("##########FINAL RESULTS##########")
         train_acc = model.scorer.evaluate_model(model, self.dataset.train_iterator, "Train")
         print("#################################")

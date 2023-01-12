@@ -444,7 +444,7 @@ class MultiClassGruCNNBaseConfig(object):
         lr = 0.001
         max_epochs = 30
         batch_size = 256
-        max_sen_len = 150
+        max_sen_len = 200
         gamma = 0.5
         model_name = "bert-base-uncased" #bert-base-uncased jackaduma/SecBERT
         num_channels = 100
@@ -459,7 +459,7 @@ class MultiClassGruCNNBaseConfig(object):
         train_file = './myData/learning/CVE2CWE/base/cve.train'
         test_file = './myData/learning/CVE2CWE/base/cve.test'
         label_path = './myData/learning/CVE2CWE/base/classification_base.labels'
-        model_path = './ckpts/CVE2CWE/MultiClassGruCNNBase.pkl'
+        model_path = './ckpts/CVE2CWE/MultiClassGruCNNBase_v1.pkl'
 
 class MultiClassCNNBaseConfig(object):
     class model_config:

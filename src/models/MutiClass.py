@@ -331,9 +331,9 @@ class MultiClassGruCNN(MultiClass):
         # Bilstm layer
         self.gru = nn.GRU(config.d_model, config.hidden_dim, config.layer_dim, batch_first=True, bidirectional=config.bidirectional)
 
-        lstm_hiddens = config.lstm_hiddens * 2 if config.bidirectional else config.lstm_hiddens
+        hidden_dim = config.hidden_dim * 2 if config.bidirectional else config.hidden_dim
 
-        cnn_input = config.d_model + lstm_hiddens
+        cnn_input = config.d_model + hidden_dim
 
         # CNN layer
         self.conv1 = nn.Sequential(

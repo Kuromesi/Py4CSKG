@@ -105,7 +105,7 @@ def evaluate():
               MultiClassBiLSTMCNNBaseConfig()]
     config = [MultiClassGPT2BiLSTMBaseConfig(),
               MultiClassRobertaBiLSTMBaseConfig()]
-    config = [MultiClassGruBaseConfig()]
+    config = [MultiClassGruCNNBaseConfig()]
     for conf in config:
         scorer = Scorer(conf)
         model = load_model(conf.trainer_config.model_path)

@@ -93,7 +93,7 @@ class MultiClassScorer():
                   'f1': f1,
                   'recall': recall,
                   'report': report,
-                  'confusion': confusion}
+                  'confusion': confusion} 
         return result
 
 class NERScorer():
