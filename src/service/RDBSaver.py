@@ -33,6 +33,11 @@ class RDBSaver():
         
     def removeKey(self, key):
         self.r.delete(key)
+
+    def saveRDF(self, src, dest, rel):
+        self.r.select(0);
+        temp = rel + "-+-" + dest;
+        self.r.sadd(src, temp);
     
 if __name__=="__main__":
     rdb = RDBSaver()
