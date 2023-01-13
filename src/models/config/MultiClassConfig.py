@@ -438,7 +438,11 @@ class MultiClassBiLSTMCNNBaseConfig(object):
 class MultiClassGruCNNBaseConfig(object):
     class model_config:
         model_type = 'MultiClass'
-        d_model = 256 #512 in Transformer Paper
+        N = 6 #6 in Transformer Paper
+        d_model = 512 #512 in Transformer Paper
+        d_ff = 2048 #2048 in Transformer Paper
+        h = 8
+        # d_model = 256 #512 in Transformer Paper
         dropout = 0.2
         output_size = 158
         lr = 0.001
