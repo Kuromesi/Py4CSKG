@@ -86,8 +86,8 @@ class MultiClassScorer():
         print("\t{name} Precision: {score:.4f}".format(name=name, score=precision))
         print("\t{name} F1: {score:.4f}".format(name=name, score=f1))
         print("\t{name} Recall: {score:.4f}".format(name=name, score=recall))
-        # df = pd.DataFrame(confusion)
-        # df.to_csv('myData/thesis/confusion.csv')
+        df = pd.DataFrame(confusion)
+        df.to_csv('myData/thesis/confusion_grucnn.csv')
         result = {'accuracy': accuracy,
                   'precision': precision,
                   'f1': f1,

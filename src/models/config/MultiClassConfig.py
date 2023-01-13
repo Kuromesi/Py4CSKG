@@ -447,7 +447,7 @@ class MultiClassGruCNNBaseConfig(object):
         output_size = 158
         lr = 0.001
         max_epochs = 30
-        batch_size = 256
+        batch_size = 128
         max_sen_len = 200
         gamma = 0.5
         model_name = "bert-base-uncased" #bert-base-uncased jackaduma/SecBERT

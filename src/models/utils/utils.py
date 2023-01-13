@@ -147,7 +147,7 @@ class Dataset():
         print ("Loaded {} validation examples".format(len(valid_dataset)))
 
     def text2vec(self, text):
-        return self.tokenizer(text, padding=True, truncation=True, return_tensors="pt", max_length=self.config.max_sen_len)
+        return self.tokenizer(text, padding=PADDING, truncation=True, return_tensors="pt", max_length=self.config.max_sen_len)
 
         
 def evaluate_model(model, iterator):

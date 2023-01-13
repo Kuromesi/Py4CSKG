@@ -326,23 +326,12 @@ class MultiClassGruCNN(MultiClass):
         super(MultiClassGruCNN, self).__init__()
         self.config = config
         # Embedding layer
-        # self.src_embed = Embeddings(config.d_model, src_vocab)
-
-        h, N, dropout = self.config.h, self.config.N, self.config.dropout
-        d_model, d_ff = self.config.d_model, self.config.d_ff
-        
-        attn = MultiHeadedAttention(h, d_model)
-        ff = PositionwiseFeedForward(d_model, d_ff, dropout)
-        position = PositionalEncoding(d_model, dropout)
-        
-        self.encoder = Encoder(EncoderLayer(config.d_model, deepcopy(attn), deepcopy(ff), dropout), N)
-        self.src_embed = nn.Sequential(Embeddings(config.d_model, src_vocab), deepcopy(position))
+        self.src_embed = Embeddings(config.d_model, src_vocab)
 
         # Bilstm layer
         self.gru = nn.GRU(config.d_model, config.hidden_dim, config.layer_dim, batch_first=True, bidirectional=config.bidirectional)
 
         hidden_dim = config.hidden_dim * 2 if config.bidirectional else config.hidden_dim
-
         cnn_input = config.d_model + hidden_dim
 
         # CNN layer

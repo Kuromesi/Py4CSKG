@@ -79,7 +79,7 @@ def multiClassPredict():
     model = load_model('ckpts/CVE2CWE/MultiClassGruBase.pkl')
     config = model.config
     dataset = Dataset(config)
-    text = "A remote script injection vulnerability was discovered in HPE 3PAR StoreServ Management and Core Software Media version(s): prior to 3.5.0.1."
+    text = "NWFTPD.nlm before 5.02i in the FTP server in Novell NetWare does not properly listen for data connections, which allows remote attackers to cause a denial of service (abend) via multiple FTP sessions."
     text_vec = dataset.text2vec(text)
     data = {'data': text_vec['input_ids'].cuda(), 'attention_mask': text_vec['attention_mask'].cuda()}
     pred = model(data)
