@@ -68,7 +68,7 @@ class Dataset():
         self.train_iterator = None
         self.test_iterator = None
         self.val_iterator = None
-        
+        self.no = 0
         self.word_embeddings = {}
 
         self.tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
@@ -85,6 +85,7 @@ class Dataset():
         label = label.split('|')
         if self.config.model_type == 'MultiClass':
             idx = int(label[0])
+            self.no += 1
         elif self.config.model_type == 'MultiLabel':
             idx = [0.] * self.config.output_size
             for la in label:

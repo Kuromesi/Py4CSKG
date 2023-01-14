@@ -10,15 +10,16 @@ def plot1(path):
     year = df['year'].tolist()
     total = df['total'].tolist()
     linked = df['linked'].tolist()
-    plt.figure(figsize=(8, 3))
+    plt.figure(figsize=(9, 3.2))
     for i in range(len(year)):
         year[i] -= width / 2
-    plt.bar(year, total, width=width, label='Total', color='white', alpha=1, edgecolor='k')
+    plt.bar(year, total, width=width, label='Total CVE entries', color='white', alpha=1, edgecolor='k')
     for i in range(len(year)):
         year[i] += width
-    plt.bar(year, linked, width=width, label='Linked', color='k', alpha=0.5, edgecolor='k')
+    plt.bar(year, linked, width=width, label='Classified CVE entries', color='k', alpha=0.5, edgecolor='k')
     plt.legend()
-    plt.savefig('./myData/thesis/cve2cwe/image/fig1.png',dpi=600, bbox_inches='tight')
+    plt.xticks([i for i in range(1999, 2022)], rotation=300)
+    plt.savefig('./myData/thesis/cve2cwe/image/fig1.png',dpi=1000, bbox_inches='tight')
     plt.show()
 
 

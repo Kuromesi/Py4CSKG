@@ -136,6 +136,97 @@ class CAPECTraverser(XmlTraverser):
                             relation = related_weakness.name
                             # self.rs.saveRDF(src, dest, relation)
 
+class CWETraverser(XmlTraverser):
+    def __init__(self, path: str):
+        self.TYPE = "Weakness"
+        with open(path, "r") as file:
+            self.soup = BeautifulSoup(file, "xml")
+    
+    def traverse(self):
+        srcID, destID = None, None
+        
+        # Find views
+        views = self.soup.find_all("View")
+        for view in views:
+            if view["Status"] != "Deprecated":
+                # Find view properties
+                type = view.name
+                name = view["Name"]
+                src = "CWE-" + view["ID"]
+                objective = view.Objective.text
+                node_prop = {
+                    "id": src,
+                    "name": name,
+                    "type": type,
+                    "prop": self.TYPE,
+                    "des": objective,
+                    "url": src
+                }
+                # Save node
+                srcID = self.ds.addNode(node_prop)
+
+                #Find members
+                members = view.Members
+                if members is not None:
+                    for member in members.children:
+                        dest = "CWE-" + member["CWE_ID"]
+                        relation = member.name
+                        self.rs.saveRDF(src, dest, relation)
+                # Find categories
+                categories = self.soup.find_all("Category")
+                for view in categories:
+                    if view["Status"] != "Deprecated":
+                        # Find categories properties
+                        type = view.name
+                        name = view["Name"]
+                        src = "CWE-" + view["ID"]
+                        objective = view.Summary.text
+                        node_prop = {
+                            "id": src,
+                            "name": name,
+                            "type": type,
+                            "prop": self.TYPE,
+                            "des": objective,
+                            "url": src
+                        }
+                        # Save node
+                        srcID = self.ds.addNode(node_prop)
+                        # Find members
+                        members = view.Relationships
+                        if members is not None:
+                            for member in members.children:
+                                dest = "CWE-" + member["CWE_ID"]
+                                relation = member.name
+                                self.rs.saveRDF(src, dest, relation)
+                                
+                # Find weaknesses
+                weaknesses = self.soup.find_all("Weakness")
+                for weakness in weaknesses:
+                    if weakness["Status"] != "Deprecated":
+                        # Find weakness properties
+                        type = weakness.name
+                        name = weakness["Name"]
+                        src = "CWE-" + weakness["ID"]
+                        objective = weakness.Description.text
+                        node_prop = {
+                            "id": src,
+                            "name": name,
+                            "type": type,
+                            "prop": self.TYPE,
+                            "des": objective,
+                            "url": src
+                        }
+                        # Save node
+                        srcID = self.ds.addNode(node_prop)
+                        
+                # Find members
+                members = weakness.Relationships
+                if members is not None:
+                    for member in members.children:
+                        dest = "CWE-" + member["CWE_ID"]
+                        relation = member.name
+                        self.rs.saveRDF(src, dest, relation)
+
 if __name__ == "__main__":
     capect = CAPECTraverser('data/CAPEC.xml')
     capect.traverse()
