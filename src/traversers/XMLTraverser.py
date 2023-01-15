@@ -1,6 +1,7 @@
 # from service.GDBSaver import GDBSaver
 # from service.RDBSaver import RDBSaver
 from bs4 import BeautifulSoup
+import pandas as pd
 
 class XmlTraverser: 
     def init(self): 
@@ -37,6 +38,7 @@ class CAPECTraverser(XmlTraverser):
         # self.rs = RDBSaver()
 
     def traverse(self):
+        df = pd.DataFrame(columns=['id', 'description'])
         # Find views
         views = self.soup.find_all("View")
         for view in views:
@@ -55,6 +57,7 @@ class CAPECTraverser(XmlTraverser):
                     "des": objective,
                     "url": src
                 }
+                df.loc[len(df.index)] = [src, objective] #kuro
         
         # Save node
         # srcID = self.ds.addNode(node_prop)
@@ -86,6 +89,7 @@ class CAPECTraverser(XmlTraverser):
                     "des": objective,
                     "url": src
                 }
+                df.loc[len(df.index)] = [src, objective] #kuro
                 # Save node
                 # srcID = self.ds.addNode(node_prop)
                 # Find members
@@ -106,6 +110,7 @@ class CAPECTraverser(XmlTraverser):
                 name = atkpt["Name"]
                 src = "CAPEC-" + atkpt["ID"]
                 print(src)
+                
                 description = self.get_value(atkpt, "Description") + self.get_value(atkpt, "Extended_Description")
                 node_prop = {
                     "id": src,
@@ -115,6 +120,8 @@ class CAPECTraverser(XmlTraverser):
                     "des": description,
                     "url": src
                 }
+                df.loc[len(df.index)] = [src, self.get_value(atkpt, "Description")] #kuro
+
                 # Save node
                 # srcID = self.ds.addNode(node_prop)
 
@@ -135,6 +142,7 @@ class CAPECTraverser(XmlTraverser):
                             dest = "CWE-" + related_weakness['CWE_ID']
                             relation = related_weakness.name
                             # self.rs.saveRDF(src, dest, relation)
+        df.to_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv', index=False)       
 
 class CWETraverser(XmlTraverser):
     def __init__(self, path: str):
