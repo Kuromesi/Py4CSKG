@@ -1,4 +1,4 @@
-# from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer
 from transformers import BertModel, BertConfig, AutoTokenizer
 import pandas as pd
 
@@ -29,6 +29,18 @@ class TextSimilarity():
         df = df.sort_values(by='similarity', ascending=False)
         print(df)
 
+    def _calculate_similarity(self, docs:pd.DataFrame, query):
+        model = SentenceTransformer('all-MiniLM-L6-v2', device='cuda')
+        docs_vec = model.encode(docs['description'].tolist())
+        query_vec = model.encode(query)
+        df = pd.DataFrame(columns=['id', 'similarity'])
+        for i in range(len(docs_vec)):
+            doc_vec = docs_vec[i]
+            sim = self.cosine_distance(doc_vec, query_vec)[0]
+            doc_id = docs['id'].loc[i]
+            df.loc[len(df.index)] = [doc_id, sim]
+        df = df.sort_values(by='similarity', ascending=False)
+        print(df)
 
 
 if __name__ == '__main__':
@@ -39,7 +51,7 @@ if __name__ == '__main__':
     df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
     ts = TextSimilarity()
     text = "SQL injection vulnerability allows remote attackers execute arbitrary SQL commands via the username parameter."
-    ts.calculate_similarity(df, text)
+    ts._calculate_similarity(df, text)
 #Sentences are encoded by calling model.encode()
 # embeddings = model.encode(sentences)
 # print(cosine_distance(embeddings[0], embeddings[1]))
