@@ -59,17 +59,17 @@ class CAPECTraverser(XmlTraverser):
                 }
                 df.loc[len(df.index)] = [src, objective] #kuro
         
-        # Save node
-        # srcID = self.ds.addNode(node_prop)
-        
-        # Find members
-        members = view.Members
-        if members:
-            for member in members.children:
-                if member != "\n":
-                    dest = "CAPEC-" + member["CAPEC_ID"]
-                    relation = member.name
-                    # self.rs.saveRDF(src, dest, relation)
+                # Save node
+                # srcID = self.ds.addNode(node_prop)
+                
+                # Find members
+                members = view.Members
+                if members:
+                    for member in members.children:
+                        if member != "\n":
+                            dest = "CAPEC-" + member["CAPEC_ID"]
+                            relation = member.name
+                            # self.rs.saveRDF(src, dest, relation)
         
         # Find categories
         categories = self.soup.find_all("Category")
@@ -106,18 +106,20 @@ class CAPECTraverser(XmlTraverser):
         for atkpt in atkpts:
             if atkpt["Status"] != "Deprecated":
                 # Find attack patterns properties
-                type = atkpt.name
+                type = atkpt['Abstraction']
                 name = atkpt["Name"]
                 src = "CAPEC-" + atkpt["ID"]
                 print(src)
                 
-                description = self.get_value(atkpt, "Description") + self.get_value(atkpt, "Extended_Description")
+                description = self.get_value(atkpt, "Description") 
+                extended_des = self.get_value(atkpt, "Extended_Description")
                 node_prop = {
                     "id": src,
                     "name": name,
                     "type": type,
                     "prop": self.TYPE,
-                    "des": description,
+                    "description": description,
+                    "extended_description": extended_des,
                     "url": src
                 }
                 df.loc[len(df.index)] = [src, self.get_value(atkpt, "Description")] #kuro

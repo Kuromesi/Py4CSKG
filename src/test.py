@@ -12,13 +12,13 @@ spacy.prefer_gpu()
 def cosine_distance(x, y):
     return np.dot(x, y.T) / (np.linalg.norm(x) * np.linalg.norm(y))
 
-# nlp = spacy.load('./myData/ATTACKLabel/output/model-best')
-# txt = "For example, AD CS certificates can be stolen from encrypted storage (in the Registry or files), misplaced certificate files (i.e. [MASK]), or directly from the Windows certificate store via various crypto APIs."
+nlp = spacy.load('./data/v1/output/model-best')
+txt = "Adobe Acrobat and Reader versions 2019.021.20061 and earlier, 2017.011.30156 and earlier, 2017.011.30156 and earlier, and 2015.006.30508 and earlier have a privilege escalation vulnerability. Successful exploitation could lead to arbitrary file system write."
 
 
-# tmp = nlp(txt)
-# for ent in tmp.ents:
-#     print(ent.text, ent.label_)
+tmp = nlp(txt)
+for ent in tmp.ents:
+    print(ent.text, ent.label_)
 # trainer = Trainer()
 
 # nlp = spacy.load('en_core_web_lg')
@@ -84,7 +84,7 @@ def cosine_distance(x, y):
 # res = pd.read_csv('./myData/learning/result.csv')
 # res.loc[len(res.index)] = ['1', '2', '3', '4', '5']
 # print(1)
-toML('myData/learning/CVE2CWE/base/cve.test', 'myData/learning/CVE2CWE/base/cve_test.csv')
+# toML('myData/learning/CVE2CWE/base/cve.test', 'myData/learning/CVE2CWE/base/cve_test.csv')
 # summarize_cve2cwe()
 # find_weakness()
 # traverseCWE()
