@@ -295,7 +295,7 @@ class MultiClassBertConfig(object):
         d_model = 256 #512 in Transformer Paper
         dropout = 0.2
         output_size = 295
-        lr = 0.001
+        lr = 5e-5
         max_epochs = 10
         batch_size = 256
         max_sen_len = 100

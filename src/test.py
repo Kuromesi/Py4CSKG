@@ -1,11 +1,11 @@
 import spacy
-from utils.NLP import NLP
-import numpy as np
-from utils.PathFinder import *
-from utils.CVEExtractor import *
-from utils.utils import *
-from models.trainer import Trainer
-from utils.cweTree import *
+# from utils.NLP import NLP
+# import numpy as np
+# from utils.PathFinder import *
+# from utils.CVEExtractor import *
+# from utils.utils import *
+# from models.trainer import Trainer
+# from utils.cweTree import *
 
 spacy.prefer_gpu()
 
@@ -13,7 +13,7 @@ def cosine_distance(x, y):
     return np.dot(x, y.T) / (np.linalg.norm(x) * np.linalg.norm(y))
 
 nlp = spacy.load('./data/v1/output/model-best')
-txt = "Adobe Acrobat and Reader versions 2019.021.20061 and earlier, 2017.011.30156 and earlier, 2017.011.30156 and earlier, and 2015.006.30508 and earlier have a privilege escalation vulnerability. Successful exploitation could lead to arbitrary file system write."
+txt = "The SSI printenv command in Apache Tomcat 9.0.0.M1 to 9.0.0.17, 8.5.0 to 8.5.39 and 7.0.0 to 7.0.93 echoes user provided data without escaping and is, therefore, vulnerable to XSS. SSI is disabled by default. The printenv command is intended for debugging and is unlikely to be present in a production website."
 
 
 tmp = nlp(txt)

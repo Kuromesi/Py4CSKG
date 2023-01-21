@@ -41,7 +41,7 @@ def train():
     # config = MultiClassBiLSTMConfig()
     # config = MultiClassBertBiLSTMConfig()
     # config = MultiClassGPT2BiLSTMConfig()
-    config = MultiClassGruCNNBaseConfig()
+    # config = MultiClassGruCNNBaseConfig()
     # config = MultiClassRobertaBiLSTMConfig()
     # config = MultiLabelBiLSTMConfigTactic()
     # config = MultiLabelTransformerTacticConfig()
@@ -51,7 +51,7 @@ def train():
     # config = MultiClassBiLSTMCNNConfig()
     # config = MultiClassRNNConfig()
     # config = MultiClassTransformerConfig()
-    # config = MultiClassBertConfig()
+    config = MultiClassBertConfig()
     # config = MultiClassBiLSTMNLPConfig()
     trainer_config = config.trainer_config
     model_config = config.model_config
@@ -113,8 +113,8 @@ def evaluate():
         report.to_csv('./myData/learning/evaluation/%s.csv'%conf.trainer_config.name, index=False)
 
 if __name__=='__main__':
-    # train()
+    train()
     # multi_train()
     # multiClassPredict()
     # multiLabelPredict()
-    evaluate()
+    # evaluate()

@@ -9,7 +9,7 @@ from models.layers.encoder import EncoderLayer, Encoder
 from models.layers.feed_forward import PositionwiseFeedForward
 import numpy as np
 from models.utils.utils import *
-from transformers import BertModel, BertConfig, RobertaModel, RobertaConfig, GPT2Config, GPT2Model
+from transformers import BertModel, BertConfig, RobertaModel, RobertaConfig, GPT2Config, GPT2Model, BertPreTrainedModel
 from models.Model import Model
 from models.utils.metric import MultiClassScorer
 
@@ -73,27 +73,77 @@ class MultiClassBiLSTM(MultiClass):
         logits = self.classifier(logits)
         return logits
     
-class MultiClassBert(MultiClass):
-    def __init__(self, config, src_vocab):
-        super(MultiClassBert, self).__init__()
-        self.config = config
-        self.best = 0
-        bertConfig = BertConfig.from_pretrained(config.model_name)
+class MultiClassBert(BertPreTrainedModel):
 
-        # Embedding layer
-        self.src_embed = BertModel.from_pretrained(config.model_name, config=bertConfig)
-
-        # Fully-Connected Layer
-        self.classifier = nn.Sequential(
-            # nn.Linear(bertConfig.hidden_size, bertConfig.hidden_size),
-            # nn.ReLU(),
-            nn.Linear(bertConfig.hidden_size, config.output_size))
+    def __init__(self, config):
+        super(MultiClassBert, self).__init__(config)
+        self.bert = BertModel(config)
+        self.dropout = torch.nn.Dropout(config.hidden_dropout_prob)
+        self.classifier = torch.nn.Linear(config.hidden_size, config.num_labels)
+        self.init_weights()
 
     def forward(self, x):
-        with torch.no_grad():
-            logits = self.src_embed(x['data'], attention_mask=x['attention_mask'])[1] # shape = (batch_size, sen_len, d_model)
+        logits = self.bert(x['data'], attention_mask=x['attention_mask'])[1] # shape = (batch_size, sen_len, d_model)
         logits = self.classifier(logits)
         return logits
+    
+    def add_optimizer(self, optimizer, config):
+        self.best = 0
+        self.config = config
+        self.optimizer = optimizer
+        self.scorer = MultiClassScorer()
+        # Exponential
+        # self.attenuation = torch.optim.lr_scheduler.ExponentialLR(self.optimizer, gamma=self.config.gamma)
+        
+        # Step
+        self.attenuation = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=int(self.config.max_epochs / 3), gamma=self.config.gamma)
+        
+    def loss_op(self, data):
+        y = data['label']
+        y_pred = data['predict']
+        y = y.type(torch.cuda.LongTensor)
+        loss = nn.CrossEntropyLoss()
+        loss = loss(y_pred, y)
+        return loss
+                
+    def run_epoch(self, train_iterator, val_iterator, epoch):
+        train_losses = []
+        val_accuracies = []
+        losses = []
+            
+        for i, batch in enumerate(train_iterator):
+            self.optimizer.zero_grad()
+            if torch.cuda.is_available():
+                x = batch[1].cuda()
+                # y = (batch[0] - 1).type(torch.cuda.LongTensor)
+                y = batch[0].cuda()
+            else:
+                x = batch[1].type(torch.LongTensor)
+                # y = (batch[0] - 1).type(torch.LongTensor)
+                y = batch[0]
+            data = {'data': x,
+                    'label': y,
+                    'attention_mask': batch[2].cuda()}
+            y_pred = self.__call__(data)
+            data['predict'] = y_pred
+            loss = self.loss_op(data)
+            loss.backward()
+            losses.append(loss.data.cpu().numpy())
+            self.optimizer.step()
+            if i % 500 == 0:
+                print("Iter: {}".format(i+1))
+                avg_train_loss = np.mean(losses)
+                train_losses.append(avg_train_loss)
+                print("\tAverage training loss: {:.5f}".format(avg_train_loss))
+                losses = []
+                
+                # Evalute Accuracy on validation set
+                report = self.scorer.evaluate_model(self, val_iterator, "Validation")
+                if (epoch  > 4 * self.config.max_epochs / 5 and self.best < report['precision']):
+                    save_model(self, self.model_path)
+                    self.best = report['precision']
+                self.train()       
+        return train_losses, val_accuracies
 
 class MultiClassBertBiLSTM(MultiClass):
     def __init__(self, config, src_vocab):

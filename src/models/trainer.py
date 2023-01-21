@@ -49,7 +49,7 @@ class Trainer():
         elif self.model == 'MultiClassBiLSTMCNN':
             self.run(MultiClassBiLSTMCNN(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
         elif self.model == 'MultiClassBert':
-            self.run(MultiClassBert(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
+            self.run(MultiClassBert.from_pretrained(self.model_config.model_name, num_labels=self.model_config.output_size), self.model_config.model_type)
         elif self.model == 'MultiClassRobertaBiLSTM':
             self.run(MultiClassRobertaBiLSTM(self.model_config, len(self.dataset.vocab)), self.model_config.model_type)
         elif self.model == 'MultiClassGPT2BiLSTM':
@@ -66,7 +66,7 @@ class Trainer():
         model.labels = labels
         model.cuda()
         model.train()
-        model.add_optimizer(optim.Adam(model.parameters(), lr=self.model_config.lr, weight_decay=0.0002))
+        model.add_optimizer(optim.Adam(model.parameters(), lr=self.model_config.lr, weight_decay=0.0002), self.model_config)
         
         train_losses = []
         val_accuracies = []

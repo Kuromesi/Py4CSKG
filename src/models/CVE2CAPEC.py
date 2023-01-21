@@ -33,7 +33,7 @@ class TextSimilarity():
         '''
         BERT
         '''
-        docs_embedding = self.embedding(docs).detach().numpy()
+        docs_embedding = self.embedding(docs['description'].tolist()).detach().numpy()
         query_embedding = self.embedding(query).detach().numpy()
         df = pd.DataFrame(columns=['id', 'similarity'])
         for i in range(len(docs_embedding)):

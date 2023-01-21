@@ -115,7 +115,7 @@ class Dataset():
     def load_data(self, train_file, test_file=None, val_file=None):
         # tokenizer = lambda sent: [x.lemma_.lower() for x in NLP(sent) if x.lemma_.lower() != " "]
         # tokenizer = get_tokenizer('basic_english')
-        with open(train_file, 'r') as datafile:     
+        with open(train_file, 'r', encoding='utf-8') as datafile:     
                     data = [line.strip().split(',', maxsplit=1) for line in datafile if len(line.strip().split(',', maxsplit=1)) > 1]
                     data_text = list(map(lambda x: x[1], data))
                     data_label = list(map(lambda x: self.parse_label(x[0]), data))
@@ -124,7 +124,7 @@ class Dataset():
         self.label_pipeline = lambda x: int(x) - 1
 
         # Load test data
-        with open(test_file, 'r') as datafile:     
+        with open(test_file, 'r', encoding='utf-8') as datafile:     
             data = [line.strip().split(',', maxsplit=1) for line in datafile]
             data_text = list(map(lambda x: x[1], data))
             data_label = list(map(lambda x: self.parse_label(x[0]), data))
