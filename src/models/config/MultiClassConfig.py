@@ -296,11 +296,11 @@ class MultiClassBertConfig(object):
         dropout = 0.2
         output_size = 295
         lr = 5e-5
-        max_epochs = 10
-        batch_size = 256
-        max_sen_len = 100
+        max_epochs = 30
+        batch_size = 64
+        max_sen_len = 200
         gamma = 0.5
-        model_name = "jackaduma/SecBERT" #bert-base-uncased jackaduma/SecBERT
+        model_name = "bert-base-uncased" #bert-base-uncased jackaduma/SecBERT
 
     class trainer_config:
         name = "MultiClassBert"
