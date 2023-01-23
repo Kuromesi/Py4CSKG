@@ -35,8 +35,8 @@ class TextSimilarity():
         tokens = tokens['input_ids']
         decoded_text = self.tokenizer.tokenize(text)
         
-        weight = torch.ones(52)
-        l = [i for i in range(30, 49)]
+        weight = torch.ones(61)
+        l = [i for i in range(18, 52)] + [i for i in range(53, 58)]
         weight[l] = 50
         embedding = self.bert(tokens)[0]
         weight = weight.unsqueeze(-1).expand(embedding.size()).float()
@@ -147,6 +147,10 @@ if __name__ == '__main__':
 # model = SentenceTransformer('all-MiniLM-L6-v2', device='cuda')
 
 #Our sentences we like to encode
+    df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
+    ts = TextSimilarity()
+    text = "The International Domain Name (IDN) support in Epiphany allows remote attackers to spoof domain names using punycode encoded domain names that are decoded in URLs and SSL certificates in a way that uses homograph characters from other character sets, which facilitates phishing attacks."
+    ts.calculate_similarity(df, text)
 #Sentences are encoded by calling model.encode()
 # embeddings = model.encode(sentences)
 # print(cosine_distance(embeddings[0], embeddings[1]))
