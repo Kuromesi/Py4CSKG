@@ -2,6 +2,9 @@
 # from service.RDBSaver import RDBSaver
 from bs4 import BeautifulSoup
 import pandas as pd
+import re
+
+CVE = re.compile(r'CVE-\d*-\d*')
 
 class XmlTraverser: 
     def init(self): 
@@ -38,7 +41,7 @@ class CAPECTraverser(XmlTraverser):
         # self.rs = RDBSaver()
 
     def traverse(self):
-        df = pd.DataFrame(columns=['id', 'name', 'description'])
+        df = pd.DataFrame(columns=['id', 'name', 'description', 'cve'])
         # Find views
         views = self.soup.find_all("View")
         for view in views:
@@ -57,7 +60,8 @@ class CAPECTraverser(XmlTraverser):
                     "des": objective,
                     "url": src
                 }
-                df.loc[len(df.index)] = [src, name, objective] #kuro
+                t = view.get_text()
+                df.loc[len(df.index)] = [src, name, objective, CVE.findall(t)] #kuro
         
                 # Save node
                 # srcID = self.ds.addNode(node_prop)
@@ -89,7 +93,8 @@ class CAPECTraverser(XmlTraverser):
                     "des": objective,
                     "url": src
                 }
-                df.loc[len(df.index)] = [src, name, objective] #kuro
+                t = category.get_text()
+                df.loc[len(df.index)] = [src, name, objective, CVE.findall(t)] #kuro
                 # Save node
                 # srcID = self.ds.addNode(node_prop)
                 # Find members
@@ -122,7 +127,8 @@ class CAPECTraverser(XmlTraverser):
                     "extended_description": extended_des,
                     "url": src
                 }
-                df.loc[len(df.index)] = [src, name, self.get_value(atkpt, "Description")] #kuro
+                t = atkpt.get_text()
+                df.loc[len(df.index)] = [src, name, self.get_value(atkpt, "Description"), CVE.findall(t)] #kuro
 
                 # Save node
                 # srcID = self.ds.addNode(node_prop)
