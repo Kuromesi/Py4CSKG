@@ -38,7 +38,7 @@ class CAPECTraverser(XmlTraverser):
         # self.rs = RDBSaver()
 
     def traverse(self):
-        df = pd.DataFrame(columns=['id', 'description'])
+        df = pd.DataFrame(columns=['id', 'name', 'description'])
         # Find views
         views = self.soup.find_all("View")
         for view in views:
@@ -57,7 +57,7 @@ class CAPECTraverser(XmlTraverser):
                     "des": objective,
                     "url": src
                 }
-                df.loc[len(df.index)] = [src, objective] #kuro
+                df.loc[len(df.index)] = [src, name, objective] #kuro
         
                 # Save node
                 # srcID = self.ds.addNode(node_prop)
@@ -89,7 +89,7 @@ class CAPECTraverser(XmlTraverser):
                     "des": objective,
                     "url": src
                 }
-                df.loc[len(df.index)] = [src, objective] #kuro
+                df.loc[len(df.index)] = [src, name, objective] #kuro
                 # Save node
                 # srcID = self.ds.addNode(node_prop)
                 # Find members
@@ -122,7 +122,7 @@ class CAPECTraverser(XmlTraverser):
                     "extended_description": extended_des,
                     "url": src
                 }
-                df.loc[len(df.index)] = [src, self.get_value(atkpt, "Description")] #kuro
+                df.loc[len(df.index)] = [src, name, self.get_value(atkpt, "Description")] #kuro
 
                 # Save node
                 # srcID = self.ds.addNode(node_prop)
