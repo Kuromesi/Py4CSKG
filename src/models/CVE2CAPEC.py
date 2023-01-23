@@ -32,14 +32,15 @@ class TextSimilarity():
         tokens = tokens['input_ids']
         decoded_text = self.tokenizer.tokenize(text)
         
-        weight = torch.ones(97)
-        l = [63, 64, 50, 51, 52, 53, 54, 55]
-        weight[l] = 10
+        weight = torch.ones(61)
+        l = [i for i in range(18, 52)] + [i for i in range(53, 58)]
+        weight[l] = 50
         embedding = self.bert(tokens)[0]
         weight = weight.unsqueeze(-1).expand(embedding.size()).float()
         print(embedding.size())
         mask = attention_mask.unsqueeze(-1).expand(embedding.size()).float()
         masked_embeddings = embedding * mask * weight
+        # masked_embeddings = embedding * mask
         summed = torch.sum(masked_embeddings, 1)
         summed_mask = torch.clamp(mask.sum(1), min=1e-9)
         mean_pooled = summed / summed_mask
@@ -89,7 +90,7 @@ if __name__ == '__main__':
 #Our sentences we like to encode
     df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
     ts = TextSimilarity()
-    text = "the SSI printenv command in Apache Tomcat 9.0.0.M1 to 9.0.0.17, 8.5.0 to 8.5.39 and 7.0.0 to 7.0.93 echoes user provided data without escaping and is, therefore, vulnerable to XSS. SSI is disabled by default. The printenv command is intended for debugging and is unlikely to be present in a production website."
+    text = "The International Domain Name (IDN) support in Epiphany allows remote attackers to spoof domain names using punycode encoded domain names that are decoded in URLs and SSL certificates in a way that uses homograph characters from other character sets, which facilitates phishing attacks."
     ts.calculate_similarity(df, text)
 #Sentences are encoded by calling model.encode()
 # embeddings = model.encode(sentences)
