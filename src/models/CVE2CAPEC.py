@@ -55,6 +55,8 @@ class TextSimilarity():
         BERT
         '''
         docs_embedding = self.embedding(docs['description'].tolist()).detach().numpy()
+        name_embedding = self.embedding(docs['name'].tolist()).detach().numpy()
+        docs_embedding = (10 * name_embedding + docs_embedding) / 11
         query_embedding = self.weighted_embedding(query).detach().numpy()
         df = pd.DataFrame(columns=['id', 'similarity'])
         for i in range(len(docs_embedding)):
