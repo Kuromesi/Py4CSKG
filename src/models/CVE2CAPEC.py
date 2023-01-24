@@ -6,6 +6,9 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from ast import literal_eval
 from sklearn.metrics import f1_score
+from sklearn.feature_extraction.text import TfidfVectorizer
+import spacy, re
+from tqdm import tqdm, trange
 
 class TextSimilarity():
     def __init__(self) -> None: 
@@ -35,14 +38,14 @@ class TextSimilarity():
         tokens = tokens['input_ids']
         decoded_text = self.tokenizer.tokenize(text)
         
-        weight = torch.ones(61)
-        l = [i for i in range(18, 52)] + [i for i in range(53, 58)]
-        weight[l] = 50
+        # weight = torch.ones(61)
+        # l = [i for i in range(18, 52)] + [i for i in range(53, 58)]
+        # weight[l] = 50
         embedding = self.bert(tokens)[0]
-        weight = weight.unsqueeze(-1).expand(embedding.size()).float()
+        # weight = weight.unsqueeze(-1).expand(embedding.size()).float()
         mask = attention_mask.unsqueeze(-1).expand(embedding.size()).float()
-        masked_embeddings = embedding * mask * weight
-        # masked_embeddings = embedding * mask
+        # masked_embeddings = embedding * mask * weight
+        masked_embeddings = embedding * mask
         summed = torch.sum(masked_embeddings, 1)
         summed_mask = torch.clamp(mask.sum(1), min=1e-9)
         mean_pooled = summed / summed_mask
@@ -105,6 +108,7 @@ class TextSimilarity():
         df = df.sort_values(by='similarity', ascending=False)
         print(df)
 
+
 def precision_test():
     '''
     Predict corresponding CAPEC of CVE
@@ -141,16 +145,43 @@ def calculate_precision():
     t = f1_score(y_true=df['true'].tolist(), y_pred=df['pred'].tolist(), average='micro')
     print(t)
 
+def preprocess(text):
+    spacy.prefer_gpu()
+    # Official model
+    nlp = spacy.load('en_core_web_trf')
+    text = nlp(text)
+    tmp = ""
+    for token in text:
+        if not token.is_stop and token.is_alpha:
+            tmp += token.lemma_.lower() + " "
+    return tmp.strip()
+
+def tfidf():
+    df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
+    corpus = df['description']
+    bar = trange(len(corpus))
+    for i in bar:
+        bar.set_postfix(ID=df['id'].loc[i])
+        corpus[i] = preprocess(corpus[i])
+    df['processed'] = corpus
+    df.to_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv', index=False)
+    tv=TfidfVectorizer()#初始化一个空的tv。
+    tv_fit=tv.fit_transform(corpus)#用训练数据充实tv,也充实了tv_fit。
+    print("fit后，所有的词汇如下：")
+    print(tv.get_feature_names())
+    print("fit后，训练数据的向量化表示为：")
+    print(tv_fit.toarray())
+
 
 if __name__ == '__main__':
 
 # model = SentenceTransformer('all-MiniLM-L6-v2', device='cuda')
 
 #Our sentences we like to encode
-    df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
-    ts = TextSimilarity()
-    text = "The International Domain Name (IDN) support in Epiphany allows remote attackers to spoof domain names using punycode encoded domain names that are decoded in URLs and SSL certificates in a way that uses homograph characters from other character sets, which facilitates phishing attacks."
-    ts.calculate_similarity(df, text)
+    # df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
+    # ts = TextSimilarity()
+    # text = "The International Domain Name (IDN) support in Epiphany allows remote attackers to spoof domain names using punycode encoded domain names that are decoded in URLs and SSL certificates in a way that uses homograph characters from other character sets, which facilitates phishing attacks."
+    # ts.calculate_similarity(df, text)
 #Sentences are encoded by calling model.encode()
 # embeddings = model.encode(sentences)
 # print(cosine_distance(embeddings[0], embeddings[1]))
@@ -159,9 +190,11 @@ if __name__ == '__main__':
 #     print("Sentence:", sentence)
 #     print("Embedding:", embedding)
 #     print("")
-    df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
-    ts = TextSimilarity()
-    text = "Dave Nielsen and Patrick Breitenbach PayPal Web Services (aka PHP Toolkit) 0.50, and possibly earlier versions, allows remote attackers to enter false payment entries into the log file via HTTP POST requests to ipn_success.php."
-    ts.calculate_similarity(df, text)
+    # df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
+    # ts = TextSimilarity()
+    # text = "Dave Nielsen and Patrick Breitenbach PayPal Web Services (aka PHP Toolkit) 0.50, and possibly earlier versions, allows remote attackers to enter false payment entries into the log file via HTTP POST requests to ipn_success.php."
+    # ts.calculate_similarity(df, text)
     # precision_test()
     # calculate_precision()
+    tfidf()
+    # print()
