@@ -9,6 +9,8 @@ from sklearn.metrics import f1_score
 from sklearn.feature_extraction.text import TfidfVectorizer
 import spacy, re
 from tqdm import tqdm, trange
+from gensim import corpora
+from gensim.models import TfidfModel
 
 class TextSimilarity():
     def __init__(self) -> None: 
@@ -18,19 +20,33 @@ class TextSimilarity():
         self.bert = BertModel.from_pretrained(model_name, config=bert_config)
         self.batch_size = 32
 
-    def embedding(self, text):
+    def embedding(self, text, weight=None, weighted=True):
         tokens = self.tokenizer(text, padding=True, return_tensors="pt")
         attention_mask = tokens['attention_mask']
-        tokens = tokens['input_ids']
-        decoded_text = self.tokenizer.decode(tokens[0])
+        tokens_ids = tokens['input_ids']
+        # FOR TEST ONLY
+        decoded_text = self.tokenizer.decode(tokens_ids[0])
         decoded_text = decoded_text.split()
-        embedding = self.bert(tokens)[0]
+        
+        embedding = self.bert(tokens_ids)[0]
         mask = attention_mask.unsqueeze(-1).expand(embedding.size()).float()
-        masked_embeddings = embedding * mask
+
+        if weighted:
+            feature = weight['feature']
+            tfidf = weight['tfidf']
+            weight = []
+            for tokens_id in tokens_ids:
+                temp = [tfidf[np.where(feature==str(i.item()))][0] if i != 0 else 0.0 for i in tokens_id ]
+                weight.append(temp)
+            weight = torch.tensor(weight)
+            weight = weight.unsqueeze(-1).expand(embedding.size()).float()
+            masked_embeddings = embedding * mask * weight
+        else:
+            masked_embeddings = embedding * mask
         summed = torch.sum(masked_embeddings, 1)
         summed_mask = torch.clamp(mask.sum(1), min=1e-9)
         mean_pooled = summed / summed_mask
-        return mean_pooled
+        return {'embedding': mean_pooled}
 
     def weighted_embedding(self, text, weight=[]):
         tokens = self.tokenizer(text, padding=True, return_tensors="pt")
@@ -38,43 +54,65 @@ class TextSimilarity():
         tokens = tokens['input_ids']
         decoded_text = self.tokenizer.tokenize(text)
         
-        # weight = torch.ones(61)
-        # l = [i for i in range(18, 52)] + [i for i in range(53, 58)]
-        # weight[l] = 50
+        weight = torch.ones(tokens.size(1))
+        l = [i for i in range(20, 23)] + [i for i in range(27, 38)]
+        weight[l] = 10
         embedding = self.bert(tokens)[0]
-        # weight = weight.unsqueeze(-1).expand(embedding.size()).float()
+        weight = weight.unsqueeze(-1).expand(embedding.size()).float()
         mask = attention_mask.unsqueeze(-1).expand(embedding.size()).float()
-        # masked_embeddings = embedding * mask * weight
-        masked_embeddings = embedding * mask
+        masked_embeddings = embedding * mask * weight
+        # masked_embeddings = embedding * mask
         summed = torch.sum(masked_embeddings, 1)
         summed_mask = torch.clamp(mask.sum(1), min=1e-9)
         mean_pooled = summed / summed_mask
         return mean_pooled
         
-    def batch_embedding(self, text):
+    def batch_embedding(self, text, weight):
         step = len(text) // self.batch_size
         tail = len(text) % self.batch_size
         embedding = None
         for i in range(step):
             batch = text[i * self.batch_size: (i + 1) * self.batch_size]
             if embedding is not None:
-                embedding = torch.cat((embedding, self.embedding(batch)), 0)
+                embedding = torch.cat((embedding, self.embedding(batch, weight)['embedding']), 0)
             else:
-                embedding = self.embedding(batch)
+                embedding = self.embedding(batch, weight)['embedding']
 
         batch = text[step * self.batch_size: len(text)]
-        embedding = torch.cat((embedding, self.embedding(batch)), 0)
+        embedding = torch.cat((embedding, self.embedding(batch, weight)['embedding']), 0)
         return embedding
     
+    def transform_tfidf(self, corpus):
+        tv=TfidfVectorizer()#初始化一个空的tv。
+        corpus_vec = []
+        for corp in corpus:
+            text = ""
+            for i in self.tokenizer.encode(corp):
+                text += str(i) + " "
+            corpus_vec.append(text.strip())
+        tv.fit_transform(corpus_vec)#用训练数据充实tv,也充实了tv_fit。
+        features = tv.get_feature_names_out()
+        tfidf = tv.idf_
+        return {'feature': features, 'tfidf': tfidf}
+
     def calculate_similarity(self, docs:pd.DataFrame, query):
         '''
         BERT
         '''
-        name_embedding = self.batch_embedding(docs['name'].tolist()).detach().numpy()
-        docs_embedding = self.batch_embedding(docs['description'].tolist()).detach().numpy()
+        # name_embedding = self.batch_embedding(docs['name'].tolist()).detach().numpy()
+        # docs_embedding = self.batch_embedding(docs['description'].tolist()).detach().numpy()
         # docs_embedding = self.embedding(docs['description'].tolist()).detach().numpy()
-        
         # docs_embedding = (1 * name_embedding + docs_embedding) / 2
+        
+        # t = [doc.split() for doc in docs['processed'].tolist()]
+        # dictionary = corpora.Dictionary([doc.split() for doc in docs['processed'].tolist()])
+        # corpus = [dictionary.doc2bow(doc.split()) for doc in docs['processed'].tolist()]
+        # tv = TfidfModel(corpus)
+        # tfidf = tv['employ']
+        weight = self.transform_tfidf(docs['processed'].tolist())
+        
+        docs_embedding = self.batch_embedding(docs['processed'].tolist(), weight).detach().numpy()
+        
         query_embedding = self.weighted_embedding(query).detach().numpy()
         df = pd.DataFrame(columns=['id', 'similarity'])
         for i in range(len(docs_embedding)):
@@ -84,12 +122,6 @@ class TextSimilarity():
             df.loc[len(df.index)] = [doc_id, sim]
         df = df.sort_values(by='similarity', ascending=False)
         print(df)
-
-    def batch_calculate_similarity(self, docs:pd.DataFrame, query):
-        name_embedding = self.batch_embedding(docs['name'].tolist()).detach().numpy()
-        docs_embedding = self.batch_embedding(docs['description'].tolist()).detach().numpy()
-        docs_embedding = (1 * name_embedding + docs_embedding) / 2
-        query_embedding = self.batch_embedding(query).detach().numpy()
 
     def _calculate_similarity(self, docs:pd.DataFrame, query):
         '''
@@ -146,6 +178,13 @@ def calculate_precision():
     print(t)
 
 def preprocess(text):
+    # df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
+    # corpus = df['description']
+    # bar = trange(len(corpus))
+    # for i in bar:
+    #     bar.set_postfix(ID=df['id'].loc[i])
+    #     corpus[i] = preprocess(corpus[i])
+    # df['processed'] = corpus
     spacy.prefer_gpu()
     # Official model
     nlp = spacy.load('en_core_web_trf')
@@ -157,19 +196,14 @@ def preprocess(text):
     return tmp.strip()
 
 def tfidf():
-    df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
-    corpus = df['description']
-    bar = trange(len(corpus))
-    for i in bar:
-        bar.set_postfix(ID=df['id'].loc[i])
-        corpus[i] = preprocess(corpus[i])
-    df['processed'] = corpus
-    df.to_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv', index=False)
+    df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv', index_col=0)
+    corpus = df['processed']
     tv=TfidfVectorizer()#初始化一个空的tv。
     tv_fit=tv.fit_transform(corpus)#用训练数据充实tv,也充实了tv_fit。
     print("fit后，所有的词汇如下：")
     print(tv.get_feature_names())
     print("fit后，训练数据的向量化表示为：")
+    a = tv_fit.toarray()
     print(tv_fit.toarray())
 
 
@@ -190,11 +224,11 @@ if __name__ == '__main__':
 #     print("Sentence:", sentence)
 #     print("Embedding:", embedding)
 #     print("")
-    # df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
-    # ts = TextSimilarity()
-    # text = "Dave Nielsen and Patrick Breitenbach PayPal Web Services (aka PHP Toolkit) 0.50, and possibly earlier versions, allows remote attackers to enter false payment entries into the log file via HTTP POST requests to ipn_success.php."
-    # ts.calculate_similarity(df, text)
+    df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+    ts = TextSimilarity()
+    text = "The Internationalized Domain Names (IDN) blacklist in Mozilla Firefox 3.0.6 and other versions before 3.0.9; Thunderbird before 2.0.0.21; and SeaMonkey before 1.1.15 does not include box-drawing characters, which allows remote attackers to spoof URLs and conduct phishing attacks, as demonstrated by homoglyphs of the / (slash) and ? (question mark) characters in a subdomain of a .cn domain name, a different vulnerability than CVE-2005-0233"
+    ts.calculate_similarity(df, preprocess(text))
     # precision_test()
     # calculate_precision()
-    tfidf()
+    # tfidf()
     # print()
