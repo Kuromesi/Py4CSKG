@@ -177,18 +177,12 @@ def calculate_precision():
     t = f1_score(y_true=df['true'].tolist(), y_pred=df['pred'].tolist(), average='micro')
     print(t)
 
+spacy.prefer_gpu()
+NLP = spacy.load('en_core_web_trf')
+
 def preprocess(text):
-    # df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
-    # corpus = df['description']
-    # bar = trange(len(corpus))
-    # for i in bar:
-    #     bar.set_postfix(ID=df['id'].loc[i])
-    #     corpus[i] = preprocess(corpus[i])
-    # df['processed'] = corpus
-    spacy.prefer_gpu()
     # Official model
-    nlp = spacy.load('en_core_web_trf')
-    text = nlp(text)
+    text = NLP(text)
     tmp = ""
     for token in text:
         if not token.is_stop and token.is_alpha:
@@ -196,8 +190,14 @@ def preprocess(text):
     return tmp.strip()
 
 def tfidf():
-    df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv', index_col=0)
-    corpus = df['processed']
+    df = pd.read_csv('./myData/learning/CVE2CAPEC/cve.csv')
+    corpus = df['des']
+    bar = trange(len(corpus))
+    for i in bar:
+        bar.set_postfix(ID=df['id'].loc[i])
+        corpus[i] = preprocess(corpus[i])
+    df['processed'] = corpus
+    df.to_csv('./myData/learning/CVE2CAPEC/cve_nlp.csv', index=False)
     tv=TfidfVectorizer()#初始化一个空的tv。
     tv_fit=tv.fit_transform(corpus)#用训练数据充实tv,也充实了tv_fit。
     print("fit后，所有的词汇如下：")
@@ -224,11 +224,11 @@ if __name__ == '__main__':
 #     print("Sentence:", sentence)
 #     print("Embedding:", embedding)
 #     print("")
-    df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-    ts = TextSimilarity()
-    text = "The Internationalized Domain Names (IDN) blacklist in Mozilla Firefox 3.0.6 and other versions before 3.0.9; Thunderbird before 2.0.0.21; and SeaMonkey before 1.1.15 does not include box-drawing characters, which allows remote attackers to spoof URLs and conduct phishing attacks, as demonstrated by homoglyphs of the / (slash) and ? (question mark) characters in a subdomain of a .cn domain name, a different vulnerability than CVE-2005-0233"
-    ts.calculate_similarity(df, preprocess(text))
+    # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+    # ts = TextSimilarity()
+    # text = "The Internationalized Domain Names (IDN) blacklist in Mozilla Firefox 3.0.6 and other versions before 3.0.9; Thunderbird before 2.0.0.21; and SeaMonkey before 1.1.15 does not include box-drawing characters, which allows remote attackers to spoof URLs and conduct phishing attacks, as demonstrated by homoglyphs of the / (slash) and ? (question mark) characters in a subdomain of a .cn domain name, a different vulnerability than CVE-2005-0233"
+    # ts.calculate_similarity(df, preprocess(text))
     # precision_test()
     # calculate_precision()
-    # tfidf()
+    tfidf()
     # print()
