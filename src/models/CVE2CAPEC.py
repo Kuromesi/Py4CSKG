@@ -54,32 +54,32 @@ class TextSimilarity():
         tokens = tokens['input_ids']
         decoded_text = self.tokenizer.tokenize(text)
         
-        weight = torch.ones(tokens.size(1))
-        l = [i for i in range(20, 23)] + [i for i in range(27, 38)]
-        weight[l] = 10
+        # weight = torch.ones(tokens.size(1))
+        # l = [i for i in range(1, 4)] + [i for i in range(23, 30)]
+        # weight[l] = 10
         embedding = self.bert(tokens)[0]
-        weight = weight.unsqueeze(-1).expand(embedding.size()).float()
+        # weight = weight.unsqueeze(-1).expand(embedding.size()).float()
         mask = attention_mask.unsqueeze(-1).expand(embedding.size()).float()
-        masked_embeddings = embedding * mask * weight
-        # masked_embeddings = embedding * mask
+        # masked_embeddings = embedding * mask * weight
+        masked_embeddings = embedding * mask
         summed = torch.sum(masked_embeddings, 1)
         summed_mask = torch.clamp(mask.sum(1), min=1e-9)
         mean_pooled = summed / summed_mask
         return mean_pooled
         
-    def batch_embedding(self, text, weight):
+    def batch_embedding(self, text, weight=None, weighted=False):
         step = len(text) // self.batch_size
         tail = len(text) % self.batch_size
         embedding = None
         for i in range(step):
             batch = text[i * self.batch_size: (i + 1) * self.batch_size]
             if embedding is not None:
-                embedding = torch.cat((embedding, self.embedding(batch, weight)['embedding']), 0)
+                embedding = torch.cat((embedding, self.embedding(batch, weight, weighted=weighted)['embedding']), 0)
             else:
-                embedding = self.embedding(batch, weight)['embedding']
+                embedding = self.embedding(batch, weight, weighted=weighted)['embedding']
 
         batch = text[step * self.batch_size: len(text)]
-        embedding = torch.cat((embedding, self.embedding(batch, weight)['embedding']), 0)
+        embedding = torch.cat((embedding, self.embedding(batch, weight, weighted=weighted)['embedding']), 0)
         return embedding
     
     def transform_tfidf(self, corpus):
@@ -109,11 +109,14 @@ class TextSimilarity():
         # corpus = [dictionary.doc2bow(doc.split()) for doc in docs['processed'].tolist()]
         # tv = TfidfModel(corpus)
         # tfidf = tv['employ']
-        weight = self.transform_tfidf(docs['processed'].tolist())
+        cves = pd.read_csv('./myData/learning/CVE2CAPEC/cve_nlp.csv', index_col=0)
+
+        docs_weight = self.transform_tfidf(docs['processed'].tolist())
+        query_weight = self.transform_tfidf(cves['processed'].tolist())
+
+        docs_embedding = self.batch_embedding(docs['description'].tolist(), docs_weight, weighted=False).detach().numpy()
         
-        docs_embedding = self.batch_embedding(docs['processed'].tolist(), weight).detach().numpy()
-        
-        query_embedding = self.weighted_embedding(query).detach().numpy()
+        query_embedding = self.weighted_embedding(query, query_weight).detach().numpy()
         df = pd.DataFrame(columns=['id', 'similarity'])
         for i in range(len(docs_embedding)):
             doc_vec = docs_embedding[i]
@@ -122,6 +125,39 @@ class TextSimilarity():
             df.loc[len(df.index)] = [doc_id, sim]
         df = df.sort_values(by='similarity', ascending=False)
         print(df)
+
+    def precision_test(self):
+        '''
+        Predict corresponding CAPEC of CVE
+        '''
+        capec_df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+        cve_df = pd.read_csv('./myData/learning/CVE2CAPEC/cve.csv', index_col=0)
+        
+        cves = []
+        true = []
+        true_des = []
+        pred = []
+        pred_des = []
+        for i in range(len(capec_df.index)):
+            cur = literal_eval(capec_df['cve'].loc[i])
+            true += [capec_df['id'].loc[i]] * len(cur)
+            true_des += [capec_df['name'].loc[i]] * len(cur)
+            cves += cur
+        query = cve_df.loc[cves]['des'].to_list()
+        docs_weight = self.transform_tfidf(capec_df['description'].tolist())
+        query_weight = self.transform_tfidf(cve_df['des'].tolist())
+
+        docs_embedding = self.batch_embedding(capec_df['description'].tolist(), docs_weight, weighted=True).detach().numpy()
+        # name_embedding = ts.batch_embedding(capec_df['name'].tolist()).detach().numpy()
+        # docs_embedding = (1 * name_embedding + docs_embedding) / 2
+        query_embedding = self.batch_embedding(query, query_weight, weighted=True).detach().numpy()
+        sim = cosine_similarity(docs_embedding, query_embedding)
+        index = np.argmax(sim, axis=0)
+        for i in index:
+            pred.append(capec_df['id'].loc[i])
+            pred_des.append(capec_df['name'].loc[i])
+        result_df = pd.DataFrame({'id': cves, 'true': true, 'pred': pred, 'true_name': true_des, 'pred_name': pred_des, 'cve_des': query})
+        result_df.to_csv('./myData/learning/CVE2CAPEC/result_weight.csv', index=False)
 
     def _calculate_similarity(self, docs:pd.DataFrame, query):
         '''
@@ -141,39 +177,10 @@ class TextSimilarity():
         print(df)
 
 
-def precision_test():
-    '''
-    Predict corresponding CAPEC of CVE
-    '''
-    capec_df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
-    cve_df = pd.read_csv('./myData/learning/CVE2CAPEC/cve.csv', index_col=0)
-    
-    cves = []
-    true = []
-    true_des = []
-    pred = []
-    pred_des = []
-    for i in range(len(capec_df.index)):
-        cur = literal_eval(capec_df['cve'].loc[i])
-        true += [capec_df['id'].loc[i]] * len(cur)
-        true_des += [capec_df['name'].loc[i]] * len(cur)
-        cves += cur
-    query = cve_df.loc[cves]['des'].to_list()
-    ts = TextSimilarity()
-    docs_embedding = ts.batch_embedding(capec_df['description'].tolist()).detach().numpy()
-    # name_embedding = ts.batch_embedding(capec_df['name'].tolist()).detach().numpy()
-    # docs_embedding = (1 * name_embedding + docs_embedding) / 2
-    query_embedding = ts.batch_embedding(query).detach().numpy()
-    sim = cosine_similarity(docs_embedding, query_embedding)
-    index = np.argmax(sim, axis=0)
-    for i in index:
-        pred.append(capec_df['id'].loc[i])
-        pred_des.append(capec_df['name'].loc[i])
-    result_df = pd.DataFrame({'id': cves, 'true': true, 'pred': pred, 'true_name': true_des, 'pred_name': pred_des, 'cve_des': query})
-    result_df.to_csv('./myData/learning/CVE2CAPEC/result.csv', index=False)
+
 
 def calculate_precision():
-    df = pd.read_csv('./myData/learning/CVE2CAPEC/result.csv')
+    df = pd.read_csv('./myData/learning/CVE2CAPEC/result_weight.csv')
     t = f1_score(y_true=df['true'].tolist(), y_pred=df['pred'].tolist(), average='micro')
     print(t)
 
@@ -184,14 +191,17 @@ def preprocess(text):
     # Official model
     text = NLP(text)
     tmp = ""
+    # for token in text:
+    #     if not token.is_stop and token.is_alpha:
+    #         tmp += token.lemma_.lower() + " "
     for token in text:
-        if not token.is_stop and token.is_alpha:
+        if not token.is_stop and not token.is_digit and not token.is_punct:
             tmp += token.lemma_.lower() + " "
     return tmp.strip()
 
 def tfidf():
     df = pd.read_csv('./myData/learning/CVE2CAPEC/cve.csv')
-    corpus = df['des']
+    corpus = df['des'].tolist()
     bar = trange(len(corpus))
     for i in bar:
         bar.set_postfix(ID=df['id'].loc[i])
@@ -226,9 +236,15 @@ if __name__ == '__main__':
 #     print("")
     # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
     # ts = TextSimilarity()
-    # text = "The Internationalized Domain Names (IDN) blacklist in Mozilla Firefox 3.0.6 and other versions before 3.0.9; Thunderbird before 2.0.0.21; and SeaMonkey before 1.1.15 does not include box-drawing characters, which allows remote attackers to spoof URLs and conduct phishing attacks, as demonstrated by homoglyphs of the / (slash) and ? (question mark) characters in a subdomain of a .cn domain name, a different vulnerability than CVE-2005-0233"
-    # ts.calculate_similarity(df, preprocess(text))
+    # text = "Integer overflow in the ProcAuWriteElement function in server/dia/audispatch.c in Network Audio System (NAS) before 1.8a SVN 237 allows remote attackers to cause a denial of service (crash) and possibly execute arbitrary code via a large max_samples value."
+    # ts.calculate_similarity(df, text)
     # precision_test()
     # calculate_precision()
     tfidf()
     # print()
+
+
+    # PRECISION TEST
+    # ts = TextSimilarity()
+    # ts.precision_test()
+    # calculate_precision()
