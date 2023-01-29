@@ -21,7 +21,7 @@ class TextSimilarity():
         self.batch_size = 32
 
     def embedding(self, text, weight=None, weighted=True):
-        tokens = self.tokenizer(text, padding=True, return_tensors="pt")
+        tokens = self.tokenizer(text, padding=True, return_tensors="pt", truncation=True, max_length=512)
         attention_mask = tokens['attention_mask']
         tokens_ids = tokens['input_ids']
         # FOR TEST ONLY
@@ -87,7 +87,7 @@ class TextSimilarity():
         corpus_vec = []
         for corp in corpus:
             text = ""
-            for i in self.tokenizer.encode(corp):
+            for i in self.tokenizer.encode(corp, truncation=True, max_length=512):
                 text += str(i) + " "
             corpus_vec.append(text.strip())
         tv.fit_transform(corpus_vec)#用训练数据充实tv,也充实了tv_fit。
@@ -114,7 +114,7 @@ class TextSimilarity():
         docs_weight = self.transform_tfidf(docs['processed'].tolist())
         query_weight = self.transform_tfidf(cves['processed'].tolist())
 
-        docs_embedding = self.batch_embedding(docs['description'].tolist(), docs_weight, weighted=False).detach().numpy()
+        docs_embedding = self.batch_embedding(docs['processed'].tolist(), docs_weight, weighted=False).detach().numpy()
         
         query_embedding = self.weighted_embedding(query, query_weight).detach().numpy()
         df = pd.DataFrame(columns=['id', 'similarity'])
@@ -126,12 +126,12 @@ class TextSimilarity():
         df = df.sort_values(by='similarity', ascending=False)
         print(df)
 
-    def precision_test(self):
+    def precision_test(self, fuzzy_num=0):
         '''
         Predict corresponding CAPEC of CVE
         '''
         capec_df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-        cve_df = pd.read_csv('./myData/learning/CVE2CAPEC/cve.csv', index_col=0)
+        cve_df = pd.read_csv('./myData/learning/CVE2CAPEC/cve_nlp.csv', index_col=0)
         
         cves = []
         true = []
@@ -144,18 +144,23 @@ class TextSimilarity():
             true_des += [capec_df['name'].loc[i]] * len(cur)
             cves += cur
         query = cve_df.loc[cves]['des'].to_list()
-        docs_weight = self.transform_tfidf(capec_df['description'].tolist())
+        docs = capec_df['processed'].tolist()
+        docs_weight = self.transform_tfidf(docs)
         query_weight = self.transform_tfidf(cve_df['des'].tolist())
 
-        docs_embedding = self.batch_embedding(capec_df['description'].tolist(), docs_weight, weighted=True).detach().numpy()
+        docs_embedding = self.batch_embedding(docs, docs_weight, weighted=True).detach().numpy()
         # name_embedding = ts.batch_embedding(capec_df['name'].tolist()).detach().numpy()
         # docs_embedding = (1 * name_embedding + docs_embedding) / 2
         query_embedding = self.batch_embedding(query, query_weight, weighted=True).detach().numpy()
         sim = cosine_similarity(docs_embedding, query_embedding)
-        index = np.argmax(sim, axis=0)
-        for i in index:
-            pred.append(capec_df['id'].loc[i])
-            pred_des.append(capec_df['name'].loc[i])
+        
+        if fuzzy_num:
+            pass
+        else:
+            index = np.argmax(sim, axis=0)
+            for i in index:
+                pred.append(capec_df['id'].loc[i])
+                pred_des.append(capec_df['name'].loc[i])
         result_df = pd.DataFrame({'id': cves, 'true': true, 'pred': pred, 'true_name': true_des, 'pred_name': pred_des, 'cve_des': query})
         result_df.to_csv('./myData/learning/CVE2CAPEC/result_weight.csv', index=False)
 
@@ -195,19 +200,18 @@ def preprocess(text):
     #     if not token.is_stop and token.is_alpha:
     #         tmp += token.lemma_.lower() + " "
     for token in text:
-        if not token.is_stop and not token.is_digit and not token.is_punct:
             tmp += token.lemma_.lower() + " "
     return tmp.strip()
 
 def tfidf():
-    df = pd.read_csv('./myData/learning/CVE2CAPEC/cve.csv')
-    corpus = df['des'].tolist()
+    df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
+    corpus = df['description'].tolist()
     bar = trange(len(corpus))
     for i in bar:
         bar.set_postfix(ID=df['id'].loc[i])
         corpus[i] = preprocess(corpus[i])
     df['processed'] = corpus
-    df.to_csv('./myData/learning/CVE2CAPEC/cve_nlp.csv', index=False)
+    df.to_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv', index=False)
     tv=TfidfVectorizer()#初始化一个空的tv。
     tv_fit=tv.fit_transform(corpus)#用训练数据充实tv,也充实了tv_fit。
     print("fit后，所有的词汇如下：")
@@ -240,11 +244,11 @@ if __name__ == '__main__':
     # ts.calculate_similarity(df, text)
     # precision_test()
     # calculate_precision()
-    tfidf()
+    # tfidf()
     # print()
 
 
     # PRECISION TEST
-    # ts = TextSimilarity()
-    # ts.precision_test()
-    # calculate_precision()
+    ts = TextSimilarity()
+    ts.precision_test()
+    calculate_precision()
