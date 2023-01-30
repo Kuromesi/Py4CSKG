@@ -44,8 +44,8 @@ class CAPECTraverser(XmlTraverser):
         df = pd.DataFrame(columns=['id', 'name', 'description', 'cve'])
         # Find views
         views = self.soup.find_all("View")
-        print("TRAVERSING VIEWS")
         views = tqdm(views)
+        views.set_description("TRAVERSING VIEWS")
         for view in views:
             if view["Status"] != "Deprecated":
                 # Find view properties
@@ -87,8 +87,8 @@ class CAPECTraverser(XmlTraverser):
         
         # Find categories
         categories = self.soup.find_all("Category")
-        print("TRAVERSING CATEGORIES")
         categories = tqdm(categories)
+        views.set_description("TRAVERSING CATEGORIES")
         for category in categories:
             if category["Status"] != "Deprecated":
                 # Find categories properties
@@ -127,8 +127,8 @@ class CAPECTraverser(XmlTraverser):
 
         # Find attack patterns
         atkpts = self.soup.find_all("Attack_Pattern")
-        print("TRAVERSING ATTACK PATTERNS")
         atkpts = tqdm(atkpts)
+        views.set_description("TRAVERSING ATTACK PATTERNS")
         for atkpt in atkpts:
             if atkpt["Status"] != "Deprecated":
                 # Find attack patterns properties
@@ -191,8 +191,8 @@ class CWETraverser(XmlTraverser):
         
         # Find views
         views = self.soup.find_all("View")
-        print("TRAVERSING VIEWS")
         views = tqdm(views)
+        views.set_description("TRAVERSING VIEWS")
         for view in views:
             if view["Status"] != "Deprecated":
                 # Find view properties
@@ -230,8 +230,8 @@ class CWETraverser(XmlTraverser):
 
         # Find categories
         categories = self.soup.find_all("Category")
-        print("TRAVERSING CATEGORIES")
         categories = tqdm(categories)
+        views.set_description("TRAVERSING CATEGORIES")
         for view in categories:
             if view["Status"] != "Deprecated":
                 # Find categories properties
@@ -268,8 +268,8 @@ class CWETraverser(XmlTraverser):
                             
         # Find weaknesses
         weaknesses = self.soup.find_all("Weakness")
-        print("TRAVERSING WEAKNESSES")
         weaknesses = tqdm(weaknesses)
+        views.set_description("TRAVERSING WEAKNESSES")
         for weakness in weaknesses:
             if weakness["Status"] != "Deprecated":
                 # Find weakness properties
