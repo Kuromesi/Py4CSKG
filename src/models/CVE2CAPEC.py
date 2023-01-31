@@ -155,7 +155,16 @@ class TextSimilarity():
         sim = cosine_similarity(docs_embedding, query_embedding)
         
         if fuzzy_num:
-            pass
+            index = np.argsort(np.transpose(sim), axis=1)
+            for i in range(len(index)):
+                ind = index[i][-fuzzy_num: ]
+                true_id = capec_df[capec_df['id'] == true[i]].index.to_list()[0]
+                if true_id in ind:
+                    pred.append(capec_df['id'].loc[true_id])
+                    pred_des.append(capec_df['name'].loc[true_id])
+                else:
+                    pred.append(capec_df['id'].loc[ind[-1]])
+                    pred_des.append(capec_df['name'].loc[ind[-1]])
         else:
             index = np.argmax(sim, axis=0)
             for i in index:
@@ -181,6 +190,20 @@ class TextSimilarity():
         df = df.sort_values(by='similarity', ascending=False)
         print(df)
 
+class TFIDFSimilarity():
+    
+    def calculate(self, df, query):
+        docs = df['processed'].tolist()
+        tv = TfidfVectorizer()
+        sents = docs + [query]
+        tv.fit_transform(sents)
+        docs_vec = tv.transform(docs).toarray()
+        query_vec = tv.transform([query]).toarray()
+        sim = cosine_similarity(query_vec, docs_vec)
+        index = np.argmax(sim, axis=1)
+        id = df['id'].loc[index]
+        print(id)
+
 
 
 
@@ -189,8 +212,6 @@ def calculate_precision():
     t = f1_score(y_true=df['true'].tolist(), y_pred=df['pred'].tolist(), average='micro')
     print(t)
 
-spacy.prefer_gpu()
-NLP = spacy.load('en_core_web_trf')
 
 def preprocess(text):
     # Official model
@@ -249,6 +270,14 @@ if __name__ == '__main__':
 
 
     # PRECISION TEST
-    ts = TextSimilarity()
-    ts.precision_test()
-    calculate_precision()
+    # spacy.prefer_gpu()
+    # NLP = spacy.load('en_core_web_trf')
+    # ts = TextSimilarity()
+    # ts.precision_test(fuzzy_num=10)
+    # calculate_precision()
+
+    # TFIDF SIMILARITY
+    df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+    tis = TFIDFSimilarity()
+    query = "Directory traversal vulnerability in CesarFTP 0.98b and earlier allows remote authenticated users (such as anonymous) to read arbitrary files via a GET with a filename that contains a ...%5c (modified dot dot)."
+    tis.calculate(df, query)
