@@ -3,6 +3,7 @@
 
 # Saved models
 ckpts
+trained_models
 
 # Data
 data

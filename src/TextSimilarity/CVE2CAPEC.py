@@ -11,6 +11,7 @@ import spacy, re
 from tqdm import tqdm, trange
 from gensim import corpora
 from gensim.models import TfidfModel
+from predict import *
 
 class TextSimilarity():
     def __init__(self) -> None: 
@@ -19,6 +20,9 @@ class TextSimilarity():
         bert_config = BertConfig.from_pretrained(model_name)
         self.bert = BertModel.from_pretrained(model_name, config=bert_config)
         self.batch_size = 32
+
+    def init_ner(self):
+        self.ner = NERPredict()
 
     def embedding(self, text, weight=None, weighted=True):
         tokens = self.tokenizer(text, padding=True, return_tensors="pt", truncation=True, max_length=512)
@@ -48,20 +52,21 @@ class TextSimilarity():
         mean_pooled = summed / summed_mask
         return {'embedding': mean_pooled}
 
-    def weighted_embedding(self, text, weight=[]):
+    def weighted_embedding(self, text, weighted=False):
         tokens = self.tokenizer(text, padding=True, return_tensors="pt")
         attention_mask = tokens['attention_mask']
         tokens = tokens['input_ids']
-        decoded_text = self.tokenizer.tokenize(text)
-        
-        # weight = torch.ones(tokens.size(1))
-        # l = [i for i in range(1, 4)] + [i for i in range(23, 30)]
-        # weight[l] = 10
         embedding = self.bert(tokens)[0]
-        # weight = weight.unsqueeze(-1).expand(embedding.size()).float()
         mask = attention_mask.unsqueeze(-1).expand(embedding.size()).float()
-        # masked_embeddings = embedding * mask * weight
-        masked_embeddings = embedding * mask
+        if weighted:
+            weight = torch.ones(tokens.size(1))
+            res = self.ner.predict(text)
+            l = res['weight']
+            weight[l] = 20
+            weight = weight.unsqueeze(-1).expand(embedding.size()).float()
+            masked_embeddings = embedding * mask * weight
+        else:
+            masked_embeddings = embedding * mask
         summed = torch.sum(masked_embeddings, 1)
         summed_mask = torch.clamp(mask.sum(1), min=1e-9)
         mean_pooled = summed / summed_mask
@@ -112,11 +117,10 @@ class TextSimilarity():
         cves = pd.read_csv('./myData/learning/CVE2CAPEC/cve_nlp.csv', index_col=0)
 
         docs_weight = self.transform_tfidf(docs['processed'].tolist())
-        query_weight = self.transform_tfidf(cves['processed'].tolist())
+        # query_weight = self.transform_tfidf(cves['des'].tolist())
 
         docs_embedding = self.batch_embedding(docs['processed'].tolist(), docs_weight, weighted=False).detach().numpy()
-        
-        query_embedding = self.weighted_embedding(query, query_weight).detach().numpy()
+        query_embedding = self.weighted_embedding(query, weighted=True).detach().numpy()
         df = pd.DataFrame(columns=['id', 'similarity'])
         for i in range(len(docs_embedding)):
             doc_vec = docs_embedding[i]
@@ -192,7 +196,7 @@ class TextSimilarity():
 
 class TFIDFSimilarity():
     
-    def calculate(self, df, query):
+    def calculate(self, df, query, fuzzy_num=0):
         docs = df['processed'].tolist()
         tv = TfidfVectorizer()
         sents = docs + [query]
@@ -200,7 +204,10 @@ class TFIDFSimilarity():
         docs_vec = tv.transform(docs).toarray()
         query_vec = tv.transform([query]).toarray()
         sim = cosine_similarity(query_vec, docs_vec)
-        index = np.argmax(sim, axis=1)
+        if fuzzy_num:
+            pass
+        else:
+            index = np.argmax(sim, axis=1)
         id = df['id'].loc[index]
         print(id)
 
@@ -259,10 +266,11 @@ if __name__ == '__main__':
 #     print("Sentence:", sentence)
 #     print("Embedding:", embedding)
 #     print("")
-    # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-    # ts = TextSimilarity()
-    # text = "Integer overflow in the ProcAuWriteElement function in server/dia/audispatch.c in Network Audio System (NAS) before 1.8a SVN 237 allows remote attackers to cause a denial of service (crash) and possibly execute arbitrary code via a large max_samples value."
-    # ts.calculate_similarity(df, text)
+    df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+    ts = TextSimilarity()
+    text = "IIS 4.0 and 5.0 allows remote attackers to read documents outside of the web root, and possibly execute arbitrary commands, via malformed URLs that contain UNICODE encoded characters, aka the \"Web Server Folder Traversal\" vulnerability."
+    ts.init_ner()
+    ts.calculate_similarity(df, text)
     # precision_test()
     # calculate_precision()
     # tfidf()
@@ -273,11 +281,11 @@ if __name__ == '__main__':
     # spacy.prefer_gpu()
     # NLP = spacy.load('en_core_web_trf')
     # ts = TextSimilarity()
-    # ts.precision_test(fuzzy_num=10)
+    # ts.precision_test(fuzzy_num=0)
     # calculate_precision()
 
     # TFIDF SIMILARITY
-    df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-    tis = TFIDFSimilarity()
-    query = "Directory traversal vulnerability in CesarFTP 0.98b and earlier allows remote authenticated users (such as anonymous) to read arbitrary files via a GET with a filename that contains a ...%5c (modified dot dot)."
-    tis.calculate(df, query)
+    # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+    # tis = TFIDFSimilarity()
+    # query = "Directory traversal vulnerability in CesarFTP 0.98b and earlier allows remote authenticated users (such as anonymous) to read arbitrary files via a GET with a filename that contains a ...%5c (modified dot dot)."
+    # tis.calculate(df, query)
