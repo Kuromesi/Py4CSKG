@@ -52,29 +52,54 @@ class TextSimilarity():
         mean_pooled = summed / summed_mask
         return {'embedding': mean_pooled}
 
+    def batch_weighted_embedding(self, text, weighted):
+        step = len(text) // self.batch_size
+        embedding = None
+        for i in range(step):
+            batch = text[i * self.batch_size: (i + 1) * self.batch_size]
+            if embedding is not None:
+                embedding = torch.cat((embedding, self.weighted_embedding(batch, weighted=weighted)['embedding']), 0)
+            else:
+                embedding = self.weighted_embedding(batch, weighted=weighted)['embedding']
+
+        batch = text[step * self.batch_size: len(text)]
+        embedding = torch.cat((embedding, self.weighted_embedding(batch, weighted=weighted)['embedding']), 0)
+        return embedding
+
     def weighted_embedding(self, text, weighted=False):
-        tokens = self.tokenizer(text, padding=True, return_tensors="pt")
+        tokens = self.tokenizer(text, padding=True, return_tensors="pt", truncation=True, max_length=256)
         attention_mask = tokens['attention_mask']
         tokens = tokens['input_ids']
         embedding = self.bert(tokens)[0]
         mask = attention_mask.unsqueeze(-1).expand(embedding.size()).float()
-        if weighted:
-            weight = torch.ones(tokens.size(1))
-            res = self.ner.predict(text)
-            l = res['weight']
-            weight[l] = 20
-            weight = weight.unsqueeze(-1).expand(embedding.size()).float()
-            masked_embeddings = embedding * mask * weight
+        if isinstance(text, list):
+            if weighted:
+                weight = torch.ones(tokens.size())
+                res = self.ner.predict(text)
+                l = res['weight']
+                for i in range(len(weight)):
+                    weight[i][l[i]] = 10
+                weight = weight.unsqueeze(-1).expand(embedding.size()).float()
+                masked_embeddings = embedding * mask * weight
+            else:
+                masked_embeddings = embedding * mask
         else:
-            masked_embeddings = embedding * mask
+            if weighted:
+                weight = torch.ones(tokens.size(1))
+                res = self.ner.predict(text)
+                l = res['weight']
+                weight[l] = 1000
+                weight = weight.unsqueeze(-1).expand(embedding.size()).float()
+                masked_embeddings = embedding * mask * weight
+            else:
+                masked_embeddings = embedding * mask
         summed = torch.sum(masked_embeddings, 1)
         summed_mask = torch.clamp(mask.sum(1), min=1e-9)
         mean_pooled = summed / summed_mask
-        return mean_pooled
+        return {'embedding': mean_pooled}
         
     def batch_embedding(self, text, weight=None, weighted=False):
         step = len(text) // self.batch_size
-        tail = len(text) % self.batch_size
         embedding = None
         for i in range(step):
             batch = text[i * self.batch_size: (i + 1) * self.batch_size]
@@ -155,7 +180,7 @@ class TextSimilarity():
         docs_embedding = self.batch_embedding(docs, docs_weight, weighted=True).detach().numpy()
         # name_embedding = ts.batch_embedding(capec_df['name'].tolist()).detach().numpy()
         # docs_embedding = (1 * name_embedding + docs_embedding) / 2
-        query_embedding = self.batch_embedding(query, query_weight, weighted=True).detach().numpy()
+        query_embedding = self.batch_embedding(query, query_weight, weighted=False).detach().numpy()
         sim = cosine_similarity(docs_embedding, query_embedding)
         
         if fuzzy_num:
@@ -177,6 +202,55 @@ class TextSimilarity():
         result_df = pd.DataFrame({'id': cves, 'true': true, 'pred': pred, 'true_name': true_des, 'pred_name': pred_des, 'cve_des': query})
         result_df.to_csv('./myData/learning/CVE2CAPEC/result_weight.csv', index=False)
 
+    def _precision_test(self, fuzzy_num=0):
+        '''
+        Predict corresponding CAPEC of CVE
+        '''
+        capec_df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+        cve_df = pd.read_csv('./myData/learning/CVE2CAPEC/cve_nlp.csv', index_col=0)
+        
+        cves = []
+        true = []
+        true_des = []
+        pred = []
+        pred_des = []
+        for i in range(len(capec_df.index)):
+            cur = literal_eval(capec_df['cve'].loc[i])
+            true += [capec_df['id'].loc[i]] * len(cur)
+            true_des += [capec_df['name'].loc[i]] * len(cur)
+            cves += cur
+        query = cve_df.loc[cves]['des'].to_list()
+        docs = capec_df['processed'].tolist()
+        docs_weight = self.transform_tfidf(docs)
+
+        docs_embedding = self.batch_embedding(docs, docs_weight, weighted=True).detach().numpy()
+        name_embedding = self.batch_embedding(capec_df['name'].tolist()).detach().numpy()
+        docs_embedding = 8e-01 * name_embedding + docs_embedding
+        query_embedding = self.batch_weighted_embedding(query, weighted=True).detach().numpy()
+
+        sim = cosine_similarity(docs_embedding, query_embedding)
+        
+        if fuzzy_num:
+            index = np.argsort(np.transpose(sim), axis=1)
+            for i in range(len(index)):
+                ind = index[i][-fuzzy_num: ]
+                true_id = capec_df[capec_df['id'] == true[i]].index.to_list()[0]
+                if true_id in ind:
+                    pred.append(capec_df['id'].loc[true_id])
+                    pred_des.append(capec_df['name'].loc[true_id])
+                else:
+                    pred.append(capec_df['id'].loc[ind[-1]])
+                    pred_des.append(capec_df['name'].loc[ind[-1]])
+        else:
+            index = np.argmax(sim, axis=0)
+            for i in index:
+                pred.append(capec_df['id'].loc[i])
+                pred_des.append(capec_df['name'].loc[i])
+        result_df = pd.DataFrame({'id': cves, 'true': true, 'pred': pred, 'true_name': true_des, 'pred_name': pred_des, 'cve_des': query})
+        result_df.to_csv('./myData/learning/CVE2CAPEC/result_weight.csv', index=False)
+        return {'true': true, 'sim': sim}
+
+
     def _calculate_similarity(self, docs:pd.DataFrame, query):
         '''
         Sentence-BERT
@@ -196,21 +270,63 @@ class TextSimilarity():
 
 class TFIDFSimilarity():
     
-    def calculate(self, df, query, fuzzy_num=0):
-        docs = df['processed'].tolist()
+    def calculate(self, docs, query):
         tv = TfidfVectorizer()
         sents = docs + [query]
         tv.fit_transform(sents)
         docs_vec = tv.transform(docs).toarray()
         query_vec = tv.transform([query]).toarray()
         sim = cosine_similarity(query_vec, docs_vec)
+        return sim
+
+    def precision_test(self, fuzzy_num=0):
+        '''
+        Predict corresponding CAPEC of CVE
+        '''
+        capec_df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+        cve_df = pd.read_csv('./myData/learning/CVE2CAPEC/cve_nlp.csv', index_col=0)
+        
+        cves = []
+        true = []
+        true_des = []
+        pred = []
+        pred_des = []
+        for i in range(len(capec_df.index)):
+            cur = literal_eval(capec_df['cve'].loc[i])
+            true += [capec_df['id'].loc[i]] * len(cur)
+            true_des += [capec_df['name'].loc[i]] * len(cur)
+            cves += cur
+        query = cve_df.loc[cves]['des'].to_list()
+        docs = capec_df['processed'].tolist()
+        names = capec_df['name'].tolist()
+        doc_name = []
+        for i in range(len(docs)):
+            doc_name.append(docs[i] + " " + names[i])
+
+        sim = np.empty((0, len(docs)))
+        for q in query:
+            sim = np.append(sim, self.calculate(doc_name, q), axis=0)
+        
         if fuzzy_num:
-            pass
+            index = np.argsort(sim, axis=1)
+            for i in range(len(index)):
+                ind = index[i][-fuzzy_num: ]
+                true_id = capec_df[capec_df['id'] == true[i]].index.to_list()[0]
+                if true_id in ind:
+                    pred.append(capec_df['id'].loc[true_id])
+                    pred_des.append(capec_df['name'].loc[true_id])
+                else:
+                    pred.append(capec_df['id'].loc[ind[-1]])
+                    pred_des.append(capec_df['name'].loc[ind[-1]])
         else:
             index = np.argmax(sim, axis=1)
-        id = df['id'].loc[index]
-        print(id)
-
+            for i in index:
+                pred.append(capec_df['id'].loc[i])
+                pred_des.append(capec_df['name'].loc[i])
+        result_df = pd.DataFrame({'id': cves, 'true': true, 'pred': pred, 'true_name': true_des, 'pred_name': pred_des, 'cve_des': query})
+        result_df.to_csv('./myData/learning/CVE2CAPEC/result_tfidf.csv', index=False)
+        
+        return {'true': true, 'sim': sim}
 
 
 
@@ -248,6 +364,41 @@ def tfidf():
     a = tv_fit.toarray()
     print(tv_fit.toarray())
 
+def calculate(sim, capec_df, fuzzy_num, true):
+    pred = []
+    index = np.argsort(sim, axis=1)
+    for i in range(len(index)):
+        ind = index[i][-fuzzy_num: ]
+        true_id = capec_df[capec_df['id'] == true[i]].index.to_list()[0]
+        if true_id in ind:
+            pred.append(capec_df['id'].loc[true_id])
+        else:
+            pred.append(capec_df['id'].loc[ind[-1]])
+    f1 = f1_score(y_true=true, y_pred=pred, average='micro')
+    return {'f1': f1}
+
+def comparison_result():
+    '''
+    Generate comparison result between TF-IDF and SBERT
+    '''
+    spacy.prefer_gpu()
+    NLP = spacy.load('en_core_web_trf')
+    capec_df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+    tis = TFIDFSimilarity()
+    ts = TextSimilarity()
+    ts.init_ner()
+    f1_bert = []
+    f1_tfidf = []
+    res = ts._precision_test(fuzzy_num=1)
+    sim_ts = np.transpose(res['sim'])
+    true = res['true']
+    res = tis.precision_test(fuzzy_num=1)
+    sim_tis = res['sim']
+    for i in trange(30):
+        f1_bert.append(calculate(sim_ts, capec_df, i + 1, true)['f1'])
+        f1_tfidf.append(calculate(sim_tis, capec_df, i + 1, true)['f1'])
+    df = pd.DataFrame({'f1_bert': f1_bert, 'f1_tfidf': f1_tfidf})
+    df.to_csv('./myData/learning/CVE2CAPEC/comparison.csv', index=False)
 
 if __name__ == '__main__':
 
@@ -266,11 +417,11 @@ if __name__ == '__main__':
 #     print("Sentence:", sentence)
 #     print("Embedding:", embedding)
 #     print("")
-    df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-    ts = TextSimilarity()
-    text = "IIS 4.0 and 5.0 allows remote attackers to read documents outside of the web root, and possibly execute arbitrary commands, via malformed URLs that contain UNICODE encoded characters, aka the \"Web Server Folder Traversal\" vulnerability."
-    ts.init_ner()
-    ts.calculate_similarity(df, text)
+    # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+    # ts = TextSimilarity()
+    # text = "Heap overflow in FTP daemon in Solaris 8 allows remote attackers to execute arbitrary commands by creating a long pathname and calling the LIST command, which uses glob to generate long strings."
+    # ts.init_ner()
+    # ts.calculate_similarity(df, text)
     # precision_test()
     # calculate_precision()
     # tfidf()
@@ -278,14 +429,15 @@ if __name__ == '__main__':
 
 
     # PRECISION TEST
-    # spacy.prefer_gpu()
-    # NLP = spacy.load('en_core_web_trf')
-    # ts = TextSimilarity()
-    # ts.precision_test(fuzzy_num=0)
-    # calculate_precision()
+    spacy.prefer_gpu()
+    NLP = spacy.load('en_core_web_trf')
+    ts = TextSimilarity()
+    ts.init_ner()
+    ts._precision_test(fuzzy_num=1)
+    calculate_precision()
 
     # TFIDF SIMILARITY
     # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
     # tis = TFIDFSimilarity()
-    # query = "Directory traversal vulnerability in CesarFTP 0.98b and earlier allows remote authenticated users (such as anonymous) to read arbitrary files via a GET with a filename that contains a ...%5c (modified dot dot)."
-    # tis.calculate(df, query)
+    # tis.precision_test(fuzzy_num=30)
+    # calculate_precision()
