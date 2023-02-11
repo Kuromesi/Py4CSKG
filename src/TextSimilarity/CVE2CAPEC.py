@@ -172,15 +172,15 @@ class TextSimilarity():
             true += [capec_df['id'].loc[i]] * len(cur)
             true_des += [capec_df['name'].loc[i]] * len(cur)
             cves += cur
-        query = cve_df.loc[cves]['des'].to_list()
+        query = cve_df.loc[cves]['processed'].to_list()
         docs = capec_df['processed'].tolist()
         docs_weight = self.transform_tfidf(docs)
-        query_weight = self.transform_tfidf(cve_df['des'].tolist())
+        query_weight = self.transform_tfidf(cve_df['processed'].tolist())
 
         docs_embedding = self.batch_embedding(docs, docs_weight, weighted=True).detach().numpy()
         # name_embedding = ts.batch_embedding(capec_df['name'].tolist()).detach().numpy()
         # docs_embedding = (1 * name_embedding + docs_embedding) / 2
-        query_embedding = self.batch_embedding(query, query_weight, weighted=False).detach().numpy()
+        query_embedding = self.batch_embedding(query, query_weight, weighted=True).detach().numpy()
         sim = cosine_similarity(docs_embedding, query_embedding)
         
         if fuzzy_num:
@@ -201,6 +201,7 @@ class TextSimilarity():
                 pred_des.append(capec_df['name'].loc[i])
         result_df = pd.DataFrame({'id': cves, 'true': true, 'pred': pred, 'true_name': true_des, 'pred_name': pred_des, 'cve_des': query})
         result_df.to_csv('./myData/learning/CVE2CAPEC/result_weight.csv', index=False)
+        return {'true': true, 'sim': sim}
 
     def _precision_test(self, fuzzy_num=0):
         '''
@@ -226,7 +227,7 @@ class TextSimilarity():
         docs_embedding = self.batch_embedding(docs, docs_weight, weighted=True).detach().numpy()
         name_embedding = self.batch_embedding(capec_df['name'].tolist()).detach().numpy()
         docs_embedding = 8e-01 * name_embedding + docs_embedding
-        query_embedding = self.batch_weighted_embedding(query, weighted=True).detach().numpy()
+        query_embedding = self.batch_weighted_embedding(query, weighted=False).detach().numpy()
 
         sim = cosine_similarity(docs_embedding, query_embedding)
         
@@ -296,7 +297,7 @@ class TFIDFSimilarity():
             true += [capec_df['id'].loc[i]] * len(cur)
             true_des += [capec_df['name'].loc[i]] * len(cur)
             cves += cur
-        query = cve_df.loc[cves]['des'].to_list()
+        query = cve_df.loc[cves]['processed'].to_list()
         docs = capec_df['processed'].tolist()
         names = capec_df['name'].tolist()
         doc_name = []
@@ -400,6 +401,26 @@ def comparison_result():
     df = pd.DataFrame({'f1_bert': f1_bert, 'f1_tfidf': f1_tfidf})
     df.to_csv('./myData/learning/CVE2CAPEC/comparison.csv', index=False)
 
+def comparison_result_single():
+    '''
+    Generate comparison result between TF-IDF and SBERT
+    '''
+    spacy.prefer_gpu()
+    NLP = spacy.load('en_core_web_trf')
+    capec_df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+    ts = TextSimilarity()
+    ts.init_ner()
+    f1_bert = []
+    res = ts._precision_test(fuzzy_num=1)
+    sim_ts = np.transpose(res['sim'])
+    true = res['true']
+    sim_tis = res['sim']
+    for i in trange(30):
+        f1_bert.append(calculate(sim_ts, capec_df, i + 1, true)['f1'])
+    df = pd.read_csv('./myData/learning/CVE2CAPEC/comparison.csv')
+    df['bert_without_ner'] = f1_bert
+    df.to_csv('./myData/learning/CVE2CAPEC/comparison.csv', index=False)
+
 if __name__ == '__main__':
 
 # model = SentenceTransformer('all-MiniLM-L6-v2', device='cuda')
@@ -429,15 +450,16 @@ if __name__ == '__main__':
 
 
     # PRECISION TEST
-    spacy.prefer_gpu()
-    NLP = spacy.load('en_core_web_trf')
-    ts = TextSimilarity()
-    ts.init_ner()
-    ts._precision_test(fuzzy_num=1)
-    calculate_precision()
+    # spacy.prefer_gpu()
+    # NLP = spacy.load('en_core_web_trf')
+    # ts = TextSimilarity()
+    # ts.init_ner()
+    # ts._precision_test(fuzzy_num=1)
+    # calculate_precision()
 
     # TFIDF SIMILARITY
     # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
     # tis = TFIDFSimilarity()
     # tis.precision_test(fuzzy_num=30)
     # calculate_precision()
+    comparison_result_single()
