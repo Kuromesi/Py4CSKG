@@ -2,8 +2,11 @@ from flask import Flask
 from flask import request, render_template
 import json, html
 from service.utils import *
+from utils.prediction import *
+from utils.draw import *
 
 app = Flask(__name__)
+cve2capec = CVE2CAPEC()
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -34,6 +37,18 @@ def model():
 @app.route('/test', methods=['GET'])
 def test():
     return render_template("test.html")
+
+@app.route('/predict', methods=['GET'])
+def predict():
+    return render_template("predict.html")
+
+@app.route('/predict/submit', methods=['POST'])
+def predict1():
+    cve = request.get_data()
+    cve = json.loads(cve)
+    res = cve2capec.calculate_similarity(cve['cve'])
+    graph = create_cve2net(res, cve['cve'])
+    return graph
 
 @app.errorhandler(404)
 def show_404(e):

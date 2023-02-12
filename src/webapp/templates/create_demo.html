@@ -1,0 +1,160 @@
+<html>
+<meta name="viewport"
+    content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.css" type="text/css" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis-network.min.js"> </script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue/2.7.0/vue.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/navigation.css') }}">
+
+    <style type="text/css">
+        #network {
+            width: 100%;
+            height: 50%;
+            background-color: #ffffff;
+            border: 10px solid lightgray;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        #create_node {
+            float: left;
+            width: 20%;
+            height: 40%;
+        }
+
+        #config {
+            float: left;
+            width: 20%;
+            height: 40%;
+        }
+
+        #display {
+            float: left;
+            width: 20%;
+            height: 40%;
+        }
+
+        .information {
+            width: 80%;
+            height: fit-content;
+            margin: 0 auto;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            margin-top: 5%;
+        }
+
+        .nav {
+            width: 100%;
+            height: fit-content;
+            position: fixed;
+        }
+
+        body {
+            background-image: linear-gradient(to bottom, #ba5370, #f4e2d8);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <div class="nav">
+        <ul class="menu cf">
+            <li><a href="">Menu item</a></li>
+            <li>
+              <a href="">Menu item</a>
+              <ul class="submenu">
+                <li><a href="">Submenu item</a></li>
+                <li><a href="">Submenu item</a></li>
+                <li><a href="">Submenu item</a></li>
+                <li><a href="">Submenu item</a></li>
+              </ul>			
+            </li>
+            <li><a href="">Menu item</a></li>
+            <li><a href="">Menu item</a></li>
+            <li><a href="">Menu item</a></li>
+          </ul>
+
+    </div> -->
+    <div class="container">
+
+        <div id="network">
+            <div id="mynetwork"></div>
+        </div>
+
+
+        <div class="information">
+            <div id="object">
+                Object
+                <div v-for="(v, k) in content">
+                    <p>{[ k ]}: {[ v ]}</p>
+                    <textarea v-model="content[k]"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div id="display">
+            Add or modify node
+            <textarea class="create" id="id"></textarea>
+            <textarea class="create" id="name"></textarea>
+            <textarea class="create" id="contents"></textarea>
+            <button id="modify">add/modify</button>
+        </div>
+
+        <div id="display">
+            Information
+            <textarea class="display" id="id">{[ content ]}</textarea>
+            <textarea class="display" id="name"></textarea>
+            <textarea class="display" id="contents"></textarea>
+        </div>
+
+        <div id="display">
+            Add edge
+            <textarea class="edge" id="node1_id"></textarea>
+            <button id="node1_id">select</button>
+            <textarea class="edge" id="node2_id"></textarea>
+            <button id="node2_id">select</button>
+            <button id="create_edge">create edge</button>
+        </div>
+
+        <div id="display">
+            Delete node
+            <textarea class="delete" id="id"></textarea>
+            <button id="delete_node">delete</button>
+        </div>
+
+        <div id="display">
+            <button id="delete_edge">delete edge</button>
+        </div>
+
+        <div id="object">
+            Object
+            <div v-for="(v, k) in content">
+                <p>{[ k ]}: {[ v ]}</p>
+                <textarea v-model="content[k]"></textarea>
+            </div>
+        </div>
+
+        <div id="config"></div>
+    </div>
+    <script src="{{ url_for('static',filename='js/draw_graph.js') }}"></script>
+    <script>
+        var nodes = '{{ nodes|tojson }}';
+        var edges = '{{ edges|tojson }}';
+        nodes = $.parseJSON(nodes);
+        edges = $.parseJSON(edges);
+        nodes = new vis.DataSet(nodes);
+        edges = new vis.DataSet(edges);
+        network = drawGraph(nodes, edges);
+    </script>
+    <script src="{{ url_for('static',filename='js/create_graph.js') }}"></script>
+</body>
+
+</html>

@@ -13,7 +13,8 @@ t2 = new Vue({
         }
 })
 
-$(function () {
+
+$(function () {         
         var clickedNode;
         var nodeObj = network.body.data.nodes._data;
         network.on('click', function (params) {
@@ -23,7 +24,7 @@ $(function () {
                                 clickedNode = nodes._data[nodeID];
                         }
                         //alert(test) 
-
+                        network.interactionHandler._checkShowPopup(params.pointer.DOM);
                         t1.content = clickedNode.id
                         t2.content = clickedNode
                         $(".display#name").val(clickedNode.name);
