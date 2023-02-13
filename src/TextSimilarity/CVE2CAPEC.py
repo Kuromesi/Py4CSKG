@@ -224,7 +224,7 @@ class TextSimilarity():
         docs = capec_df['processed'].tolist()
         docs_weight = self.transform_tfidf(docs)
 
-        docs_embedding = self.batch_embedding(docs, docs_weight, weighted=True).detach().numpy()
+        docs_embedding = self.batch_embedding(docs, docs_weight, weighted=False).detach().numpy()
         name_embedding = self.batch_embedding(capec_df['name'].tolist()).detach().numpy()
         docs_embedding = 8e-01 * name_embedding + docs_embedding
         query_embedding = self.batch_weighted_embedding(query, weighted=False).detach().numpy()
@@ -418,7 +418,7 @@ def comparison_result_single():
     for i in trange(30):
         f1_bert.append(calculate(sim_ts, capec_df, i + 1, true)['f1'])
     df = pd.read_csv('./myData/learning/CVE2CAPEC/comparison.csv')
-    df['bert_without_ner'] = f1_bert
+    df['bert_noweight'] = f1_bert
     df.to_csv('./myData/learning/CVE2CAPEC/comparison.csv', index=False)
 
 if __name__ == '__main__':

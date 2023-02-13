@@ -67,3 +67,15 @@ function drawGraph(nodes, edges) {
     return network;
 
 }
+
+info = new Vue({
+    el: "#info",
+    delimiters:['{[', ']}'],
+    data: {
+            content: ""
+    }
+})
+
+
+
+
