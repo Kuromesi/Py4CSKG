@@ -13,6 +13,7 @@ class Software():
     description = ""
     product = ""
     version = ""
+    exposed = False
 
 class Firmware():
     name = ""

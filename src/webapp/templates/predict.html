@@ -24,56 +24,7 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/navigation.css') }}">
-
-    <style type="text/css">
-        #network {
-            width: 100%;
-            height: 50%;
-            background-color: #ffffff;
-            border: 10px solid lightgray;
-            position: relative;
-            margin: 0 auto;
-        }
-
-        .information {
-            width: 80%;
-            height: fit-content;
-            margin: 0 auto;
-        }
-
-        .main {
-            width: 70%;
-            height: 100%;
-            margin: 0 auto;
-            margin-top: 5%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .nav {
-            width: 80%;
-            margin-top: 1%;
-        }
-
-        #interaction {
-            width: 100%;
-            margin: 0 auto;
-            margin-top: 5%;
-        }
-
-
-        body {
-            font-size: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-image: linear-gradient(to bottom, #ba5370, #f4e2d8);
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/template.css') }}">
 </head>
 
 <body>
@@ -81,17 +32,25 @@
         <div class="page">
             <nav class="page__menu menu">
                 <ul class="menu__list r-list">
-                    <li class="menu__group"><a href="#0" class="menu__link r-link text-underlined">MODELING</a></li>
-                    <li class="menu__group"><a href="#0" class="menu__link r-link text-underlined">QUERY</a></li>
-                    <li class="menu__group"><a href="#0" class="menu__link r-link text-underlined">EXPLORE</a></li>
+                    <li class="menu__group"><a href="/model" class="menu__link r-link text-underlined">MODELING</a></li>
+                    <li class="menu__group"><a href="/predict" class="menu__link r-link text-underlined">QUERY</a></li>
+                    <li class="menu__group"><a href="/explore" class="menu__link r-link text-underlined">EXPLORE</a></li>
                 </ul>
             </nav>
         </div>
     </div>
     <div class="main">
-
         <div id="network">
             <div id="mynetwork" @click="click"></div>
+            <div id="network_info">
+                <h1>Information</h1>
+                <div>
+                    <div v-for="(v, k) in content">
+                        <h2>{[ k ]}</h2>
+                        <p>{[ v ]}</p>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="interaction">
             <div id="query" style="display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
@@ -106,93 +65,10 @@
                     <button class="btn-1" id="app" @click="send">Send</button>
                 </div>
             </div>
-
-            <div id="info">
-                <h1>Information</h1>
-                <div>
-                    <div v-for="(v, k) in content">
-                        <h2>{[ k ]}</h2>
-                        <p>{[ v ]}</p>
-                    </div>
-                </div>
-            </div>
-
-            <details class="custom-select">
-                <summary class="radios">
-                    <input type="radio" name="item" id="default" title="Select component type" checked>
-                    <input type="radio" name="item" id="item1" title="Component">
-                    <input type="radio" name="item" id="item2" title="Software">
-                    <input type="radio" name="item" id="item3" title="Hardware">
-                    <input type="radio" name="item" id="item4" title="Firmware">
-                    <input type="radio" name="item" id="item5" title="Entry point">
-                    <input type="radio" name="item" id="item6" title="Operation system">
-                </summary>
-                <ul class="list" id="selection">
-                    <li id="selection">
-                        <label for="item1">
-                            Item 1
-                            <span></span>
-                        </label>
-                    </li>
-                    <li id="selection">
-                        <label for="item2">Item 2</label>
-                    </li>
-                    <li id="selection">
-                        <label for="item3">Item 3</label>
-                    </li>
-                    <li id="selection">
-                        <label for="item4">Item 4</label>
-                    </li>
-                    <li id="selection">
-                        <label for="item5">Item 5</label>
-                    </li>
-                </ul>
-            </details>
-
         </div>
     </div>
-
-    <script src="{{ url_for('static',filename='js/new_create.js') }}"></script>
-    <script type="text/javascript">
-        new Vue({
-            el: "#app",
-            methods: {
-                send() {
-                    var cve = document.getElementById("inp").value;
-                    var role = {
-                        "cve": cve
-                    };
-                    var url = "/predict/submit";
-                    axios({
-                        method: 'post',
-                        url: '/predict/submit',
-                        data: role
-                    }).then(function (res) {
-                        console.log(res.data);
-                        var nodes = res.data.nodes;
-                        var edges = res.data.edges;
-                        nodes = new vis.DataSet(nodes);
-                        edges = new vis.DataSet(edges);
-                        network = drawGraph(nodes, edges);
-                        if (network) {
-                            network.on('click', function (params) {
-                                if (params.nodes.length != 0) {
-                                    var nodeID = params.nodes[0];
-                                    if (nodeID) {
-                                        clickedNode = nodes.get(nodeID);
-                                    }
-                                    // content = clickedNode.id
-                                    info.content = clickedNode
-                                }
-                            })
-                        }
-                    });
-                }
-            }
-        });
-    </script>
-
-    <script src="{{ url_for('static',filename='js/create_graph.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/graph.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/predict.js') }}"></script>
 </body>
 
 </html>

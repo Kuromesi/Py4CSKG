@@ -6,7 +6,6 @@ from utils.prediction import *
 from utils.draw import *
 
 app = Flask(__name__)
-cve2capec = CVE2CAPEC()
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -29,10 +28,10 @@ def signin():
 
 @app.route('/model', methods=['GET'])
 def model():
-    project = load_project('./src/modeling/data/test_project')
-    nodes = project['nodes']
-    edges = project['edges']
-    return render_template("create_demo.html", nodes=nodes, edges=edges)
+    # project = load_project('./src/webapp/data/test_project')
+    # nodes = project['nodes']
+    # edges = project['edges']
+    return render_template("model.html")
 
 @app.route('/test', methods=['GET'])
 def test():
@@ -42,12 +41,14 @@ def test():
 def predict():
     return render_template("predict.html")
 
+# cve2capec = CVE2CAPEC()
 @app.route('/predict/submit', methods=['POST'])
 def predict1():
-    cve = request.get_data()
-    cve = json.loads(cve)
-    res = cve2capec.calculate_similarity(cve['cve'])
-    graph = create_cve2net(res, cve['cve'])
+    # cve = request.get_data()
+    # cve = json.loads(cve)
+    # res = cve2capec.calculate_similarity(cve['cve'])
+    # graph = create_cve2net(res, cve['cve'])
+    graph = ""
     return graph
 
 @app.errorhandler(404)
