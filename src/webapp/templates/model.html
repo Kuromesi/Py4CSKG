@@ -60,7 +60,7 @@
                     <div v-if="type==0">
                         <h1>Control panel</h1>
                     </div>
-                    <div v-if="type==1 || type==5">
+                    <div v-if="type=='Component' || type=='Entry Point'">
                         <div class="group">
                             <input id="modeling" type="text" required v-model="cur_node['name']">
                             <span class="highlight"></span>
@@ -79,7 +79,7 @@
                             <button @click="modify_node">Modify Node</button>
                         </div>
                     </div>
-                    <div v-if="type==2 || type==3 || type==4 || type==6">
+                    <div v-if="type=='Software' || type=='Hardware' || type=='Operating System' || type=='Firmware'">
                         <div class="group">
                             <input id="modeling" type="text" required v-model="cur_node['name']">
                             <span class="highlight"></span>
@@ -97,6 +97,9 @@
                             <span class="highlight"></span>
                             <span class="bar"></span>
                             <label id="modeling">Product</label>
+                        </div>
+                        <div style="overflow: auto;" v-if="if_recommend">
+                            <p id="file_link" v-for="recom in recommendations"  @click="fill_product(recom)">{[ recom ]}</p>
                         </div>
                         <div class="group">
                             <input id="modeling" type="text" required v-model="cur_node['version']">
@@ -154,25 +157,25 @@
                         </summary>
                         <ul class="list" id="selection">
                             <li id="selection">
-                                <label for="item1" @click="type=1">
+                                <label for="item1" @click="type='Component'">
                                     Component
                                     <span></span>
                                 </label>
                             </li>
                             <li id="selection">
-                                <label for="item2" @click="type=2">Software</label>
+                                <label for="item2" @click="type='Software'">Software</label>
                             </li>
                             <li id="selection">
-                                <label for="item3" @click="type=3">Hardware</label>
+                                <label for="item3" @click="type='Hardware'">Hardware</label>
                             </li>
                             <li id="selection">
-                                <label for="item4" @click="type=4">Firmware</label>
+                                <label for="item4" @click="type='Firmware'">Firmware</label>
                             </li>
                             <li id="selection">
-                                <label for="item5" @click="type=5">Entry point</label>
+                                <label for="item5" @click="type='Entry point'">Entry point</label>
                             </li>
                             <li id="selection">
-                                <label for="item6" @click="type=6">Operating system</label>
+                                <label for="item6" @click="type='Operating system'">Operating system</label>
                             </li>
                         </ul>
                     </details>

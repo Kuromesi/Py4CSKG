@@ -4,6 +4,7 @@ import json, html
 from service.utils import *
 from utils.prediction import *
 from utils.draw import *
+from utils.search import *
 
 app = Flask(__name__)
 
@@ -54,6 +55,13 @@ def model_load():
     path = request.get_data().decode("utf-8")
     project = load_project(os.path.join('./src/webapp/data', path))
     return project
+
+@app.route('/model/keyword', methods=['POST'])
+def model_keyword():
+    data = json.loads(request.get_data())
+    query = data['query']
+    recommended = search_product(query)
+    return recommended
 
 @app.route('/test', methods=['GET'])
 def test():

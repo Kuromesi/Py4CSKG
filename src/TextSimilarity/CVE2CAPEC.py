@@ -12,6 +12,7 @@ from tqdm import tqdm, trange
 from gensim import corpora
 from gensim.models import TfidfModel
 from predict import *
+import os
 
 class TextSimilarity():
     def __init__(self) -> None: 
@@ -20,14 +21,16 @@ class TextSimilarity():
         bert_config = BertConfig.from_pretrained(model_name)
         self.bert = BertModel.from_pretrained(model_name, config=bert_config)
         self.batch_size = 32
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.bert.to(self.device)
 
     def init_ner(self):
         self.ner = NERPredict()
 
     def embedding(self, text, weight=None, weighted=True):
-        tokens = self.tokenizer(text, padding=True, return_tensors="pt", truncation=True, max_length=512)
-        attention_mask = tokens['attention_mask']
-        tokens_ids = tokens['input_ids']
+        tokens = self.tokenizer(text, padding=True, return_tensors="pt", truncation=True, max_length=512).to(self.device)
+        attention_mask = tokens['attention_mask'].to(self.device)
+        tokens_ids = tokens['input_ids'].to(self.device)
         # FOR TEST ONLY
         decoded_text = self.tokenizer.decode(tokens_ids[0])
         decoded_text = decoded_text.split()
@@ -101,7 +104,7 @@ class TextSimilarity():
     def batch_embedding(self, text, weight=None, weighted=False):
         step = len(text) // self.batch_size
         embedding = None
-        for i in range(step):
+        for i in trange(step):
             batch = text[i * self.batch_size: (i + 1) * self.batch_size]
             if embedding is not None:
                 embedding = torch.cat((embedding, self.embedding(batch, weight, weighted=weighted)['embedding']), 0)
@@ -269,6 +272,13 @@ class TextSimilarity():
             df.loc[len(df.index)] = [doc_id, doc_name, sim]
         df = df.sort_values(by='similarity', ascending=False)
         print(df)
+
+    def create_embedding(self, docs, name, weighted=False):
+        docs_weight = []
+        if weighted:
+            docs_weight = self.transform_tfidf(docs)
+        docs_embedding = self.batch_embedding(docs, docs_weight, weighted=weighted).detach().numpy()
+        np.save(os.path.join('data/embeddings', name + ".npy"), docs_embedding)
 
 class TFIDFSimilarity():
     
@@ -463,4 +473,9 @@ if __name__ == '__main__':
     # tis = TFIDFSimilarity()
     # tis.precision_test(fuzzy_num=30)
     # calculate_precision()
-    comparison_result_single()
+    # comparison_result_single()
+
+    df = pd.read_csv('./data/CVE/product.csv')
+    docs = df['product'].to_list()
+    ts = TextSimilarity()
+    ts.create_embedding(docs, "product")

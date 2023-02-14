@@ -26,7 +26,9 @@ modeling = new Vue({
         protocol: "",
         files: [],
         cur_project: "",
-        clicked: {}
+        clicked: {},
+        recommendations: [],
+        if_recommend: true
     },
     methods: {
         select_node(type) {
@@ -40,38 +42,34 @@ modeling = new Vue({
         },
         add_node() {
             switch (this.type) {
-                case 1:
-                    type = "Component";
+                case "Component":
                     color = "#00ff00"
                     size = 13.75;
                     break;
-                case 2:
-                    type = "Software";
+                case "Software":
                     color = "#99dfff"
                     size = 10;
                     break;
-                case 3:
-                    type = "Hardware";
+                case "Hardware":
                     color = "#99dfff"
                     size = 10;
                     break;
-                case 4:
-                    type = "Firmware";
+                case "Firmware":
                     color = "#99dfff"
                     size = 10;
                     break;
-                case 5:
-                    type = "Entry";
+                case "Entry":
                     color = "#99dfff"
                     size = 10;
                     break;
-                case 6:
-                    type = "OS";
+                case "OS":
                     color = "#99dfff"
                     size = 10;
                     break;
             }
+            type = this.type;
             var node = {
+                type: type,
                 name: this.cur_node.name,
                 description: this.cur_node.description,
                 product: this.cur_node.product,
@@ -182,9 +180,31 @@ modeling = new Vue({
                 network = drawGraph(graph.nodes, graph.edges);
                 network.on('click', network_click);
             })
+        },
+        fill_product(recommendation) {
+            this.cur_node.product = recommendation;
+            this.if_recommend = false;
+            this.recommendations = [];
         }
     }
-})
+});
+
+modeling.$watch('cur_node.product', function (after, berfore) {
+    if (!this.if_recommend) {
+        this.if_recommend = true;
+    } else {
+        var url = "/model/keyword"
+            axios({
+                method: 'post',
+                url: url,
+                data: {query: after}
+            }).then(function (res) {
+                console.log(res.data);
+                modeling.recommendations = res.data;
+            })
+    }
+    
+});
 
 function network_click(params) {
     if (params.nodes.length != 0) {
@@ -194,6 +214,7 @@ function network_click(params) {
                         }
                         info.content = clickedNode;
                         modeling.clicked = clickedNode;
+                        modeling.type = clickedNode.type;
                         Object.assign(modeling.cur_node, clickedNode);
                     } else if (params.edges.length != 0) {
                         var edgeID = params.edges[0];
