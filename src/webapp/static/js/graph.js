@@ -82,3 +82,7 @@ function drawGraph(in_nodes, in_edges) {
 function addNode(in_node) {
     nodes.update(in_node);
 }
+
+function addEdge(in_edge) {
+    edges.update(in_edge);
+}

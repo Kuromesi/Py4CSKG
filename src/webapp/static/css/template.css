@@ -7,14 +7,14 @@
 }
 
 #mynetwork {
-    width: 55%;
+    width: 60%;
     background-color: #ffffff;
     border: 10px solid lightgray;
     position: relative;
 }
 
 #network_info {
-    width: 40%; 
+    width: 35%; 
     overflow: auto;
 }
 
@@ -55,4 +55,8 @@ body {
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
+}
+
+#file_link:hover {
+    color: #6c5ce7;
 }

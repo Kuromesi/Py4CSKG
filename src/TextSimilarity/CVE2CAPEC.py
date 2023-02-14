@@ -144,8 +144,9 @@ class TextSimilarity():
         docs_weight = self.transform_tfidf(docs['processed'].tolist())
         # query_weight = self.transform_tfidf(cves['des'].tolist())
 
-        docs_embedding = self.batch_embedding(docs['processed'].tolist(), docs_weight, weighted=False).detach().numpy()
-        query_embedding = self.weighted_embedding(query, weighted=True).detach().numpy()
+        docs_embedding = self.batch_embedding(docs['processed'].tolist(), docs_weight, weighted=True).detach().numpy()
+        # np.save('./data/capec_embedding.npy', docs_embedding)
+        query_embedding = self.weighted_embedding(query, weighted=True)['embedding'].detach().numpy()
         df = pd.DataFrame(columns=['id', 'similarity'])
         for i in range(len(docs_embedding)):
             doc_vec = docs_embedding[i]

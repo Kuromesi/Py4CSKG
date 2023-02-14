@@ -165,8 +165,9 @@ class CVE2CAPEC():
         BERT
         '''
         docs = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-        docs_weight = self.transform_tfidf(docs['processed'].tolist())
-        docs_embedding = self.batch_embedding(docs['processed'].tolist(), docs_weight, weighted=True).detach().numpy()
+        # docs_weight = self.transform_tfidf(docs['processed'].tolist())
+        # docs_embedding = self.batch_embedding(docs['processed'].tolist(), docs_weight, weighted=True).detach().numpy()
+        docs_embedding = np.load('./data/embeddings/capec_embedding.npy')
         query_embedding = self.weighted_embedding(query, weighted=True)['embedding'].detach().numpy()
         df = pd.DataFrame(columns=['id', 'name', 'description', 'similarity'])
         for i in range(len(docs_embedding)):

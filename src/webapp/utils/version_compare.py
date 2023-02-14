@@ -265,5 +265,5 @@ class VersionString(str):
         return 'VersionString(%s)' %(str.__repr__(self),)
     
 if __name__ == '__main__':
-    a = cmp_version("1.0 b2", "1.0 beta2")
+    a = cmp_version("1.1", "1.0 update3")
     print(a)

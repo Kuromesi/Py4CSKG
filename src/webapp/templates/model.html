@@ -26,11 +26,11 @@
 </head>
 
 <body>
-
     <div class="nav">
         <div class="page">
             <nav class="page__menu menu">
                 <ul class="menu__list r-list">
+                    <li class="menu__group"><a href="/kuromesi" class="menu__link r-link text-underlined">KUROMESI</a></li>
                     <li class="menu__group"><a href="/model" class="menu__link r-link text-underlined">MODELING</a></li>
                     <li class="menu__group"><a href="/predict" class="menu__link r-link text-underlined">QUERY</a></li>
                     <li class="menu__group"><a href="/explore" class="menu__link r-link text-underlined">EXPLORE</a>
@@ -58,90 +58,147 @@
                 <div id="model_info"
                     style="display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
                     <div v-if="type==0">
-                        <h1>MODELING</h1>
+                        <h1>Control panel</h1>
                     </div>
                     <div v-if="type==1 || type==5">
                         <div class="group">
-                            <input id="modeling" type="text" required v-model="name">
+                            <input id="modeling" type="text" required v-model="cur_node['name']">
                             <span class="highlight"></span>
                             <span class="bar"></span>
                             <label id="modeling">Name</label>
                         </div>
                         <div class="group">
-                            <input id="modeling" type="text" required v-model="description">
+                            <input id="modeling" type="text" required v-model="cur_node['description']">
                             <span class="highlight"></span>
                             <span class="bar"></span>
                             <label id="modeling">Description</label>
+                        </div>
+                        <div id="buttons" style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-around;">
+                            <button @click="add_node">Add Node</button>
+                            <button @click="delete_node">Delete Node</button>
+                            <button @click="modify_node">Modify Node</button>
                         </div>
                     </div>
                     <div v-if="type==2 || type==3 || type==4 || type==6">
                         <div class="group">
-                            <input id="modeling" type="text" required v-model="name">
+                            <input id="modeling" type="text" required v-model="cur_node['name']">
                             <span class="highlight"></span>
                             <span class="bar"></span>
                             <label id="modeling">Name</label>
                         </div>
                         <div class="group">
-                            <input id="modeling" type="text" required v-model="description">
+                            <input id="modeling" type="text" required v-model="cur_node['description']">
                             <span class="highlight"></span>
                             <span class="bar"></span>
                             <label id="modeling">Description</label>
                         </div>
                         <div class="group">
-                            <input id="modeling" type="text" required v-model="product">
+                            <input id="modeling" type="text" required v-model="cur_node['product']">
                             <span class="highlight"></span>
                             <span class="bar"></span>
                             <label id="modeling">Product</label>
-
                         </div>
                         <div class="group">
-                            <input id="modeling" type="text" required v-model="version">
+                            <input id="modeling" type="text" required v-model="cur_node['version']">
                             <span class="highlight"></span>
                             <span class="bar"></span>
                             <label id="modeling">Version</label>
                         </div>
-                        <button @click="add_node">Add Node</button>
+                        <div id="buttons" style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-around;">
+                            <button @click="add_node">Add Node</button>
+                            <button @click="delete_node">Delete Node</button>
+                            <button @click="modify_node">Modify Node</button>
+                        </div>
                     </div>
                 </div>
-                <details class="custom-select" style="margin-top: 0;">
-                    <summary class="radios">
-                        <input type="radio" name="item" id="default" title="Select component type" checked>
-                        <input type="radio" name="item" id="item1" title="Component">
-                        <input type="radio" name="item" id="item2" title="Software">
-                        <input type="radio" name="item" id="item3" title="Hardware">
-                        <input type="radio" name="item" id="item4" title="Firmware">
-                        <input type="radio" name="item" id="item5" title="Entry point">
-                        <input type="radio" name="item" id="item6" title="Operating system">
-                    </summary>
-                    <ul class="list" id="selection">
-                        <li id="selection">
-                            <label for="item1" @click="type=1">
-                                Component
-                                <span></span>
-                            </label>
-                        </li>
-                        <li id="selection">
-                            <label for="item2" @click="type=2">Software</label>
-                        </li>
-                        <li id="selection">
-                            <label for="item3" @click="type=3">Hardware</label>
-                        </li>
-                        <li id="selection">
-                            <label for="item4" @click="type=4">Firmware</label>
-                        </li>
-                        <li id="selection">
-                            <label for="item5" @click="type=5">Entry point</label>
-                        </li>
-                        <li id="selection">
-                            <label for="item5" @click="type=6">Operating system</label>
-                        </li>
-                    </ul>
-                </details>
+                <div id="edge_control">
+                    <div style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-between;">
+                        <div class="group">
+                            <input id="modeling" type="text" required :value="cur_edge.source">
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                            <label id="modeling">Source</label>
+                        </div>
+                        <button @click="select_node('source')">Select Node</button>
+                    </div>
+                    <div style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-between;">
+                        <div class="group">
+                            <input id="modeling" type="text" required :value="cur_edge.dest">
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                            <label id="modeling">Destination</label>
+                        </div>
+                        <button @click="select_node('dest')">Select Node</button>
+                    </div>
+                    <div class="group">
+                        <input id="modeling" type="text" required v-model="cur_edge.protocol">
+                        <span class="highlight"></span>
+                        <span class="bar"></span>
+                        <label id="modeling">Protocol</label>
+                    </div>
+                    <div id="buttons" style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-around;">
+                        <button @click="add_edge">Add Edge</button>
+                        <button @click="modify_edge">Modify Edge</button>
+                    </div>
+                </div>
+                <div id="misc" style="height: 100%;">
+                    <details class="custom-select">
+                        <summary class="radios">
+                            <input type="radio" name="item" id="default" title="Select component type" checked>
+                            <input type="radio" name="item" id="item1" title="Component">
+                            <input type="radio" name="item" id="item2" title="Software">
+                            <input type="radio" name="item" id="item3" title="Hardware">
+                            <input type="radio" name="item" id="item4" title="Firmware">
+                            <input type="radio" name="item" id="item5" title="Entry point">
+                            <input type="radio" name="item" id="item6" title="Operating system">
+                        </summary>
+                        <ul class="list" id="selection">
+                            <li id="selection">
+                                <label for="item1" @click="type=1">
+                                    Component
+                                    <span></span>
+                                </label>
+                            </li>
+                            <li id="selection">
+                                <label for="item2" @click="type=2">Software</label>
+                            </li>
+                            <li id="selection">
+                                <label for="item3" @click="type=3">Hardware</label>
+                            </li>
+                            <li id="selection">
+                                <label for="item4" @click="type=4">Firmware</label>
+                            </li>
+                            <li id="selection">
+                                <label for="item5" @click="type=5">Entry point</label>
+                            </li>
+                            <li id="selection">
+                                <label for="item6" @click="type=6">Operating system</label>
+                            </li>
+                        </ul>
+                    </details>
+                    <div style="margin-top: 10%;">
+                        <div style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-around;">
+                            <input v-model="cur_project">
+                            <button @click="save_graph">Save Graph</button>
+                        </div>
+                        <div style="overflow: auto;">
+                            <h2>Projects</h2>
+                            <div v-for="v in files">
+                                <div :id="v">
+                                    <p id="file_link" @click="load_project(v)">{[ v ]}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button @click="list_files">List</button>
+                    </div>
+                </div>
+                
             </div>
             
         </div>
+        
     </div>
-
+    
     <script src="{{ url_for('static',filename='js/graph.js') }}"></script>
     <script src="{{ url_for('static',filename='js/modeling.js') }}"></script>
 </body>

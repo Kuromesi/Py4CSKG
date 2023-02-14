@@ -1,7 +1,14 @@
 import json
 import pandas as pd
+from tqdm import tqdm 
 # from service.GDBSaver import GDBSaver
 # from service.RDBSaver import RDBSaver
+
+type_dict = {
+    'a': "Software",
+    'o': "OS",
+    'h': "Hardware"
+}
 
 class CVETraverser():
     def __init__(self, cves) -> None:
@@ -17,12 +24,14 @@ class CVETraverser():
         cpe23uri = ""
         for node in nodes:
             operator = node['operator']
-            if operator is "AND":
+            if operator == "AND":
                 if 'children' in node:
                     results = self.get_cpe(node['children'], results)
             else:
                 cpe_match = node['cpe_match']
                 for cpe in cpe_match:
+                    if not cpe['vulnerable']:
+                        continue
                     if 'versionStartIncluding' in cpe:
                         cpe23uri = cpe['cpe23Uri'] + ":" + cpe['versionStartIncluding']
                     elif 'versionStartExcluding' in cpe:
@@ -35,9 +44,44 @@ class CVETraverser():
                         cpe23uri += ":" + cpe['versionEndExcluding']
                     else:
                         cpe23uri += ":*"
+                    results.append(cpe23uri)
         return results
 
-    def cpe_processor(cpe):
+    def l2s(self, str_list):
+        string = ""
+        for stri in str_list:
+            string += stri + " "
+        return string.strip()
+    
+    def cpe_summary(self, cpes):
+        for cpe in cpes:
+            cpe = self.cpe_processor(cpe)
+            product = cpe['vendor'].split('_') + cpe['id'].split('_')
+            product = self.l2s(product)
+            # if cpe['version'] != 
+            version = cpe['version'] + " " + cpe['update']
+
+    def _cpe_processor(self, cpe):
+        result = {}
+        words = cpe.split(":")
+        
+        result["type"] = type_dict[words[2]] # OS, Hardware or Software
+        product = words[3].split('_') + words[4].split('_')
+        product = self.l2s(product)
+        result["product"] = product
+        result["id"] = product
+        version = "0"
+        if words[5] != "*":
+            version = words[5]
+            if words[6] != "*":
+                version += " " + words[6]
+        result["versionStart"] = words[13] if words[13] != "*" else version
+        result["versionEnd"] = words[14] if words[14] != "*" else version
+        result["prop"] = "Platform"
+        result["uri"] = cpe
+        return result
+
+    def cpe_processor(self, cpe):
         result = {}
         words = cpe.split(":")
         result["cpe_version"] = words[0] + "-" + words[1]
@@ -62,18 +106,22 @@ class CVETraverser():
     def traverse(self):
         # KURO
         # df = pd.DataFrame(columns=['id', 'des'])
+        # product = set()
+        # df = pd.DataFrame(columns=['product'])
 
         for path in self.cves:
             with open(path, 'r', encoding='utf-8') as f:
                 items = json.load(f)
             items = items['CVE_Items']
+            items = tqdm(items)
             for cur in items:
                 cve = cur['cve']
                 src = cve['CVE_data_meta']['ID']
-                print(src)
+                items.set_postfix(CVE=src)
+                # print(src)
                 des = cve['description']['description_data'][0]['value']
                 if ("** REJECT **" not in des):
-                    df.loc[len(df.index)] = [src, des]
+                    # df.loc[len(df.index)] = [src, des]
                     # CVSS
                     cvss = cur['impact']
                     cvss2 = "None"
@@ -104,11 +152,15 @@ class CVETraverser():
                     if 'configurations' in cur and 'nodes' in cur['configurations']:
                         cpe = cur['configurations']['nodes']
                         cpe_uri = self.get_cpe(cpe, [])
-                        # for uri in cpe_uri:
+                        for uri in cpe_uri:
+                            res = self._cpe_processor(uri)
+                            # product.add(res['product'])
                             # if not self.rs.checkNode(uri):
-                            #     self.ds.addNode(self.cpe_processor(uri))
+                                # self.ds.addNode(self._cpe_processor(uri))
                             # self.rs.saveRDF(src, uri, "has_platform")
-        df.to_csv('myData/learning/CVE2CAPEC/cve.csv', index=False)
+        # df['product'] = list(product)
+        # df.to_csv('data/CVE/product.csv', index=False)
+        # df.to_csv('myData/learning/CVE2CAPEC/cve.csv', index=False)
 if __name__ == '__main__':
     cves = [
         'data/CVE/CVE-2002.json', 'data/CVE/CVE-2003.json', 'data/CVE/CVE-2004.json',

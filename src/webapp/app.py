@@ -33,6 +33,28 @@ def model():
     # edges = project['edges']
     return render_template("model.html")
 
+@app.route('/model/submit', methods=['POST'])
+def model_submit():
+    data = json.loads(request.get_data())
+    graph = data['graph']
+    path = os.path.join('./src/webapp/data/', data['path'])
+    if not os.path.exists(path):
+        os.mkdir(path)
+    with open(os.path.join(path, "graph.json"), 'w', encoding='utf-8') as f:
+        json.dump(graph, f)
+    return "Saved!"
+
+@app.route('/model/list', methods=['POST'])
+def model_list():
+    projects = os.listdir('./src/webapp/data/')
+    return projects
+
+@app.route('/model/load', methods=['POST'])
+def model_load():
+    path = request.get_data().decode("utf-8")
+    project = load_project(os.path.join('./src/webapp/data', path))
+    return project
+
 @app.route('/test', methods=['GET'])
 def test():
     return render_template("test.html")
@@ -43,7 +65,7 @@ def predict():
 
 # cve2capec = CVE2CAPEC()
 @app.route('/predict/submit', methods=['POST'])
-def predict1():
+def predict_submit():
     # cve = request.get_data()
     # cve = json.loads(cve)
     # res = cve2capec.calculate_similarity(cve['cve'])
