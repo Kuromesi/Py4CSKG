@@ -7,7 +7,7 @@ class BERTConfig:
     linear_lr = 7.5e-3
     max_epochs = 100
     min_epochs = 5
-    batch_size = 16
+    batch_size = 256
     max_sen_len = 200
     gamma = 0.99
     weight_decay = 0.001
@@ -19,6 +19,6 @@ class BERTConfig:
     lstm_hiddens = 768
     lstm_layers = 2
     bidirectional = True
-    train_file = './myData/learning/CVE2CWE/base/cve.train'
+    train_file = './myData/learning/CVE2CWE/base/cve.test'
     test_file = './myData/learning/CVE2CWE/base/cve.test'
     label_path = './myData/learning/CVE2CWE/base/classification_base.labels'

@@ -28,6 +28,12 @@ class BERT(BertPreTrainedModel):
         summed_mask = torch.clamp(mask.sum(1), min=1e-9)
         mean_pooled = summed / summed_mask
         logits = self.classifier(mean_pooled)    
-        outputs = (logits,)
+
+        y = labels
+        y_pred = logits
+        y = y.type(torch.cuda.LongTensor)
+        loss = self.loss_func(y_pred, y)
+        outputs = (loss, logits)
+
         
         return outputs  # (loss), scores

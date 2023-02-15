@@ -31,12 +31,8 @@ def train_epoch(model, data_iterator, optimizer, scheduler, config, use_crf=Fals
         batch_masks = data['attention_mask'] # get padding mask
 
         # compute model output and loss
-        logits = model(batch_data, token_type_ids=None, attention_mask=batch_masks, labels=batch_tags, use_crf=use_crf)[0]
-        y = batch_tags
-        y_pred = logits
-        y = y.type(torch.cuda.LongTensor)
-        loss = nn.CrossEntropyLoss()
-        loss = loss(y_pred, y)
+        loss = model(batch_data, token_type_ids=None, attention_mask=batch_masks, labels=batch_tags, use_crf=use_crf)[0]
+        
 
         # clear previous gradients, compute gradients of all variables wrt loss
         model.zero_grad()
@@ -76,7 +72,7 @@ def train_and_evaluate(model, train_data_iterator, val_data_iterator,  optimizer
 
         # Evaluate for one epoch on training set and validation set
         config.eval_steps = config.val_steps
-        val_metrics = scorer.evaluate(model, val_data_iterator, name='Val')
+        val_metrics = scorer.evaluate_model(model, val_data_iterator, name='Val')
         
         val_f1 = val_metrics['f1']
         improve_f1 = val_f1 - best_val_f1
@@ -130,12 +126,14 @@ if __name__ == '__main__':
     # Specify the training and validation dataset sizes
     config.train_size = dataset.train_size
     config.val_size = dataset.val_size
-
+    labels = [i for i in range(config.output_size)]
     # Prepare model
     logging.info("Loading BERT model...")
 
     # Prepare model
     model = BERT.from_pretrained(config.model_name, config, num_labels=config.output_size, ignore_mismatched_sizes=True)
+    model.labels = labels
+    model.loss_func = nn.CrossEntropyLoss()
     model.to(config.device)
 
     # Prepare optimizer
@@ -193,6 +191,6 @@ if __name__ == '__main__':
 
     # Train and evaluate the model
     logging.info("Starting training for {} epoch(s)".format(config.max_epochs))
-    scorer = MultiClassScorer()
+    scorer = BERTMultiClassScorer()
     # train_and_evaluate(model, train_data, val_data, optimizer, scheduler, config, tagger_model_dir, scorer, args.restore_dir, test_data_iterator=test_data, use_crf=True)
     train_and_evaluate(model, train_data, val_data, optimizer, scheduler, config, tagger_model_dir, scorer, test_data_iterator=test_data, use_crf=True)

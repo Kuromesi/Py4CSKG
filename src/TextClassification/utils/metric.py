@@ -4,6 +4,7 @@ from sklearn.metrics import accuracy_score, precision_score, f1_score, recall_sc
 from collections import defaultdict
 from utils.utils import *
 import pandas as pd
+from utils.logger import *
 
 def report2csv(report:str) -> pd.DataFrame:
     report = report.split('\n')
@@ -59,15 +60,15 @@ class MultiClassScorer():
         all_y = []
         for idx, batch in enumerate(iterator):
             if torch.cuda.is_available():
-                x = batch[1].cuda()
-                attention_mask = batch[2].cuda()
-                y = batch[0].cuda()
+                x = batch['text_vec'].cuda()
+                attention_mask = batch['attention_mask'].cuda()
+                y = batch['label_vec'].cuda()
             else:
                 x = batch[1]
             data = {'data': x,
                     'label': y,
                     'attention_mask': attention_mask}
-            y_pred = model(data)
+            y_pred = model(x, attention_mask=attention_mask)[0]
             # predicted = torch.max(y_pred.cpu().data, 1)[1] + 1
             y_pred = y_pred.cpu().data
             predicted = torch.max(y_pred, 1)[1]
@@ -76,8 +77,8 @@ class MultiClassScorer():
         preds = np.array(all_preds)
         accuracy = accuracy_score(all_y, preds, normalize=True)
         precision = precision_score(all_y, preds, average='weighted')
-        f1 = f1_score(all_y, preds, average='weighted')
-        recall = recall_score(all_y, preds, average='weighted')
+        f1 = f1_score(all_y, preds, labels=model.labels, average='weighted')
+        recall = recall_score(all_y, preds, labels=model.labels, average='weighted')
         # report = classification_report(all_y, preds, target_names=model.labels, labels=range(len(model.labels)), digits=4)
         # report = report2csv(report)
         # report = report.sort_values(by='precision', ascending=False)
@@ -99,6 +100,45 @@ class MultiClassScorer():
             'f1': f1,
             'recall': recall} 
         return result
+
+class BERTMultiClassScorer():
+    def evaluate_model(self, model, iterator, name):
+        all_preds = []
+        all_y = []
+        loss_avg = RunningAverage()
+        for idx, batch in enumerate(iterator):
+            if torch.cuda.is_available():
+                x = batch['text_vec'].cuda()
+                attention_mask = batch['attention_mask'].cuda()
+                y = batch['label_vec'].cuda()
+            else:
+                x = batch[1]
+            data = {'data': x,
+                    'label': y,
+                    'attention_mask': attention_mask}
+            loss, y_pred = model(x, labels=y, attention_mask=attention_mask)
+            loss_avg.update(loss.item())
+            # predicted = torch.max(y_pred.cpu().data, 1)[1] + 1
+            y_pred = y_pred.cpu().data
+            predicted = torch.max(y_pred, 1)[1]
+            all_preds.extend(predicted.numpy())
+            all_y.extend(y.cpu().data.numpy())
+        preds = np.array(all_preds)
+        accuracy = accuracy_score(all_y, preds, normalize=True)
+        precision = precision_score(all_y, preds, average='weighted')
+        f1 = f1_score(all_y, preds, labels=model.labels, average='weighted')
+        recall = recall_score(all_y, preds, labels=model.labels, average='weighted')
+        metrics = {}
+        metrics['f1'] = f1
+        metrics['loss'] = loss_avg()
+        metrics_str = "; ".join("{}: {:05.2f}".format(k, v) for k, v in metrics.items())
+        logging.info("- {} metrics: ".format(name) + metrics_str)
+        result = {'accuracy': accuracy,
+            'precision': precision,
+            'f1': f1,
+            'recall': recall} 
+        return result
+
 
 class NERScorer():
     def __init__(self, labels):
