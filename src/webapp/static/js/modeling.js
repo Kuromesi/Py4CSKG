@@ -145,17 +145,18 @@ modeling = new Vue({
             var url = "/model/submit";
             if (!modeling.cur_project) {
                 alert("Please input project name!")
-            }
-            axios({
-                method: 'post',
-                url: url,
-                data: {
-                    graph: data,
-                    path: modeling.cur_project
-                }
-            }).then(function (res) {
-                alert(res.data);
-            })
+            } else {
+                axios({
+                    method: 'post',
+                    url: url,
+                    data: {
+                        graph: data,
+                        path: modeling.cur_project
+                    }
+                }).then(function (res) {
+                    alert(res.data);
+                })
+            }  
         },
         list_files() {
             var url = "/model/list";

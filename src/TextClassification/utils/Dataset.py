@@ -13,6 +13,7 @@ import numpy as np
 import pickle
 from transformers import AutoTokenizer
 import pandas as pd
+PADDING = True
 
 class BlockShuffleDataLoader(DataLoader):
     def __init__(self, dataset: Dataset, sort_key, sort_bs_num=None, is_shuffle=True, **kwargs):
@@ -61,11 +62,14 @@ class BlockShuffleDataLoader(DataLoader):
         data = list(chain(*data)) + tail_data
         return data
 
-class Dataset():
+class BERTDataset():
     def __init__(self, config):
         self.config = config
-        self.tokenizer = AutoTokenizer.from_pretrained(self.config.model_name)
-        self.vocab = self.tokenizer.vocab
+        self.train_iterator = None
+        self.test_iterator = None
+        self.val_iterator = None
+        self.word_embeddings = {}
+        self.tokenizer = AutoTokenizer.from_pretrained(config.model_name)
 
     def parse_label(self, label):
         '''
@@ -76,12 +80,7 @@ class Dataset():
             label (int) : integer value corresponding to label string
         '''
         label = label.split('|')
-        if self.config.model_type == 'MultiClass':
-            idx = int(label[0])
-        elif self.config.model_type == 'MultiLabel':
-            idx = [0.] * self.config.output_size
-            for la in label:
-                idx[int(la)] = 1.0
+        idx = int(label[0])
         return idx
 
     def yield_tokens(self, data_iter, tokenizer):
@@ -93,134 +92,97 @@ class Dataset():
         for (_label, _text) in batch:
             label_list.append(_label)
             text_list.append(_text)
-        text_list = self.tokenizer(text_list, padding=True, truncation=True, 
-                                    return_tensors="pt", max_length=self.config.max_sen_len) # padding='max_length'
+            # processed_text = torch.tensor(self.text_pipeline(_text), dtype=torch.int64)
+            # text_list.append(processed_text.tolist())
+            # offsets.append(processed_text.size(0))
+        text_list = self.tokenizer(text_list, padding=PADDING, truncation=True, return_tensors="pt", max_length=self.config.max_sen_len)
         text_vec = text_list['input_ids']
         attention_mask = text_list['attention_mask']
         label_list = torch.tensor(label_list, dtype=torch.float32)
-        return label_list, text_vec, attention_mask
+        # offsets = torch.tensor(offsets[:-1]).cumsum(dim=0)
+        # text_list = to_tensor(text_list, padding_value=1.0).t()
+        data = {
+            'label_vec': label_list,
+            'text_vec': text_vec,
+            'attention_mask': attention_mask
+                }
+        for k in data:
+            data[k] = data[k].to(self.config.device)
+        return data
 
-    def df2iter(self, df:pd.DataFrame):
-        text = df['text'].tolist()
-        label = df['label'].tolist()
-        label = list(map(lambda x: self.parse_label(x), label))
-        _iter = to_map_style_dataset(iter(list(zip(label, text))))
-        return _iter
+    def load_data(self, train_file, test_file=None, val_file=None):
+        # tokenizer = lambda sent: [x.lemma_.lower() for x in NLP(sent) if x.lemma_.lower() != " "]
+        # tokenizer = get_tokenizer('basic_english')
+        with open(train_file, 'r', encoding='utf-8') as datafile:     
+                    data = [line.strip().split(',', maxsplit=1) for line in datafile if len(line.strip().split(',', maxsplit=1)) > 1]
+                    data_text = list(map(lambda x: x[1], data))
+                    data_label = list(map(lambda x: self.parse_label(x[0]), data))
+        train = list(zip(data_label, data_text))
+        train_iter = to_map_style_dataset(iter(train))
+        self.label_pipeline = lambda x: int(x) - 1
 
-    def load_data(self, train_file, test_file):
-        train_df = pd.read_csv(train_file)
-        test_df = pd.read_csv(test_file)
-        train_iter = self.df2iter(train_df)
-        test_iter = self.df2iter(test_df)
+        # Load test data
+        with open(test_file, 'r', encoding='utf-8') as datafile:     
+            data = [line.strip().split(',', maxsplit=1) for line in datafile]
+            data_text = list(map(lambda x: x[1], data))
+            data_label = list(map(lambda x: self.parse_label(x[0]), data))
+        test = list(zip(data_label, data_text))
+        test_dataset = to_map_style_dataset(iter(test))
 
         num_train = int(len(train_iter) * 0.9)
         train_dataset, valid_dataset = random_split(train_iter, [num_train, len(train_iter) - num_train])
         train_dataset = to_map_style_dataset(train_dataset)
         valid_dataset = to_map_style_dataset(valid_dataset)
-
         sort_key=lambda x: len(x[1])
         self.train_iterator = BlockShuffleDataLoader(train_dataset, batch_size=self.config.batch_size,
                                     shuffle=True, collate_fn=self.collate_batch, sort_key=sort_key)
         self.val_iterator = BlockShuffleDataLoader(valid_dataset, batch_size=self.config.batch_size,
                                     shuffle=True, collate_fn=self.collate_batch, sort_key=sort_key)
-        self.test_iterator = BlockShuffleDataLoader(test_iter, batch_size=self.config.batch_size,
+        self.test_iterator = BlockShuffleDataLoader(test_dataset, batch_size=self.config.batch_size,
                                     shuffle=True, collate_fn=self.collate_batch, sort_key=sort_key)
-
+        self.train_size = len(train_iter)
+        self.val_size = len(valid_dataset)
         print ("Loaded {} training examples".format(len(train_dataset)))
-        print ("Loaded {} test examples".format(len(test_iter)))
+        print ("Loaded {} test examples".format(len(test_dataset)))
         print ("Loaded {} validation examples".format(len(valid_dataset)))
 
     def text2vec(self, text):
-        return self.tokenizer(text, padding=True, truncation=True, return_tensors="pt", max_length=self.config.max_sen_len)
+        return self.tokenizer(text, padding=PADDING, truncation=True, return_tensors="pt", max_length=self.config.max_sen_len)
 
-class NERDataset():
-    def __init__(self, config, labels):
-        self.config = config
-        self.tokenizer = AutoTokenizer.from_pretrained(self.config.model_name)
-        self.labels = labels
-        self.label_pipe = lambda x: self.labels.index(x)
-
-    def parse_label(self, label):
-        '''
-        Get the actual labels from label string
-        Input:
-            label (string) : labels of the form '__label__2'
-        Returns:
-            label (int) : integer value corresponding to label string
-        '''
-        label = label.split('|')
-        idx = [0.] * 11
-        for la in label:
-            idx[int(la)] = 1.0
-        return idx
-
-    def yield_tokens(self, data_iter, tokenizer):
-        for _, text in data_iter:
-            yield tokenizer(text)
-
-    def collate_batch(self, batch):
-        label_list, text_list = [], []
-        for (_label, _text) in batch:
-            label_list.append(_label)
-            text_list.append(_text)
-        text_list = self.tokenizer(text=text_list, padding=True, truncation=True, return_tensors="pt", max_length=self.config.max_sen_len, is_split_into_words=True)
-        word_ids = text_list.word_ids(1)
-        text_vec = text_list['input_ids']
-        attention_mask = text_list['attention_mask']
-
-        # Align label
-        label_vec = []
-        temp = []
-        for i in range(len(label_list)):
-            word_ids = text_list.word_ids(i)
-            for id in word_ids:
-                if id == None:
-                    temp.append(0)
-                else:
-                    temp.append(self.label_pipe(label_list[i][id]))
-            label_vec.append(temp)
-            temp = []
-                
-        label_vec = torch.tensor(label_vec, dtype=torch.long)
-        return label_vec, text_vec, attention_mask
-
-    def __read(self, path):
-        with open(path, 'r') as f:
-            label = []
-            text = []
-            data = []
-            for line in f.readlines():
-                line = line.strip().split()
-                if len(line) < 2:
-                    data.append((label, text))
-                    label = []
-                    text = []
-                else:
-                    label.append(line[3]) # change this for different format label
-                    text.append(line[0])
-        return to_map_style_dataset(iter(data))
-
-
-    def load_data(self, train_file, test_file=None, val_file=None):
-        # load train, test, validation data
-        train_iter = self.__read(train_file)
-        test_iter = self.__read(test_file)
-        if val_file:
-            val_iter = self.__read(val_file)
-        else:
-            num_train = int(len(train_iter) * 0.95)
-            train_iter, val_iter = random_split(train_iter, [num_train, len(train_iter) - num_train])
-            train_iter = to_map_style_dataset(train_iter)
-            val_iter = to_map_style_dataset(val_iter)
         
-        sort_key=lambda x: len(x[1])
-        self.train_iterator = BlockShuffleDataLoader(train_iter, batch_size=self.config.batch_size,
-                                    shuffle=True, collate_fn=self.collate_batch, sort_key=sort_key)
-        self.val_iterator = BlockShuffleDataLoader(val_iter, batch_size=self.config.batch_size,
-                                    shuffle=True, collate_fn=self.collate_batch, sort_key=sort_key)
-        self.test_iterator = BlockShuffleDataLoader(test_iter, batch_size=self.config.batch_size,
-                                    shuffle=True, collate_fn=self.collate_batch, sort_key=sort_key)
+def evaluate_model(model, iterator):
+    all_preds = []
+    all_y = []
+    for idx,batch in enumerate(iterator):
+        if torch.cuda.is_available():
+            x = batch[1].cuda()
+            attention_mask = batch[2].cuda()
+            y = batch[0].cuda()
+        else:
+            x = batch[1]
+        y_pred = model(x)
+        # predicted = torch.max(y_pred.cpu().data, 1)[1] + 1
+        y_pred = y_pred.cpu().data
+        predicted = torch.where(y_pred >= 0.3, 1, y_pred)
+        predicted = torch.where(predicted < 0.3, 0, predicted)
+        all_preds.extend(predicted.numpy())
+        all_y.extend(batch[0].numpy())
+    preds = np.array(all_preds)
+    score = accuracy_score(all_y, preds, normalize=True, sample_weight=None)
+    return score
 
-        print ("Loaded {} training examples".format(len(train_iter)))
-        print ("Loaded {} test examples".format(len(test_iter)))
-        print ("Loaded {} validation examples".format(len(val_iter)))
+def save_model(model, file_name):
+    """用于保存模型"""
+    with open(file_name, "wb") as f:
+        pickle.dump(model, f)
+
+def load_model(filename):
+    with open(filename, 'rb') as f:
+        return pickle.load(f)
+
+def loadLabels(path):
+    with open(path, 'r') as f:
+        labels = []
+        for line in f:
+            labels.append(line.strip())
+    return labels

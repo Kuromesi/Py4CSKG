@@ -20,7 +20,7 @@ class TextSimilarity():
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         bert_config = BertConfig.from_pretrained(model_name)
         self.bert = BertModel.from_pretrained(model_name, config=bert_config)
-        self.batch_size = 32
+        self.batch_size = 16
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.bert.to(self.device)
 
@@ -45,7 +45,7 @@ class TextSimilarity():
             for tokens_id in tokens_ids:
                 temp = [tfidf[np.where(feature==str(i.item()))][0] if i != 0 else 0.0 for i in tokens_id ]
                 weight.append(temp)
-            weight = torch.tensor(weight)
+            weight = torch.tensor(weight).to(self.device)
             weight = weight.unsqueeze(-1).expand(embedding.size()).float()
             masked_embeddings = embedding * mask * weight
         else:
@@ -178,13 +178,13 @@ class TextSimilarity():
             cves += cur
         query = cve_df.loc[cves]['processed'].to_list()
         docs = capec_df['processed'].tolist()
-        docs_weight = self.transform_tfidf(docs)
-        query_weight = self.transform_tfidf(cve_df['processed'].tolist())
+        docs_weight = self.transform_tfidf(docs + query)
+        # query_weight = self.transform_tfidf(cve_df['processed'].tolist())
 
         docs_embedding = self.batch_embedding(docs, docs_weight, weighted=True).detach().numpy()
         # name_embedding = ts.batch_embedding(capec_df['name'].tolist()).detach().numpy()
         # docs_embedding = (1 * name_embedding + docs_embedding) / 2
-        query_embedding = self.batch_embedding(query, query_weight, weighted=True).detach().numpy()
+        query_embedding = self.batch_embedding(query, docs_weight, weighted=True).detach().numpy()
         sim = cosine_similarity(docs_embedding, query_embedding)
         
         if fuzzy_num:
@@ -422,14 +422,14 @@ def comparison_result_single():
     ts = TextSimilarity()
     ts.init_ner()
     f1_bert = []
-    res = ts._precision_test(fuzzy_num=1)
+    res = ts.precision_test(fuzzy_num=1)
     sim_ts = np.transpose(res['sim'])
     true = res['true']
     sim_tis = res['sim']
     for i in trange(30):
         f1_bert.append(calculate(sim_ts, capec_df, i + 1, true)['f1'])
     df = pd.read_csv('./myData/learning/CVE2CAPEC/comparison.csv')
-    df['bert_noweight'] = f1_bert
+    df['bert_docstfidf'] = f1_bert
     df.to_csv('./myData/learning/CVE2CAPEC/comparison.csv', index=False)
 
 if __name__ == '__main__':
@@ -473,9 +473,9 @@ if __name__ == '__main__':
     # tis = TFIDFSimilarity()
     # tis.precision_test(fuzzy_num=30)
     # calculate_precision()
-    # comparison_result_single()
+    comparison_result_single()
 
-    df = pd.read_csv('./data/CVE/product.csv')
-    docs = df['product'].to_list()
-    ts = TextSimilarity()
-    ts.create_embedding(docs, "product")
+    # df = pd.read_csv('./data/CVE/product.csv')
+    # docs = df['product'].to_list()
+    # ts = TextSimilarity()
+    # ts.create_embedding(docs, "product")
