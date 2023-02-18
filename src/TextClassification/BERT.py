@@ -4,7 +4,7 @@ import torch
 from torchcrf import CRF
 
 class BERT(BertPreTrainedModel):
-    def __init__(self, config, params):
+    def __init__(self, config):
         super(BERT, self).__init__(config)
         self.num_labels = config.num_labels
         self.bert = BertModel(config)
@@ -28,12 +28,13 @@ class BERT(BertPreTrainedModel):
         summed_mask = torch.clamp(mask.sum(1), min=1e-9)
         mean_pooled = summed / summed_mask
         logits = self.classifier(mean_pooled)    
-
-        y = labels
-        y_pred = logits
-        y = y.type(torch.cuda.LongTensor)
-        loss = self.loss_func(y_pred, y)
-        outputs = (loss, logits)
+        outputs = (logits, )
+        if labels:
+            y = labels
+            y_pred = logits
+            y = y.type(torch.cuda.LongTensor)
+            loss = self.loss_func(y_pred, y)
+            outputs = (loss, ) + outputs
 
         
         return outputs  # (loss), scores

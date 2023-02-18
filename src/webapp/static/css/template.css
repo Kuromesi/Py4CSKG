@@ -51,6 +51,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    /* background-image: linear-gradient(to bottom, #42275a, #734b6d); */
     background-image: linear-gradient(to bottom, #ba5370, #f4e2d8);
     background-size: cover;
     background-repeat: no-repeat;

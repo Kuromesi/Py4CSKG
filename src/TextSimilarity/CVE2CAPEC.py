@@ -71,8 +71,8 @@ class TextSimilarity():
 
     def weighted_embedding(self, text, weighted=False):
         tokens = self.tokenizer(text, padding=True, return_tensors="pt", truncation=True, max_length=256)
-        attention_mask = tokens['attention_mask']
-        tokens = tokens['input_ids']
+        attention_mask = tokens['attention_mask'].to(self.device)
+        tokens = tokens['input_ids'].to(self.device)
         embedding = self.bert(tokens)[0]
         mask = attention_mask.unsqueeze(-1).expand(embedding.size()).float()
         if isinstance(text, list):
@@ -88,7 +88,7 @@ class TextSimilarity():
                 masked_embeddings = embedding * mask
         else:
             if weighted:
-                weight = torch.ones(tokens.size(1))
+                weight = torch.ones(tokens.size(1)).to(self.device)
                 res = self.ner.predict(text)
                 l = res['weight']
                 weight[l] = 1000
@@ -279,6 +279,36 @@ class TextSimilarity():
             docs_weight = self.transform_tfidf(docs)
         docs_embedding = self.batch_embedding(docs, docs_weight, weighted=weighted).detach().numpy()
         np.save(os.path.join('data/embeddings', name + ".npy"), docs_embedding)
+
+    def calculate_similarity_for_all(self, docs, query):
+        '''
+        BERT
+        '''
+        # name_embedding = self.batch_embedding(docs['name'].tolist()).detach().numpy()
+        # docs_embedding = self.batch_embedding(docs['description'].tolist()).detach().numpy()
+        # docs_embedding = self.embedding(docs['description'].tolist()).detach().numpy()
+        # docs_embedding = (1 * name_embedding + docs_embedding) / 2
+        
+        # t = [doc.split() for doc in docs['processed'].tolist()]
+        # dictionary = corpora.Dictionary([doc.split() for doc in docs['processed'].tolist()])
+        # corpus = [dictionary.doc2bow(doc.split()) for doc in docs['processed'].tolist()]
+        # tv = TfidfModel(corpus)
+        # tfidf = tv['employ']
+
+        # docs_weight = self.transform_tfidf(docs['processed'].tolist())
+        # query_weight = self.transform_tfidf(cves['des'].tolist())
+
+        docs_embedding = self.batch_embedding(docs, None, weighted=False).cpu().detach().numpy()
+        # np.save('./data/capec_embedding.npy', docs_embedding)
+        query_embedding = self.weighted_embedding(query, weighted=False)['embedding'].cpu().detach().numpy()
+        df = pd.DataFrame(columns=['id', 'similarity'])
+        for i in range(len(docs_embedding)):
+            doc_vec = docs_embedding[i]
+            sim = cosine_similarity([doc_vec], [query_embedding[0]])[0][0]
+            doc_id = docs[i]
+            df.loc[len(df.index)] = [doc_id, sim]
+        df = df.sort_values(by='similarity', ascending=False)
+        print(df)
 
 class TFIDFSimilarity():
     
@@ -473,9 +503,15 @@ if __name__ == '__main__':
     # tis = TFIDFSimilarity()
     # tis.precision_test(fuzzy_num=30)
     # calculate_precision()
-    comparison_result_single()
+    # comparison_result_single()
 
     # df = pd.read_csv('./data/CVE/product.csv')
     # docs = df['product'].to_list()
     # ts = TextSimilarity()
     # ts.create_embedding(docs, "product")
+
+    query = "improper restriction of operations within the bounds of a memory buffer"
+    df = pd.read_csv('./myData/learning/CVE2Technique/attack.csv')
+    ts = TextSimilarity()
+    ts.init_ner()
+    ts.calculate_similarity_for_all(df['name'].to_list(), query)

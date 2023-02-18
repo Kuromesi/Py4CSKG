@@ -124,11 +124,12 @@ class BERTMultiClassScorer():
             all_preds.extend(predicted.numpy())
             all_y.extend(y.cpu().data.numpy())
         preds = np.array(all_preds)
-        accuracy = accuracy_score(all_y, preds, normalize=True)
-        precision = precision_score(all_y, preds, average='weighted')
-        f1 = f1_score(all_y, preds, labels=model.labels, average='weighted')
-        recall = recall_score(all_y, preds, labels=model.labels, average='weighted')
+        accuracy = 100 * accuracy_score(all_y, preds, normalize=True)
+        precision = 100 * precision_score(all_y, preds, average='weighted')
+        f1 = 100 * f1_score(all_y, preds, labels=model.labels, average='weighted')
+        recall = 100 * recall_score(all_y, preds, labels=model.labels, average='weighted')
         metrics = {}
+        metrics['precision'] = precision
         metrics['f1'] = f1
         metrics['loss'] = loss_avg()
         metrics_str = "; ".join("{}: {:05.2f}".format(k, v) for k, v in metrics.items())

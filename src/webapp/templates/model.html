@@ -60,7 +60,7 @@
                     <div v-if="type==0">
                         <h1>Control panel</h1>
                     </div>
-                    <div v-if="type=='Component' || type=='Entry Point'">
+                    <div v-if="type=='Component' || type=='Entry'">
                         <div class="group">
                             <input id="modeling" type="text" required v-model="cur_node['name']">
                             <span class="highlight"></span>
@@ -79,7 +79,7 @@
                             <button @click="modify_node">Modify Node</button>
                         </div>
                     </div>
-                    <div v-if="type=='Software' || type=='Hardware' || type=='Operating System' || type=='Firmware'">
+                    <div v-if="type=='Software' || type=='Hardware' || type=='OS' || type=='Firmware'">
                         <div class="group">
                             <input id="modeling" type="text" required v-model="cur_node['name']">
                             <span class="highlight"></span>
@@ -172,10 +172,10 @@
                                 <label for="item4" @click="type='Firmware'">Firmware</label>
                             </li>
                             <li id="selection">
-                                <label for="item5" @click="type='Entry point'">Entry point</label>
+                                <label for="item5" @click="type='Entry'">Entry point</label>
                             </li>
                             <li id="selection">
-                                <label for="item6" @click="type='Operating system'">Operating system</label>
+                                <label for="item6" @click="type='OS'">Operating system</label>
                             </li>
                         </ul>
                     </details>

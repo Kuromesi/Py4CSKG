@@ -6,6 +6,7 @@ from models.config.MultiLabelConfig import *
 from models.config.MultiClassConfig import *
 from models.trainer import *
 
+
 def multi_train():
     config = [MultiClassBiLSTMConfig(),
               MultiClassBertBiLSTMConfig(),
@@ -87,7 +88,7 @@ def multiClassPredict():
     pred = torch.max(pred, 1)[1]
     labels = model.labels
     print(labels[pred[0]])
-
+    
 def evaluate():
     config = [MultiClassBiLSTMConfig(),
               MultiClassBertBiLSTMConfig(),

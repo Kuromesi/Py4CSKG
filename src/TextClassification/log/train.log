@@ -156,3 +156,8 @@
 2023-02-15 10:43:10,609:INFO: - Val metrics: f1: 00.81; loss: 01.09
 2023-02-15 10:43:10,610:INFO: - Found new best F1
 2023-02-15 10:43:11,199:INFO: Epoch 2/100
+2023-02-15 10:51:09,385:INFO: device: cuda
+2023-02-15 10:51:09,386:INFO: Loading the datasets...
+2023-02-15 10:51:11,639:INFO: Loading BERT model...
+2023-02-15 10:51:14,448:INFO: Starting training for 100 epoch(s)
+2023-02-15 10:51:14,449:INFO: Epoch 1/100

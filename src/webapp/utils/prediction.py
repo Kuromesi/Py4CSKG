@@ -58,6 +58,8 @@ class CVE2CAPEC():
         self.bert = BertModel.from_pretrained(model_name, config=bert_config)
         self.batch_size = 32
         self.ner = NERPredict()
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.bert.to(self.device)
 
     def embedding(self, text, weight=None, weighted=True):
         tokens = self.tokenizer(text, padding=True, return_tensors="pt", truncation=True, max_length=512)
@@ -103,17 +105,17 @@ class CVE2CAPEC():
 
     def weighted_embedding(self, text, weighted=False):
         tokens = self.tokenizer(text, padding=True, return_tensors="pt", truncation=True, max_length=256)
-        attention_mask = tokens['attention_mask']
-        tokens = tokens['input_ids']
+        attention_mask = tokens['attention_mask'].to(self.device)
+        tokens = tokens['input_ids'].to(self.device)
         embedding = self.bert(tokens)[0]
         mask = attention_mask.unsqueeze(-1).expand(embedding.size()).float()
         if isinstance(text, list):
             if weighted:
-                weight = torch.ones(tokens.size())
+                weight = torch.ones(tokens.size()).to(self.device)
                 res = self.ner.predict(text)
                 l = res['weight']
                 for i in range(len(weight)):
-                    weight[i][l[i]] = 10
+                    weight[i][l[i]] = 20
                 weight = weight.unsqueeze(-1).expand(embedding.size()).float()
                 masked_embeddings = embedding * mask * weight
             else:
@@ -168,7 +170,7 @@ class CVE2CAPEC():
         # docs_weight = self.transform_tfidf(docs['processed'].tolist())
         # docs_embedding = self.batch_embedding(docs['processed'].tolist(), docs_weight, weighted=True).detach().numpy()
         docs_embedding = np.load('./data/embeddings/capec_embedding.npy')
-        query_embedding = self.weighted_embedding(query, weighted=True)['embedding'].detach().numpy()
+        query_embedding = self.weighted_embedding(query, weighted=True)['embedding'].cpu().detach().numpy()
         df = pd.DataFrame(columns=['id', 'name', 'description', 'similarity'])
         for i in range(len(docs_embedding)):
             doc_vec = docs_embedding[i]

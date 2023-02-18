@@ -51,19 +51,19 @@ modeling = new Vue({
                     size = 10;
                     break;
                 case "Hardware":
-                    color = "#99dfff"
+                    color = "#ffff66"
                     size = 10;
                     break;
                 case "Firmware":
-                    color = "#99dfff"
+                    color = "#996633"
                     size = 10;
                     break;
                 case "Entry":
-                    color = "#99dfff"
+                    color = "#669999"
                     size = 10;
                     break;
                 case "OS":
-                    color = "#99dfff"
+                    color = "#9966ff"
                     size = 10;
                     break;
             }

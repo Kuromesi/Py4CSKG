@@ -1,0 +1,44 @@
+name
+General Improper Access Control 
+Authentication Bypass by Capture-replay 
+Improper Restriction of Excessive Authentication Attempts 
+Overly Restrictive Account Lockout Mechanism 
+Use of Password Hash Instead of Password for Authentication 
+General Credential Management Errors 
+Cleartext Transmission of Sensitive Information 
+Hard-coded Credentials 
+Weak Password/Hashing 
+General Cryptographic Issues 
+XML External Entity (XXE) 
+XML Entity Expansion (XEE) 
+URL Redirection to Untrusted Site ('Open Redirect') 
+Cross-site Scripting (XSS) 
+OS Command Injection 
+SQL Injection 
+Code Injection 
+Directory Traversal (Relative and Absolute) 
+Symlink Attacks 
+Untrusted/Uncontrolled/Unquoted Search Path 
+Unrestricted File Upload 
+Deserialization of Untrusted Data 
+Infinite Loop 
+Cross-site Request Forgery (CSRF) 
+Session Fixation 
+Uncontrolled Resource Consumption 
+Server-Side Request Forgery (SSRF) 
+Modify Configuration 
+Create Account 
+Disable protections 
+Restart/Reboot 
+Install App 
+Read from Memory 
+Obtain sensitive information: Credentials 
+Obtain sensitive information: Other data 
+Password Reset 
+Read files 
+Delete files 
+Create/Upload file 
+Write to existing file 
+Change ownership or permissions 
+"Memory Modification (Memory Buffer Errors, Pointer Issues, Type Errors, etc.)"
+"Memory Read (Memory Buffer Errors, Pointer Issues, Type Errors, etc.)"

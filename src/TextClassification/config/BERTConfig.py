@@ -7,7 +7,7 @@ class BERTConfig:
     linear_lr = 7.5e-3
     max_epochs = 100
     min_epochs = 5
-    batch_size = 256
+    batch_size = 8
     max_sen_len = 200
     gamma = 0.99
     weight_decay = 0.001
