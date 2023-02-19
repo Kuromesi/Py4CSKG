@@ -21,7 +21,7 @@ class TextSimilarity():
         bert_config = BertConfig.from_pretrained(model_name)
         self.bert = BertModel.from_pretrained(model_name, config=bert_config)
         self.batch_size = 16
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.device = "cpu" if torch.cuda.is_available() else "cpu"
         self.bert.to(self.device)
 
     def init_ner(self):
@@ -61,12 +61,12 @@ class TextSimilarity():
         for i in range(step):
             batch = text[i * self.batch_size: (i + 1) * self.batch_size]
             if embedding is not None:
-                embedding = torch.cat((embedding, self.weighted_embedding(batch, weighted=weighted)['embedding']), 0)
+                embedding = torch.cat((embedding, self.weighted_embedding(batch, weighted=weighted)['embedding'].to('cpu')), 0)
             else:
-                embedding = self.weighted_embedding(batch, weighted=weighted)['embedding']
+                embedding = self.weighted_embedding(batch, weighted=weighted)['embedding'].to('cpu')
 
         batch = text[step * self.batch_size: len(text)]
-        embedding = torch.cat((embedding, self.weighted_embedding(batch, weighted=weighted)['embedding']), 0)
+        embedding = torch.cat((embedding, self.weighted_embedding(batch, weighted=weighted)['embedding'].to('cpu')), 0)
         return embedding
 
     def weighted_embedding(self, text, weighted=False):
@@ -77,7 +77,7 @@ class TextSimilarity():
         mask = attention_mask.unsqueeze(-1).expand(embedding.size()).float()
         if isinstance(text, list):
             if weighted:
-                weight = torch.ones(tokens.size())
+                weight = torch.ones(tokens.size()).to(self.device)
                 res = self.ner.predict(text)
                 l = res['weight']
                 for i in range(len(weight)):
@@ -91,7 +91,7 @@ class TextSimilarity():
                 weight = torch.ones(tokens.size(1)).to(self.device)
                 res = self.ner.predict(text)
                 l = res['weight']
-                weight[l] = 1000
+                weight[l] = 10
                 weight = weight.unsqueeze(-1).expand(embedding.size()).float()
                 masked_embeddings = embedding * mask * weight
             else:
@@ -107,12 +107,12 @@ class TextSimilarity():
         for i in trange(step):
             batch = text[i * self.batch_size: (i + 1) * self.batch_size]
             if embedding is not None:
-                embedding = torch.cat((embedding, self.embedding(batch, weight, weighted=weighted)['embedding']), 0)
+                embedding = torch.cat((embedding, self.embedding(batch, weight, weighted=weighted)['embedding'].to('cpu')), 0)
             else:
-                embedding = self.embedding(batch, weight, weighted=weighted)['embedding']
+                embedding = self.embedding(batch, weight, weighted=weighted)['embedding'].to('cpu')
 
         batch = text[step * self.batch_size: len(text)]
-        embedding = torch.cat((embedding, self.embedding(batch, weight, weighted=weighted)['embedding']), 0)
+        embedding = torch.cat((embedding, self.embedding(batch, weight, weighted=weighted)['embedding'].to('cpu')), 0)
         return embedding
     
     def transform_tfidf(self, corpus):
@@ -150,12 +150,13 @@ class TextSimilarity():
         docs_embedding = self.batch_embedding(docs['processed'].tolist(), docs_weight, weighted=True).detach().numpy()
         # np.save('./data/capec_embedding.npy', docs_embedding)
         query_embedding = self.weighted_embedding(query, weighted=True)['embedding'].detach().numpy()
-        df = pd.DataFrame(columns=['id', 'similarity'])
+        df = pd.DataFrame(columns=['id', 'name','similarity'])
         for i in range(len(docs_embedding)):
             doc_vec = docs_embedding[i]
             sim = cosine_similarity([doc_vec], [query_embedding[0]])[0][0]
             doc_id = docs['id'].loc[i]
-            df.loc[len(df.index)] = [doc_id, sim]
+            doc_name = docs['name'].loc[i]
+            df.loc[len(df.index)] = [doc_id, doc_name, sim]
         df = df.sort_values(by='similarity', ascending=False)
         print(df)
 
@@ -228,10 +229,10 @@ class TextSimilarity():
         docs = capec_df['processed'].tolist()
         docs_weight = self.transform_tfidf(docs)
 
-        docs_embedding = self.batch_embedding(docs, docs_weight, weighted=False).detach().numpy()
+        docs_embedding = self.batch_embedding(docs, docs_weight, weighted=True).detach().numpy()
         name_embedding = self.batch_embedding(capec_df['name'].tolist()).detach().numpy()
         docs_embedding = 8e-01 * name_embedding + docs_embedding
-        query_embedding = self.batch_weighted_embedding(query, weighted=False).detach().numpy()
+        query_embedding = self.batch_weighted_embedding(query, weighted=True).detach().numpy()
 
         sim = cosine_similarity(docs_embedding, query_embedding)
         
@@ -369,6 +370,28 @@ class TFIDFSimilarity():
         result_df.to_csv('./myData/learning/CVE2CAPEC/result_tfidf.csv', index=False)
         
         return {'true': true, 'sim': sim}
+    
+    def calculate_similarity(self, query):
+        capec_df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+        docs = capec_df['processed'].tolist()
+        names = capec_df['name'].tolist()
+        doc_name = []
+        for i in range(len(docs)):
+            doc_name.append(docs[i] + " " + names[i])
+        query = preprocess(query)
+        sents = docs + [query]
+        tv = TfidfVectorizer()
+        tv.fit_transform(sents)
+        docs_vec = tv.transform(docs).toarray()
+        query_vec = tv.transform([query]).toarray()
+        sim = cosine_similarity(query_vec, docs_vec)
+        df = pd.DataFrame(columns=['id', 'name','similarity'])
+        index = np.argsort(sim, axis=1)
+        for ind in index[0]:
+            df.loc[len(df.index)] = [capec_df['id'].loc[ind], capec_df['name'].loc[ind], sim[0][ind]]
+        df = df.sort_values(by='similarity', ascending=False)
+        print(df)
+        
 
 
 
@@ -377,16 +400,16 @@ def calculate_precision():
     t = f1_score(y_true=df['true'].tolist(), y_pred=df['pred'].tolist(), average='micro')
     print(t)
 
-
 def preprocess(text):
     # Official model
+    NLP = spacy.load('en_core_web_trf')
     text = NLP(text)
     tmp = ""
-    # for token in text:
-    #     if not token.is_stop and token.is_alpha:
-    #         tmp += token.lemma_.lower() + " "
     for token in text:
+        if not token.is_stop and token.is_alpha:
             tmp += token.lemma_.lower() + " "
+    # for token in text:
+    #         tmp += token.lemma_.lower() + " "
     return tmp.strip()
 
 def tfidf():
@@ -452,14 +475,14 @@ def comparison_result_single():
     ts = TextSimilarity()
     ts.init_ner()
     f1_bert = []
-    res = ts.precision_test(fuzzy_num=1)
+    res = ts._precision_test(fuzzy_num=1)
     sim_ts = np.transpose(res['sim'])
     true = res['true']
     sim_tis = res['sim']
     for i in trange(30):
         f1_bert.append(calculate(sim_ts, capec_df, i + 1, true)['f1'])
     df = pd.read_csv('./myData/learning/CVE2CAPEC/comparison.csv')
-    df['bert_docstfidf'] = f1_bert
+    df['bert_weight20'] = f1_bert
     df.to_csv('./myData/learning/CVE2CAPEC/comparison.csv', index=False)
 
 if __name__ == '__main__':
@@ -481,26 +504,28 @@ if __name__ == '__main__':
 #     print("")
     # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
     # ts = TextSimilarity()
-    # text = "Heap overflow in FTP daemon in Solaris 8 allows remote attackers to execute arbitrary commands by creating a long pathname and calling the LIST command, which uses glob to generate long strings."
+    # text = "In setSyncSampleParams of SampleTable.cpp, there is possible resource exhaustion due to a no boundary validation. This could lead to remote denial of service with no additional execution privileges needed."
     # ts.init_ner()
     # ts.calculate_similarity(df, text)
     # precision_test()
     # calculate_precision()
     # tfidf()
     # print()
-
+    # comparison_result()
 
     # PRECISION TEST
     # spacy.prefer_gpu()
     # NLP = spacy.load('en_core_web_trf')
     # ts = TextSimilarity()
     # ts.init_ner()
-    # ts._precision_test(fuzzy_num=1)
+    # ts._precision_test(fuzzy_num=10)
     # calculate_precision()
 
     # TFIDF SIMILARITY
     # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-    # tis = TFIDFSimilarity()
+    tis = TFIDFSimilarity()
+    query = "In setSyncSampleParams of SampleTable.cpp, there is possible resource exhaustion due to a missing bounds check. This could lead to remote denial of service with no additional execution privileges needed."
+    tis.calculate_similarity(query)
     # tis.precision_test(fuzzy_num=30)
     # calculate_precision()
     # comparison_result_single()
@@ -510,8 +535,8 @@ if __name__ == '__main__':
     # ts = TextSimilarity()
     # ts.create_embedding(docs, "product")
 
-    query = "improper restriction of operations within the bounds of a memory buffer"
-    df = pd.read_csv('./myData/learning/CVE2Technique/attack.csv')
-    ts = TextSimilarity()
-    ts.init_ner()
-    ts.calculate_similarity_for_all(df['name'].to_list(), query)
+    # query = "improper restriction of operations within the bounds of a memory buffer"
+    # df = pd.read_csv('./myData/learning/CVE2Technique/attack.csv')
+    # ts = TextSimilarity()
+    # ts.init_ner()
+    # ts.calculate_similarity_for_all(df['name'].to_list(), query)

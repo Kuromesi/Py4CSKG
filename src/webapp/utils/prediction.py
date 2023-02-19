@@ -122,10 +122,10 @@ class CVE2CAPEC():
                 masked_embeddings = embedding * mask
         else:
             if weighted:
-                weight = torch.ones(tokens.size(1))
+                weight = torch.ones(tokens.size(1)).to(self.device)
                 res = self.ner.predict(text)
                 l = res['weight']
-                weight[l] = 1000
+                weight[l] = 10
                 weight = weight.unsqueeze(-1).expand(embedding.size()).float()
                 masked_embeddings = embedding * mask * weight
             else:
