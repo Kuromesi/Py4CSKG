@@ -1,15 +1,15 @@
 import torch
 import torch.nn as nn
 from copy import deepcopy
-from models.layers.train_utils import Embeddings,PositionalEncoding
-from models.layers.attention import MultiHeadedAttention
-from models.layers.encoder import EncoderLayer, Encoder
-from models.layers.feed_forward import PositionwiseFeedForward
+from TextClassification.layers.train_utils import Embeddings,PositionalEncoding
+from TextClassification.layers.attention import MultiHeadedAttention
+from TextClassification.layers.encoder import EncoderLayer, Encoder
+from TextClassification.layers.feed_forward import PositionwiseFeedForward
 import numpy as np
-from models.utils.utils import *
-from models.utils.metric import MultiLabelScorer, MultiClassScorer
+from TextClassification.utils.utils import *
+from TextClassification.utils.metric import MultiLabelScorer, MultiClassScorer
 import abc
-from models.Model import Model
+from TextClassification.Model import Model
 
 class MultiLabel(Model):
     scorer = MultiLabelScorer()

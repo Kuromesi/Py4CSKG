@@ -1,6 +1,7 @@
 class Component():
     name = ""
     description = ""
+    policy = ""
 
 class Hardware():
     name = ""

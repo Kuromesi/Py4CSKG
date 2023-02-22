@@ -2,9 +2,9 @@ import torch
 import numpy as np
 from sklearn.metrics import accuracy_score, precision_score, f1_score, recall_score, classification_report, confusion_matrix
 from collections import defaultdict
-from utils.utils import *
+from TextClassification.utils.utils import *
 import pandas as pd
-from utils.logger import *
+from TextClassification.utils.logger import *
 
 def report2csv(report:str) -> pd.DataFrame:
     report = report.split('\n')

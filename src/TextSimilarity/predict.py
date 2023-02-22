@@ -32,8 +32,12 @@ class NERPredict():
         logits = self.model((text_vec, input_token_starts), attention_mask=attention_mask, use_crf=True)
         ids = self.model.crf.decode(emissions=logits[0])
         tags = self.idx2tag(ids)
-        tokens = [self.tokenizer.tokenize(sent) for sent in sentence]
-        res = [list(zip(tokens[i], tags[i])) for i in range(len(tags))] 
+        if isinstance(sentence, list):
+            tokens = [self.tokenizer.tokenize(sent) for sent in sentence]
+            res = [list(zip(tokens[i], tags[i])) for i in range(len(tags))]
+        else:
+            tokens = self.tokenizer.tokenize(sentence)
+            res = list(zip(tokens, tags[0]))
         weight = []
         for i in range(len(ids)):
             temp = []
@@ -45,13 +49,8 @@ class NERPredict():
 
 if __name__ == "__main__":
     
-    ner = NERPredict(model, config)
-    sentence = "Untrusted search path vulnerability in the add_filename_to_string function in intl/gettext/loadmsgcat.c for Elinks 0.11.1 allows local users to cause Elinks to use an untrusted gettext message catalog (.po file) in a ""../po"" directory, which can be leveraged to conduct format string attacks."
+    ner = NERPredict()
+    sentence = "Webroot endpoint agents prior to version v9.0.28.48 did not protect the \"%PROGRAMDATA%\\WrData\\PKG\" directory against renaming. This could allow attackers to trigger a crash or wait upon Webroot service restart to rewrite and hijack dlls in this directory for privilege escalation."
     res = ner.predict(sentence)
     ids = res['ids']
     print(res['res'])
-    weight = []
-    for i in range(len(ids)):
-        if ids[i] != 0:
-            weight.append(i + 1)
-    print(weight)

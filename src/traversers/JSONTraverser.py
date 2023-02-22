@@ -1,8 +1,9 @@
 import json
 import pandas as pd
 from tqdm import tqdm 
-# from service.GDBSaver import GDBSaver
-# from service.RDBSaver import RDBSaver
+from service.GDBSaver import GDBSaver
+from service.RDBSaver import RDBSaver
+from webapp.utils.version_compare import *
 
 type_dict = {
     'a': "Software",
@@ -11,10 +12,9 @@ type_dict = {
 }
 
 class CVETraverser():
-    def __init__(self, cves) -> None:
-        # self.ds = GDBSaver()
-        # self.rs = RDBSaver()
-        self.cves = cves
+    def __init__(self) -> None:
+        self.ds = GDBSaver()
+        self.rs = RDBSaver()
         self.type = "Vulnerability"
 
     def find_kv(self):
@@ -54,12 +54,28 @@ class CVETraverser():
         return string.strip()
     
     def cpe_summary(self, cpes):
+        summary = {}
         for cpe in cpes:
-            cpe = self.cpe_processor(cpe)
-            product = cpe['vendor'].split('_') + cpe['id'].split('_')
-            product = self.l2s(product)
-            # if cpe['version'] != 
-            version = cpe['version'] + " " + cpe['update']
+            cpe = self._cpe_processor(cpe)
+            product = cpe['product']
+            if product in summary:
+                summary[product]['versionStart'] = summary[product]['versionStart'] if cmp_version(cpe['versionStart'], summary[product]['versionStart']) else cpe['versionStart']
+                summary[product]['versionEnd'] = cpe['versionEnd'] if cmp_version(cpe['versionEnd'], summary[product]['versionEnd']) else summary[product]['versionEnd']
+            else:
+                summary[product] = cpe
+        for product in summary:
+            uri = summary[product]['uri']
+            uri = uri.split(':')
+            uri[5] = "*"
+            uri[6] = "*"
+            uri[13] = summary[product]['versionStart']
+            uri[14] = summary[product]['versionEnd']
+            temp = ""
+            for i in uri:
+                temp += i + ":"
+            uri = temp.strip(":")
+            summary[product]['uri'] = uri
+        return summary
 
     def _cpe_processor(self, cpe):
         result = {}
@@ -103,13 +119,13 @@ class CVETraverser():
         result["url"] = cpe
         return result
 
-    def traverse(self):
+    def traverse(self, cves):
         # KURO
         # df = pd.DataFrame(columns=['id', 'des'])
         # product = set()
         # df = pd.DataFrame(columns=['product'])
 
-        for path in self.cves:
+        for path in cves:
             with open(path, 'r', encoding='utf-8') as f:
                 items = json.load(f)
             items = items['CVE_Items']
@@ -137,27 +153,39 @@ class CVETraverser():
                             'prop': self.type,
                             'des': des,
                             'baseMetricV2': cvss2,
-                            'baseMetricV3': cvss3}
-                    # self.ds.addNode(node)
+                            'baseMetricV3': cvss3,
+                            'complete': json.dumps(cve)}
+                    cve_id = self.ds.addNode(node)
+                    self.rs.saveNodeId(src, cve_id)
+                    
 
                     # Find related CWE
                     cwes = cve['problemtype']['problemtype_data'][0]['description']
                     for cwe in cwes:
                         cwe = cwe['value']
-                        # if cwe is not "NVD-CWE-noinfo" and cwe is not "NVD-CWE-Other":
+                        if cwe != "NVD-CWE-noinfo" and cwe != "NVD-CWE-Other":
                             # dest = self.rs.getNode(cwe)
-                            # self.rs.saveRDF(cwe, src, "observed_example")
+                            self.rs.saveRDF(cwe, src, "observed_example")
 
                     # Find CPE
                     if 'configurations' in cur and 'nodes' in cur['configurations']:
                         cpe = cur['configurations']['nodes']
                         cpe_uri = self.get_cpe(cpe, [])
-                        for uri in cpe_uri:
-                            res = self._cpe_processor(uri)
-                            # product.add(res['product'])
-                            # if not self.rs.checkNode(uri):
-                                # self.ds.addNode(self._cpe_processor(uri))
-                            # self.rs.saveRDF(src, uri, "has_platform")
+                        summary = self.cpe_summary(cpe_uri)
+                        for product in summary:
+                            if not self.rs.checkNode(summary[product]['uri']):
+                                cpe_id = self.ds.addNode(summary[product])
+                                self.rs.saveNodeId(summary[product]['uri'], cpe_id)
+                                
+                            self.rs.saveRDF(src, summary[product]['uri'], "has_platform")
+                        # for uri in cpe_uri:
+                        #     res = self._cpe_processor(uri)
+                        #     # product.add(res['product'])
+                        #     if not self.rs.checkNode(uri):
+                        #         cpe_id = self.ds.addNode(res)
+                        #         self.rs.saveNodeId(uri, cpe_id)
+                                
+                        #     self.rs.saveRDF(src, uri, "has_platform")
         # df['product'] = list(product)
         # df.to_csv('data/CVE/product.csv', index=False)
         # df.to_csv('myData/learning/CVE2CAPEC/cve.csv', index=False)

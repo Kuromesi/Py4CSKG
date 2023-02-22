@@ -1,8 +1,8 @@
 # encoder.py
 
 from torch import nn
-from models.layers.train_utils import clones
-from models.layers.sublayer import LayerNorm, SublayerOutput
+from TextClassification.layers.train_utils import clones
+from TextClassification.layers.sublayer import LayerNorm, SublayerOutput
 
 class Encoder(nn.Module):
     '''

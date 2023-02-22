@@ -57,7 +57,7 @@
                 style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-between;">
                 <div id="model_info"
                     style="display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-                    <div v-if="type==0">
+                    <!-- <div v-if="type==0">
                         <h1>Control panel</h1>
                     </div>
                     <div v-if="type=='Component' || type=='Entry'">
@@ -112,6 +112,36 @@
                             <button @click="delete_node">Delete Node</button>
                             <button @click="modify_node">Modify Node</button>
                         </div>
+                    </div> -->
+                    <div>
+                        <!-- <div class="group">
+                            <input id="modeling" type="text" required v-model="cur_component.product">
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                            <label id="modeling">test</label>
+                        </div>
+                        <p>{[ cur_component.product ]}</p> -->
+                        <div v-for="(v, k) in cur_component">
+                            <div class="group">
+                                <input id="modeling" type="text" required v-model="cur_component[k]">
+                                <span class="highlight"></span>
+                                <span class="bar"></span>
+                                <label id="modeling">{[ k ]}</label>
+                            </div>
+                            <div style="overflow: auto;" v-if="if_recommend && k == 'product'">
+                                <p id="file_link" v-for="recom in recommendations"  @click="fill_product(recom)">{[ recom ]}</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <input v-model="key">
+                            <button @click="add_attribute">Add/Delete Attribute</button>
+                        </div>
+                        <div id="buttons" style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-around;">
+                            <button @click="add_node">Add Node</button>
+                            <button @click="delete_node">Delete Node</button>
+                            <button @click="modify_node">Modify Node</button>
+                        </div>
                     </div>
                 </div>
                 <div id="edge_control">
@@ -152,30 +182,31 @@
                             <input type="radio" name="item" id="item2" title="Software">
                             <input type="radio" name="item" id="item3" title="Hardware">
                             <input type="radio" name="item" id="item4" title="Firmware">
-                            <input type="radio" name="item" id="item5" title="Entry point">
-                            <input type="radio" name="item" id="item6" title="Operating system">
+                            <input type="radio" name="item" id="item5" title="Operating system">
+                            <input type="radio" name="item" id="item6" title="Entry">
+                            <input type="radio" name="item" id="item7" title="Defender">
                         </summary>
                         <ul class="list" id="selection">
                             <li id="selection">
-                                <label for="item1" @click="type='Component'">
-                                    Component
-                                    <span></span>
-                                </label>
+                                <label for="item1" @click="component_click('component')">Component</label>
                             </li>
                             <li id="selection">
-                                <label for="item2" @click="type='Software'">Software</label>
+                                <label for="item7" @click="component_click('defender')">Defender</label>
                             </li>
                             <li id="selection">
-                                <label for="item3" @click="type='Hardware'">Hardware</label>
+                                <label for="item2" @click="component_click('software')">Software</label>
                             </li>
                             <li id="selection">
-                                <label for="item4" @click="type='Firmware'">Firmware</label>
+                                <label for="item3" @click="component_click('hardware')">Hardware</label>
                             </li>
                             <li id="selection">
-                                <label for="item5" @click="type='Entry'">Entry point</label>
+                                <label for="item4" @click="component_click('firmware')">Firmware</label>
                             </li>
                             <li id="selection">
-                                <label for="item6" @click="type='OS'">Operating system</label>
+                                <label for="item5" @click="component_click('os')">Operating system</label>
+                            </li>
+                            <li id="selection">
+                                <label for="item6" @click="component_click('entry')">Entry</label>
                             </li>
                         </ul>
                     </details>
@@ -201,9 +232,9 @@
         </div>
         
     </div>
-    
     <script src="{{ url_for('static',filename='js/graph.js') }}"></script>
     <script src="{{ url_for('static',filename='js/modeling.js') }}"></script>
+
 </body>
 
 </html>

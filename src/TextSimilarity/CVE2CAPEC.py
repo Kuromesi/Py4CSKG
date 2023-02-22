@@ -1,5 +1,5 @@
 from sentence_transformers import SentenceTransformer
-from transformers import BertModel, BertConfig, AutoTokenizer
+from transformers import BertModel, BertConfig, AutoTokenizer, AutoModel
 import pandas as pd
 import torch
 import numpy as np
@@ -16,10 +16,10 @@ import os
 
 class TextSimilarity():
     def __init__(self) -> None: 
-        model_name = "sentence-transformers/all-MiniLM-L6-v2" # jackaduma/SecBERT bert-base-uncased
+        model_name = "sentence-transformers/all-MiniLM-L6-v2" # jackaduma/SecBERT bert-base-uncased roberta-large-nli-stsb-mean-tokens all-MiniLM-L6-v2 bert-large-nli-stsb-mean-tokens
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        bert_config = BertConfig.from_pretrained(model_name)
-        self.bert = BertModel.from_pretrained(model_name, config=bert_config)
+        # bert_config = BertConfig.from_pretrained(model_name)
+        self.bert = AutoModel.from_pretrained(model_name)
         self.batch_size = 16
         self.device = "cpu" if torch.cuda.is_available() else "cpu"
         self.bert.to(self.device)
@@ -185,7 +185,7 @@ class TextSimilarity():
         docs_embedding = self.batch_embedding(docs, docs_weight, weighted=True).detach().numpy()
         # name_embedding = ts.batch_embedding(capec_df['name'].tolist()).detach().numpy()
         # docs_embedding = (1 * name_embedding + docs_embedding) / 2
-        query_embedding = self.batch_embedding(query, docs_weight, weighted=True).detach().numpy()
+        query_embedding = self.batch_embedding(query, docs_weight, weighted=False).detach().numpy()
         sim = cosine_similarity(docs_embedding, query_embedding)
         
         if fuzzy_num:
@@ -232,7 +232,7 @@ class TextSimilarity():
         docs_embedding = self.batch_embedding(docs, docs_weight, weighted=True).detach().numpy()
         name_embedding = self.batch_embedding(capec_df['name'].tolist()).detach().numpy()
         docs_embedding = 8e-01 * name_embedding + docs_embedding
-        query_embedding = self.batch_weighted_embedding(query, weighted=True).detach().numpy()
+        query_embedding = self.batch_weighted_embedding(query, weighted=False).detach().numpy()
 
         sim = cosine_similarity(docs_embedding, query_embedding)
         
@@ -502,11 +502,11 @@ if __name__ == '__main__':
 #     print("Sentence:", sentence)
 #     print("Embedding:", embedding)
 #     print("")
-    # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-    # ts = TextSimilarity()
-    # text = "In setSyncSampleParams of SampleTable.cpp, there is possible resource exhaustion due to a no boundary validation. This could lead to remote denial of service with no additional execution privileges needed."
-    # ts.init_ner()
-    # ts.calculate_similarity(df, text)
+    df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+    ts = TextSimilarity()
+    text = "switch"
+    ts.init_ner()
+    ts.calculate_similarity(df, text)
     # precision_test()
     # calculate_precision()
     # tfidf()
@@ -518,14 +518,14 @@ if __name__ == '__main__':
     # NLP = spacy.load('en_core_web_trf')
     # ts = TextSimilarity()
     # ts.init_ner()
-    # ts._precision_test(fuzzy_num=10)
+    # ts._precision_test(fuzzy_num=1)
     # calculate_precision()
 
     # TFIDF SIMILARITY
     # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-    tis = TFIDFSimilarity()
-    query = "In setSyncSampleParams of SampleTable.cpp, there is possible resource exhaustion due to a missing bounds check. This could lead to remote denial of service with no additional execution privileges needed."
-    tis.calculate_similarity(query)
+    # tis = TFIDFSimilarity()
+    # query = "In setSyncSampleParams of SampleTable.cpp, there is possible resource exhaustion due to a missing bounds check. This could lead to remote denial of service with no additional execution privileges needed."
+    # tis.calculate_similarity(query)
     # tis.precision_test(fuzzy_num=30)
     # calculate_precision()
     # comparison_result_single()
@@ -535,7 +535,7 @@ if __name__ == '__main__':
     # ts = TextSimilarity()
     # ts.create_embedding(docs, "product")
 
-    # query = "improper restriction of operations within the bounds of a memory buffer"
+    # query = "execute arbitrary code"
     # df = pd.read_csv('./myData/learning/CVE2Technique/attack.csv')
     # ts = TextSimilarity()
     # ts.init_ner()

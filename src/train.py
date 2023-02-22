@@ -1,10 +1,10 @@
 # train.py
 
-from models.utils.utils import *
-from models.MultiLabel import *
-from models.config.MultiLabelConfig import *
-from models.config.MultiClassConfig import *
-from models.trainer import *
+from TextClassification.utils.utils import *
+from TextClassification.MultiLabel import *
+from TextClassification.config.MultiLabelConfig import *
+from TextClassification.config.MultiClassConfig import *
+from TextClassification.trainer import *
 
 
 def multi_train():
@@ -80,7 +80,7 @@ def multiClassPredict():
     model = load_model('ckpts/CVE2CWE/MultiClassGruBase.pkl')
     config = model.config
     dataset = Dataset(config)
-    text = "NWFTPD.nlm before 5.02i in the FTP server in Novell NetWare does not properly listen for data connections, which allows remote attackers to cause a denial of service (abend) via multiple FTP sessions."
+    text = "Untis WebUntis before 2020.9.6 allows CSRF for certain combinations of rights and modules."
     text_vec = dataset.text2vec(text)
     data = {'data': text_vec['input_ids'].cuda(), 'attention_mask': text_vec['attention_mask'].cuda()}
     pred = model(data)
@@ -114,8 +114,8 @@ def evaluate():
         report.to_csv('./myData/learning/evaluation/%s.csv'%conf.trainer_config.name, index=False)
 
 if __name__=='__main__':
-    train()
+    # train()
     # multi_train()
-    # multiClassPredict()
+    multiClassPredict()
     # multiLabelPredict()
     # evaluate()

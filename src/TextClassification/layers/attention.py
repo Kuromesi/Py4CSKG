@@ -4,7 +4,7 @@ import torch
 from torch import nn
 import math
 import torch.nn.functional as F
-from models.layers.train_utils import clones
+from TextClassification.layers.train_utils import clones
 
 def attention(query, key, value, mask=None, dropout=None):
     "Implementation of Scaled dot product attention"

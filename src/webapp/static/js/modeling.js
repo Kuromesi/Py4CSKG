@@ -4,13 +4,44 @@ modeling = new Vue({
     el: "#modeling",
     delimiters: ['{[', ']}'],
     data: {
+        ontology: {
+            component: {
+                name: "Name",
+                description: "Description"
+            },
+            software: {
+                product: "Product",
+                version: "Version"
+            },
+            hardware: {
+                product: "Product",
+                version: "Version"
+            },
+            firmware: {
+                product: "Product",
+                version: "Version"
+            },
+            os: {
+                product: "Product",
+                version: "Version"
+            },
+            entry: {
+                name: "",
+                access: "Local, network"
+            },
+            defender: {
+                name: "",
+                description: ""
+            }
+        },
+        key: "",
         type: 0,
         name: "",
         description: "",
         product: "",
         version: "",
         node: {},
-        cur_node: {
+        cur_component: {
             name: "",
             product: "",
             version: "",
@@ -21,6 +52,7 @@ modeling = new Vue({
             dest: "",
             protocol: ""
         },
+        cur_component: {},
         source: {},
         dest: {},
         protocol: "",
@@ -32,67 +64,63 @@ modeling = new Vue({
     },
     methods: {
         select_node(type) {
+            if (this.cur_component.name)
+                node_name = this.cur_component.name;
+            else
+                node_name = this.cur_component.product;
             if (type == "source") {
-                Object.assign(this.source, this.cur_node);
-                this.cur_edge.source = this.cur_node.name
+                Object.assign(this.source, this.clicked);
+                this.cur_edge.source = node_name;
             } else {
-                Object.assign(this.dest, this.cur_node);
-                this.cur_edge.dest = this.cur_node.name
+                Object.assign(this.dest, this.clicked);
+                this.cur_edge.dest = node_name;
             }
         },
         add_node() {
-            switch (this.type) {
-                case "Component":
-                    color = "#00ff00"
-                    size = 13.75;
-                    break;
-                case "Software":
-                    color = "#99dfff"
-                    size = 10;
-                    break;
-                case "Hardware":
-                    color = "#ffff66"
-                    size = 10;
-                    break;
-                case "Firmware":
-                    color = "#996633"
-                    size = 10;
-                    break;
-                case "Entry":
-                    color = "#669999"
-                    size = 10;
-                    break;
-                case "OS":
-                    color = "#9966ff"
-                    size = 10;
-                    break;
+            component_attributes = {
+                component: {
+                    color: "#00ff00",
+                    size: 13.75
+                },
+                software: {
+                    color: "#99dfff",
+                    size: 10
+                },
+                hardware: {
+                    color: "#ffff66",
+                    size: 10
+                },
+                firmware: {
+                    color: "#996633",
+                    size: 10
+                },
+                os: {
+                    color: "#9966ff",
+                    size: 10
+                },
+                entry: {
+                    color: "#669999",
+                    size: 10
+                },
+                defender: {
+                    color: "#0066ff",
+                    size: 13.75
+                }
             }
-            type = this.type;
-            var node = {
-                type: type,
-                name: this.cur_node.name,
-                description: this.cur_node.description,
-                product: this.cur_node.product,
-                version: this.cur_node.version,
-                color: color,
-                shape: "dot",
-                size: size,
-                label: this.cur_node.name,
-                title: this.cur_node.name
+            var node = {}
+            for (k in this.cur_component) {
+                node[k] = this.cur_component[k];
             }
-
-            // this.node = [{
-            //     "type": type,
-            //     "name": this.name,
-            //     "description": this.description,
-            //     "product": this.product,
-            //     "version": this.version,
-            //     "color": "#00ff00",
-            //     "id": this.id,
-            //     "label": this.name,
-            //     "shape": "dot",
-            //     "size": 13.75
-            // }];
+            node.color = component_attributes[this.cur_component.type].color;
+            node.size = component_attributes[this.cur_component.type].size;
+            node.shape = "dot";
+            if (this.cur_component.name) {
+                node.title = this.cur_component.name;
+                node.label = this.cur_component.name;
+            } else {
+                node.title = this.cur_component.product;
+                node.label = this.cur_component.product;
+            }
             if (network) {
                 addNode(node);
             } else {
@@ -105,13 +133,20 @@ modeling = new Vue({
         },
         modify_node() {
             if (network) {
-                this.clicked.name = this.cur_node.name;
-                this.clicked.description = this.cur_node.description;
-                this.clicked.version = this.cur_node.version;
-                this.clicked.product = this.cur_node.product;
+                for (k in this.cur_component) {
+                    this.clicked[k] = this.cur_component[k];
+                }
+                if (this.cur_component.name) {
+                    this.clicked.title = this.cur_component.name;
+                    this.clicked.label = this.cur_component.name;
+                } else {
+                    this.clicked.title = this.cur_component.product;
+                    this.clicked.label = this.cur_component.product;
+                }
             } else {
                 alert("Network not initialized!")
             }
+            addNode(this.clicked)
         },
         modify_edge() {
             if (network) {
@@ -127,12 +162,6 @@ modeling = new Vue({
                     to: this.dest['id'],
                     protocol: this.cur_edge.protocol
                 });
-                // edges.update([{
-                //     from: this.source['id'],
-                //     to: this.dest['id'],
-                //     protocol: this.cur_edge.protocol
-                // }
-                // ])
             } else {
                 alert("Must select 2 nodes to create an edge!");
             }
@@ -156,7 +185,7 @@ modeling = new Vue({
                 }).then(function (res) {
                     alert(res.data);
                 })
-            }  
+            }
         },
         list_files() {
             var url = "/model/list";
@@ -164,7 +193,6 @@ modeling = new Vue({
                 method: 'post',
                 url: url
             }).then(function (res) {
-                console.log(res.data);
                 modeling.files = res.data;
             })
         },
@@ -175,7 +203,6 @@ modeling = new Vue({
                 url: url,
                 data: file
             }).then(function (res) {
-                console.log(res.data);
                 modeling.cur_project = file;
                 var graph = res.data;
                 network = drawGraph(graph.nodes, graph.edges);
@@ -183,49 +210,87 @@ modeling = new Vue({
             })
         },
         fill_product(recommendation) {
-            this.cur_node.product = recommendation;
+            this.cur_component.product = recommendation;
             this.if_recommend = false;
             this.recommendations = [];
+        },
+        component_click(type) {
+            this.cur_component = {};
+            this.cur_component.type = type;
+            for (key in this.ontology[type])
+                this.cur_component[key] = this.ontology[type][key];
+        },
+        add_attribute() {
+            if (this.cur_component[this.key] != undefined) {
+                this.$delete(this.cur_component, this.key);
+            } else {
+                this.$set(this.cur_component, this.key, "");
+            }
+        }
+    },
+    watch: {
+        'cur_component.product': {
+            handler (newVal, oldVal) {
+                if (!this.if_recommend) {
+                    this.if_recommend = true;
+                } else if (this.cur_component.product) {
+                    var url = "/model/keyword"
+                    axios({
+                        method: 'post',
+                        url: url,
+                        data: { query: newVal }
+                    }).then(function (res) {
+                        modeling.recommendations = res.data;
+                    })
+                }
+                
+            }
         }
     }
 });
 
-modeling.$watch('cur_node.product', function (after, berfore) {
-    if (!this.if_recommend) {
-        this.if_recommend = true;
-    } else {
-        var url = "/model/keyword"
-            axios({
-                method: 'post',
-                url: url,
-                data: {query: after}
-            }).then(function (res) {
-                console.log(res.data);
-                modeling.recommendations = res.data;
-            })
-    }
-    
-});
+// modeling.$watch('cur_component.product', function (after, berfore) {
+//     if (!this.if_recommend) {
+//         this.if_recommend = true;
+//     } else if (this.cur_component.product) {
+//         var url = "/model/keyword"
+//         axios({
+//             method: 'post',
+//             url: url,
+//             data: { query: after }
+//         }).then(function (res) {
+//             modeling.recommendations = res.data;
+//         })
+//     }
+// });
+
+var attributes = ['label', 'id', 'color', 'shape', 'size', 'title'];
 
 function network_click(params) {
     if (params.nodes.length != 0) {
-                        var nodeID = params.nodes[0];
-                        if (nodeID) {
-                            clickedNode = nodes.get(nodeID);
-                        }
-                        info.content = clickedNode;
-                        modeling.clicked = clickedNode;
-                        modeling.type = clickedNode.type;
-                        Object.assign(modeling.cur_node, clickedNode);
-                    } else if (params.edges.length != 0) {
-                        var edgeID = params.edges[0];
-                        if (edgeID) {
-                            clickedEdge = edges.get(edgeID);
-                        }
-                        info.content = clickedEdge;
-                        modeling.clicked = clickedEdge;
-                        modeling.cur_edge.source = nodes.get(clickedEdge.from).name;
-                        modeling.cur_edge.dest = nodes.get(clickedEdge.to).name;
-                        modeling.cur_edge.protocol = clickedEdge.protocol;
-                    }
+        var nodeID = params.nodes[0];
+        if (nodeID) {
+            clickedNode = nodes.get(nodeID);
+        }
+        info.content = clickedNode;
+        modeling.clicked = clickedNode;
+        modeling.type = clickedNode.type;
+        modeling.cur_component = {};
+        for (key in clickedNode) {
+            if (attributes.indexOf(key) > -1)
+                continue;
+            modeling.cur_component[key] = clickedNode[key];
+        }
+
+    } else if (params.edges.length != 0) {
+        var edgeID = params.edges[0];
+        if (edgeID) {
+            clickedEdge = edges.get(edgeID);
+        }
+        info.content = clickedEdge;
+        modeling.clicked = clickedEdge;
+        modeling.cur_edge.source = nodes.get(clickedEdge.from).name;
+        modeling.cur_edge.dest = nodes.get(clickedEdge.to).name;
+        modeling.cur_edge.protocol = clickedEdge.protocol;
+    }
 }

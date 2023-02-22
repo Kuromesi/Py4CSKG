@@ -9,9 +9,10 @@ from tqdm import tqdm
 CVE = re.compile(r'CVE-\d*-\d*')
 
 class XmlTraverser: 
+    ds = GDBSaver()
+    rs = RDBSaver()
     def init(self): 
-        self.ds = GDBSaver()
-        self.rs = RDBSaver()
+        
         self.root = None
     
     def write_to_file(self, src, dest, relation):
@@ -41,7 +42,7 @@ class CAPECTraverser(XmlTraverser):
         # self.rs = RDBSaver()
 
     def traverse(self):
-        df = pd.DataFrame(columns=['id', 'name', 'description', 'cve'])
+        # df = pd.DataFrame(columns=['id', 'name', 'description', 'cve'])
         # Find views
         views = self.soup.find_all("View")
         views = tqdm(views)
@@ -61,14 +62,20 @@ class CAPECTraverser(XmlTraverser):
                     "type": type1,
                     "prop": self.TYPE,
                     "des": objective,
-                    "url": src
+                    "complete": str(view)
                 }
+                # Save node
+                srcID = self.ds.addNode(node_prop)
+                self.rs.saveNodeId(node_prop['id'], srcID)
 
-                full_card = str(view)
-                card_attrs = {}
-                card_attrs['id'] = src
-                card_attrs['des'] = full_card
-                card_attrs['prop'] = "Full"
+                # full_card = str(view)
+                # card_attrs = {}
+                # card_attrs['id'] = src + "-FullCard"
+                # card_attrs['des'] = full_card
+                # card_attrs['prop'] = "FullCard"
+                # full_cardID = self.ds.addNode(card_attrs)
+                # self.rs.saveNodeId(card_attrs['id'], full_cardID)
+                # self.rs.saveRDF(node_prop['id'], card_attrs['id'], 'Has_FullCard')
                 # self.rs.saveRDF(src, )
                 
                 # df.loc[len(df.index)] = [src, name, objective, CVE.findall(t)] #kuro
@@ -88,7 +95,7 @@ class CAPECTraverser(XmlTraverser):
         # Find categories
         categories = self.soup.find_all("Category")
         categories = tqdm(categories)
-        views.set_description("TRAVERSING CATEGORIES")
+        categories.set_description("TRAVERSING CATEGORIES")
         for category in categories:
             if category["Status"] != "Deprecated":
                 # Find categories properties
@@ -104,15 +111,20 @@ class CAPECTraverser(XmlTraverser):
                     "type": type,
                     "prop": self.TYPE,
                     "des": objective,
-                    "url": src
+                    "complete": str(category)
                 }
+                # Save node
+                srcID = self.ds.addNode(node_prop)
+                self.rs.saveNodeId(node_prop['id'], srcID)
+                # full_card = str(category)
+                # card_attrs = {}
+                # card_attrs['id'] = src + "-FullCard"
+                # card_attrs['des'] = full_card
+                # card_attrs['prop'] = "FullCard"
+                # full_cardID = self.ds.addNode(card_attrs)
+                # self.rs.saveNodeId(card_attrs['id'], full_cardID)
+                # self.rs.saveRDF(node_prop['id'], card_attrs['id'], 'Has_FullCard')
                 
-                full_card = str(category)
-                card_attrs = {}
-                card_attrs['id'] = src
-                card_attrs['des'] = full_card
-                card_attrs['prop'] = "Full"
-
                 # df.loc[len(df.index)] = [src, name, objective, CVE.findall(t)] #kuro
                 # Save node
                 # srcID = self.ds.addNode(node_prop)
@@ -123,12 +135,12 @@ class CAPECTraverser(XmlTraverser):
                         if member != "\n":
                             dest = "CAPEC-" + member["CAPEC_ID"]
                             relation = member.name
-                            # self.rs.saveRDF(src, dest, relation)
+                            self.rs.saveRDF(src, dest, relation)
 
         # Find attack patterns
         atkpts = self.soup.find_all("Attack_Pattern")
         atkpts = tqdm(atkpts)
-        views.set_description("TRAVERSING ATTACK PATTERNS")
+        atkpts.set_description("TRAVERSING ATTACK PATTERNS")
         for atkpt in atkpts:
             if atkpt["Status"] != "Deprecated":
                 # Find attack patterns properties
@@ -147,14 +159,19 @@ class CAPECTraverser(XmlTraverser):
                     "prop": self.TYPE,
                     "description": description,
                     "extended_description": extended_des,
-                    "url": src
+                    "complete": str(atkpt)
                 }
-
-                full_card = str(atkpt)
-                card_attrs = {}
-                card_attrs['id'] = src
-                card_attrs['des'] = full_card
-                card_attrs['prop'] = "Full"
+                # Save node
+                srcID = self.ds.addNode(node_prop)
+                self.rs.saveNodeId(node_prop['id'], srcID)
+                # full_card = str(atkpt)
+                # card_attrs = {}
+                # card_attrs['id'] = src + "-FullCard"
+                # card_attrs['des'] = full_card
+                # card_attrs['prop'] = "FullCard"
+                # full_cardID = self.ds.addNode(card_attrs)
+                # self.rs.saveNodeId(card_attrs['id'], full_cardID)
+                # self.rs.saveRDF(node_prop['id'], card_attrs['id'], 'Has_FullCard')
 
                 # df.loc[len(df.index)] = [src, name, self.get_value(atkpt, "Description"), CVE.findall(t)] #kuro
 
@@ -168,7 +185,7 @@ class CAPECTraverser(XmlTraverser):
                         if related_attack_pattern != "\n":
                             dest = "CAPEC-" + related_attack_pattern["CAPEC_ID"]
                             relation = related_attack_pattern['Nature']
-                            # self.rs.saveRDF(src, dest, relation)
+                            self.rs.saveRDF(src, dest, relation)
 
                 # Related Weaknesses
                 related_weaknesses = atkpt.Related_Weaknesses
@@ -177,7 +194,7 @@ class CAPECTraverser(XmlTraverser):
                         if related_weakness != "\n":
                             dest = "CWE-" + related_weakness['CWE_ID']
                             relation = related_weakness.name
-                            # self.rs.saveRDF(src, dest, relation)
+                            self.rs.saveRDF(src, dest, relation)
         # df.to_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv', index=False)       
 
 class CWETraverser(XmlTraverser):
@@ -207,15 +224,21 @@ class CWETraverser(XmlTraverser):
                     "type": type,
                     "prop": self.TYPE,
                     "des": objective,
-                    "url": src
+                    "complete": str(view)
                 }
+                # Save node
+                srcID = self.ds.addNode(node_prop)
+                self.rs.saveNodeId(node_prop['id'], srcID)
 
-                full_card = str(view)
-                card_attrs = {}
-                card_attrs['id'] = src
-                card_attrs['des'] = full_card
-                card_attrs['prop'] = "Full"
-
+                # full_card = str(view)
+                # card_attrs = {}
+                # card_attrs['id'] = src + "-FullCard"
+                # card_attrs['des'] = full_card
+                # card_attrs['prop'] = "FullCard"
+                # full_cardID = self.ds.addNode(card_attrs)
+                # self.rs.saveNodeId(card_attrs['id'], full_cardID)
+                # self.rs.saveRDF(node_prop['id'], card_attrs['id'], 'Has_FullCard')
+                
                 # Save node
                 # srcID = self.ds.addNode(node_prop)
 
@@ -226,12 +249,12 @@ class CWETraverser(XmlTraverser):
                         if member != "\n":
                             dest = "CWE-" + member["CWE_ID"]
                             relation = member.name
-                        # self.rs.saveRDF(src, dest, relation)
+                            self.rs.saveRDF(src, dest, relation)
 
         # Find categories
         categories = self.soup.find_all("Category")
         categories = tqdm(categories)
-        views.set_description("TRAVERSING CATEGORIES")
+        categories.set_description("TRAVERSING CATEGORIES")
         for view in categories:
             if view["Status"] != "Deprecated":
                 # Find categories properties
@@ -246,15 +269,21 @@ class CWETraverser(XmlTraverser):
                     "type": type,
                     "prop": self.TYPE,
                     "des": objective,
-                    "url": src
+                    "complete": str(view)
                 }
-
-                full_card = str(view)
-                card_attrs = {}
-                card_attrs['id'] = src
-                card_attrs['des'] = full_card
-                card_attrs['prop'] = "Full"
-
+                # Save node
+                srcID = self.ds.addNode(node_prop)
+                self.rs.saveNodeId(node_prop['id'], srcID)
+                
+                # full_card = str(view)
+                # card_attrs = {}
+                # card_attrs['id'] = src + "-FullCard"
+                # card_attrs['des'] = full_card
+                # card_attrs['prop'] = "FullCard"
+                # full_cardID = self.ds.addNode(card_attrs)
+                # self.rs.saveNodeId(card_attrs['id'], full_cardID)
+                # self.rs.saveRDF(node_prop['id'], card_attrs['id'], 'Has_FullCard')
+                
                 # Save node
                 # srcID = self.ds.addNode(node_prop)
                 # Find members
@@ -264,12 +293,12 @@ class CWETraverser(XmlTraverser):
                         if member != "\n":
                             dest = "CWE-" + member["CWE_ID"]
                             relation = member.name
-                        # self.rs.saveRDF(src, dest, relation)
+                            self.rs.saveRDF(src, dest, relation)
                             
         # Find weaknesses
         weaknesses = self.soup.find_all("Weakness")
         weaknesses = tqdm(weaknesses)
-        views.set_description("TRAVERSING WEAKNESSES")
+        weaknesses.set_description("TRAVERSING WEAKNESSES")
         for weakness in weaknesses:
             if weakness["Status"] != "Deprecated":
                 # Find weakness properties
@@ -284,18 +313,22 @@ class CWETraverser(XmlTraverser):
                     "type": type,
                     "prop": self.TYPE,
                     "des": objective,
-                    "url": src
+                    "complete": str(weakness)
                 }
-
-                full_card = str(weakness)
-                card_attrs = {}
-                card_attrs['id'] = src
-                card_attrs['des'] = full_card
-                card_attrs['prop'] = "Full"
-
-                # Save node
-                # srcID = self.ds.addNode(node_prop)
                 
+                # Save node
+                srcID = self.ds.addNode(node_prop)
+                self.rs.saveNodeId(node_prop['id'], srcID)
+                
+                # full_card = str(weakness)
+                # card_attrs = {}
+                # card_attrs['id'] = src + "-FullCard"
+                # card_attrs['des'] = full_card
+                # card_attrs['prop'] = "FullCard"
+                # full_cardID = self.ds.addNode(card_attrs)
+                # self.rs.saveNodeId(card_attrs['id'], full_cardID)
+                # self.rs.saveRDF(node_prop['id'], card_attrs['id'], 'Has_FullCard')
+          
             # Find members
             members = weakness.Relationships
             if members is not None:
@@ -303,27 +336,31 @@ class CWETraverser(XmlTraverser):
                     if member != "\n":
                         dest = "CWE-" + member["CWE_ID"]
                         relation = member.name
-                    # self.rs.saveRDF(src, dest, relation)
+                        self.rs.saveRDF(src, dest, relation)
 
 class ATTACKTraverser(XmlTraverser):
 
     def __init__(self, path: str, tactic_url: str):
         self.TYPE = "Vulnerability"
         self.tactic_url = tactic_url
+        self.ds = GDBSaver()
+        self.rs = RDBSaver()
         with open(path, "r", encoding='utf-8') as file:
             self.soup = BeautifulSoup(file, "xml")
 
     def traverse(self):
         self.tactic_traverse(self.tactic_url)
-        print("TRAVERSING ATT&CK TECHNIQUES")
         technique = tqdm(self.soup.find_all('Technique'))
+        technique.set_description("TRAVERSING ATT&CK TECHNIQUES")
         for tech in technique:
             technique.set_postfix(id=tech['id'])
             attrs = {}
             attrs['id'] = self.string_proc(tech['id'])
             attrs['name'] = self.string_proc(tech['name'])
-            attrs['des'] = self.string_proc(tech.text)
-            attrs['type'] = 'SubTechnique'
+            attrs['des'] = self.string_proc(tech.next)
+            attrs['type'] = 'Technique'
+            attrs['prop'] = 'Technique'
+            attrs['complete'] = str(tech)
             if tech.find('Platforms'):
                 attrs['platforms'] = self.string_proc(tech.find('Platforms').text)
             if tech.find('Permissions_Required'):
@@ -332,12 +369,12 @@ class ATTACKTraverser(XmlTraverser):
                 attrs['effective_permissions'] = self.string_proc(tech.find('Effective_Permissions').text)
             if tech.find('Impact_Type'):
                 attrs['impact_type'] = self.string_proc(tech.find('Impact_Type').text)
-            attrs['url'] = attrs['id']
             # Add the node to the graph database
-            # srcID = self.ds.addNode(attrs)
+            srcID = self.ds.addNode(attrs)
+            self.rs.saveNodeId(attrs['id'], srcID)
             if tech.get('id') and '.' in tech.get('id'):
                 techId = attrs['id'].split('.')[0]
-                # self.rs.saveRDF(techId, attrs['id'], "Has_SubTechnique")
+                self.rs.saveRDF(techId, attrs['id'], "Has_SubTechnique")
 
             # Find tactics
             tactics = tech.find('Tactics')
@@ -346,35 +383,42 @@ class ATTACKTraverser(XmlTraverser):
             tactic = tactics.text.split(', ')
             for tac in tactic:
                 # Save RDF
-                # rs.saveRDF(tac, attrs['id'], 'Has_Technique')
-                pass
+                self.rs.saveRDF(tac.strip(), attrs['id'], 'Has_Technique')
+            
+            # Find capec
+            capec = tech.find('CAPEC_ID')
+            if capec:
+                capec = capec.text.split(', ')
+                for cap in capec:
+                    self.rs.saveRDF(cap.strip(), attrs['id'], 'In_CAPEC')
 
-            full_card = str(tech)
-            card_attrs = {}
-            card_attrs['id'] = attrs['id']
-            card_attrs['des'] = full_card
-            card_attrs['prop'] = "Full"
+            # full_card = str(tech)
+            # card_attrs = {}
+            # card_attrs['id'] = attrs['id'] + "-FullCard"
+            # card_attrs['des'] = full_card
+            # card_attrs['prop'] = "FullCard"
             # destID = self.ds.addNode(card_attrs)
-            # self.rs.saveRDF(srcID, destID, 'FullCard')
+            # self.rs.saveNodeId(card_attrs['id'], destID)
+            # self.rs.saveRDF(attrs['id'], card_attrs['id'], 'Has_FullCard')
 
     def tactic_traverse(self, json_url):
         with open(json_url, 'r', encoding='utf-8') as f:
             root_node = json.load(f)
         for name in root_node:
-            # print(name)
-            # if not rs.check_node(name):
-            if True:
+            print(name)
+            if not self.rs.checkNode(name):
+            # if True:
                 cur = root_node[name]
-                id = cur["id"]
+                id = cur['id']
                 contents = cur["contents"]
-                attrs = {"id": id, "type": "Tactic", "contents": contents, "name": name, "url": id}
-                # src_id = ds.add_node(attrs)
-                # rs.save_node_id(attrs["name"], src_id)
+                attrs = {"id": id, "type": "Tactic", "contents": contents, "name": name, "url": id, "prop": "Tactic"}
+                src_id = self.ds.addNode(attrs)
+                self.rs.saveNodeId(attrs["name"], src_id)
 
 if __name__ == "__main__":
-    capect = CAPECTraverser('data/CAPEC.xml')
-    capect.traverse()
-    # attackt = ATTACKTraverser('data/ATTACK_Enterprise.xml', 'data/tactic.json')
-    # attackt.traverse()
+    # capect = CAPECTraverser('data/CAPEC.xml')
+    # capect.traverse()
+    attackt = ATTACKTraverser('data/ATTACK_Enterprise.xml', 'data/tactic.json')
+    attackt.traverse()
     # cwet = CWETraverser('data/CWE.xml')
     # cwet.traverse()

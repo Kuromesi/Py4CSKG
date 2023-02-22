@@ -71,19 +71,19 @@ def test():
 def predict():
     return render_template("predict.html")
 
-cve2capec = CVE2CAPEC()
+# cve2capec = CVE2CAPEC()
 @app.route('/predict/submit', methods=['POST'])
 def predict_submit():
-    cve = request.get_data()
-    cve = json.loads(cve)
-    res = cve2capec.calculate_similarity(cve['cve'])
-    graph = create_cve2net(res, cve['cve'])
-    # graph = ""
+    # cve = request.get_data()
+    # cve = json.loads(cve)
+    # res = cve2capec.calculate_similarity(cve['cve'])
+    # graph = create_cve2net(res, cve['cve'])
+    graph = ""
     return graph
 
 @app.errorhandler(404)
-def show_404(e):
+def page_not_found(e):
     return render_template("404.html")
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host="0.0.0.0", port=5000)

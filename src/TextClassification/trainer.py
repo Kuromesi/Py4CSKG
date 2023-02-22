@@ -1,10 +1,10 @@
-from models.utils.utils import *
-from models.MultiLabel import *
-from models.MutiClass import *
-from models.NER import *
+from TextClassification.utils.utils import *
+from TextClassification.MultiLabel import *
+from TextClassification.MutiClass import *
+# from TextClassification.NER import *
 import torch.optim as optim
 from torch import nn
-from models.utils.metric import *
+from TextClassification.utils.metric import *
 import pandas as pd
 # from models.utils.Dataset import *
 

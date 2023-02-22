@@ -3,15 +3,15 @@
 import torch
 import torch.nn as nn
 from copy import deepcopy
-from models.layers.train_utils import Embeddings,PositionalEncoding
-from models.layers.attention import MultiHeadedAttention
-from models.layers.encoder import EncoderLayer, Encoder
-from models.layers.feed_forward import PositionwiseFeedForward
+from TextClassification.layers.train_utils import Embeddings,PositionalEncoding
+from TextClassification.layers.attention import MultiHeadedAttention
+from TextClassification.layers.encoder import EncoderLayer, Encoder
+from TextClassification.layers.feed_forward import PositionwiseFeedForward
 import numpy as np
-from models.utils.utils import *
+from TextClassification.utils.utils import *
 from transformers import BertModel, BertConfig, RobertaModel, RobertaConfig, GPT2Config, GPT2Model, BertPreTrainedModel
-from models.Model import Model
-from models.utils.metric import MultiClassScorer
+from TextClassification.Model import Model
+from TextClassification.utils.metric import MultiClassScorer
 
 class MultiClass(Model):
     scorer = MultiClassScorer()

@@ -1,22 +1,26 @@
 from service.GDBSaver import GDBSaver
 from service.RDBSaver import RDBSaver
+from tqdm import tqdm
 
 class R2N(): 
-    def init(self): 
+    def __init__(self): 
         self.rs =  RDBSaver()
         self.ds = GDBSaver()
 
     def r2n(self):
-        self.rs.select(0)
+        self.rs.r.select(0)
         keys = self.rs.r.keys("*")
+        keys = tqdm(keys)
         for key in keys:
-            print(key)
-            self.rs.select(0)
+            key = key.decode()
+            keys.set_postfix(key=key)
+            self.rs.r.select(0)
             vals = self.rs.r.smembers(key)
-            self.rs.select(1)
+            self.rs.r.select(2)
+            srcID = self.rs.r.get(key)
             for val in vals:
-                temp = val.split("-\\+-")
-                srcID = self.rs.r.get(key)
+                val = val.decode()
+                temp = str(val).split("-+-")
                 destID = self.rs.r.get(temp[1])
                 if destID is not None:
-                    self.ds.addRelation(srcID, destID, temp[0])
+                    self.ds.addRelation(int(srcID), int(destID), temp[0])

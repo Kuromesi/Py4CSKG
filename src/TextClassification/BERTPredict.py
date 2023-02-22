@@ -8,7 +8,7 @@ def BERT_classification_predict():
     model.to('cuda')
     config = BERTConfig()
     dataset = BERTDataset(config)
-    text = "In setSyncSampleParams of SampleTable.cpp, there is possible resource exhaustion due to a missing bounds check. This could lead to remote denial of service with no additional execution privileges needed.."
+    text = "Untis WebUntis before 2020.9.6 allows CSRF for certain combinations of rights and modules."
     text_vec = dataset.text2vec(text)
     data = {'data': text_vec['input_ids'].cuda(), 'attention_mask': text_vec['attention_mask'].cuda()}
     pred = model(data['data'], attention_mask=data['attention_mask'])[0]

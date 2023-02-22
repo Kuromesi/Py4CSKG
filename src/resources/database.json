@@ -1,6 +1,6 @@
 {
     "neo4j": {
-        "server": "bolt://192.168.9.18:30005",
+        "server": "bolt://192.168.9.10:30005",
         "username": "neo4j",
         "password": "pmy991110"
     },

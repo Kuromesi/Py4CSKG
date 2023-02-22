@@ -2,6 +2,7 @@ from neo4j import GraphDatabase
 
 from service.ConfReader import ConfReader
 
+
 class GDBSaver:
 
     def __init__(self):
@@ -21,13 +22,19 @@ class GDBSaver:
             return result.values()
         except:
             return 0
+        
+    def addSlashes(self, string):
+        string = string.replace("\\", "\\\\")
+        string = string.replace("\'", "\\\'")
+        string = string.replace("\"", "\\\"")
+        return string
 
     def addNode(self, kvpairs):
         driver = self.driver
         query = "CREATE (a:%s) "%kvpairs['prop']
         del kvpairs['prop']
         for (key, value) in kvpairs.items():
-            query += "SET a.%s = '%s' "%(key, value)
+            query += "SET a.%s = '%s' "%(key, self.addSlashes(value))
         query += "RETURN id(a)"
         with driver.session() as session:
             nodeid = session.write_transaction(self._exec, query)

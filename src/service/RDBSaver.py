@@ -8,6 +8,7 @@ class RDBSaver():
         self.r = redis.StrictRedis(host=database['redis']['server'], port=database['redis']['port'], password=database['redis']['password'], db=2)
 
     def saveNodeId(self, name, id):
+        self.r.select(2) # Table for node id
         self.r.set(name, id)
 
     def checkNode(self, key):
@@ -35,9 +36,9 @@ class RDBSaver():
         self.r.delete(key)
 
     def saveRDF(self, src, dest, rel):
-        self.r.select(0);
-        temp = rel + "-+-" + dest;
-        self.r.sadd(src, temp);
+        self.r.select(0) # Table for relations
+        temp = str(rel) + "-+-" + str(dest)
+        self.r.sadd(src, temp)
     
 if __name__=="__main__":
     rdb = RDBSaver()
