@@ -11,7 +11,7 @@ class NERPredict():
         config = BERTBiLSTMCRFConfig()
         self.tokenizer = AutoTokenizer.from_pretrained(config.model_name)
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        model_dir = "./trained_models/BERTBiLSTMCRF"
+        model_dir = "./trained_models/BERTBiLSTMCRFNER"
         self.model = BERTBiLSTMCRF.from_pretrained(model_dir, config)
         self.model.to(self.device)
         self.labels = ['O', 'B-vul', 'I-vul', 'B-cons', 'I-cons']
@@ -50,7 +50,7 @@ class NERPredict():
 if __name__ == "__main__":
     
     ner = NERPredict()
-    sentence = "Webroot endpoint agents prior to version v9.0.28.48 did not protect the \"%PROGRAMDATA%\\WrData\\PKG\" directory against renaming. This could allow attackers to trigger a crash or wait upon Webroot service restart to rewrite and hijack dlls in this directory for privilege escalation."
+    sentence = "In NetHack before 3.6.5, an invalid argument to the -w command line option can cause a buffer overflow resulting in a crash or remote code execution/privilege escalation. This vulnerability affects systems that have NetHack installed suid/sgid and shared systems that allow users to influence command line options. Users should upgrade to NetHack 3.6.5."
     res = ner.predict(sentence)
     ids = res['ids']
     print(res['res'])

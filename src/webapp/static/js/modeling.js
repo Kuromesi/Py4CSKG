@@ -27,7 +27,7 @@ modeling = new Vue({
             },
             entry: {
                 name: "",
-                access: "Local, network"
+                access: "Network, adjacent, local, physical"
             },
             defender: {
                 name: "",
@@ -210,6 +210,7 @@ modeling = new Vue({
             })
         },
         fill_product(recommendation) {
+            this.product = recommendation;
             this.cur_component.product = recommendation;
             this.if_recommend = false;
             this.recommendations = [];
@@ -229,12 +230,13 @@ modeling = new Vue({
         }
     },
     watch: {
-        'cur_component.product': {
+        product: {
             handler (newVal, oldVal) {
                 if (!this.if_recommend) {
                     this.if_recommend = true;
-                } else if (this.cur_component.product) {
-                    var url = "/model/keyword"
+                } else if (this.product) {
+                    this.cur_component.product = this.product;
+                    var url = "/model/keyword";
                     axios({
                         method: 'post',
                         url: url,
@@ -281,6 +283,7 @@ function network_click(params) {
                 continue;
             modeling.cur_component[key] = clickedNode[key];
         }
+        modeling.product = clickedNode.product;
 
     } else if (params.edges.length != 0) {
         var edgeID = params.edges[0];

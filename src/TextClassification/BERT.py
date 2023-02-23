@@ -29,7 +29,7 @@ class BERT(BertPreTrainedModel):
         mean_pooled = summed / summed_mask
         logits = self.classifier(mean_pooled)    
         outputs = (logits, )
-        if labels:
+        if labels != None:
             y = labels
             y_pred = logits
             y = y.type(torch.cuda.LongTensor)

@@ -5,6 +5,7 @@ from service.utils import *
 from utils.prediction import *
 from utils.draw import *
 from utils.search import *
+from utils.analyze import *
 
 app = Flask(__name__)
 
@@ -62,6 +63,13 @@ def model_keyword():
     query = data['query']
     recommended = search_product(query)
     return recommended
+
+# ma = ModelAnalyzer()
+@app.route('/model/analyze', methods=['POST'])
+def model_analyze():
+    data = json.loads(request.get_data())
+    return "ok"
+
 
 @app.route('/test', methods=['GET'])
 def test():

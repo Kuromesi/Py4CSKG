@@ -18,9 +18,10 @@ class R2N():
             vals = self.rs.r.smembers(key)
             self.rs.r.select(2)
             srcID = self.rs.r.get(key)
-            for val in vals:
-                val = val.decode()
-                temp = str(val).split("-+-")
-                destID = self.rs.r.get(temp[1])
-                if destID is not None:
-                    self.ds.addRelation(int(srcID), int(destID), temp[0])
+            if srcID:
+                for val in vals:
+                    val = val.decode()
+                    temp = str(val).split("-+-")
+                    destID = self.rs.r.get(temp[1])
+                    if destID:
+                        self.ds.addRelation(int(srcID), int(destID), temp[0])

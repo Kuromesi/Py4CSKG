@@ -502,11 +502,11 @@ if __name__ == '__main__':
 #     print("Sentence:", sentence)
 #     print("Embedding:", embedding)
 #     print("")
-    df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-    ts = TextSimilarity()
-    text = "switch"
-    ts.init_ner()
-    ts.calculate_similarity(df, text)
+    # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+    # ts = TextSimilarity()
+    # text = "switch"
+    # ts.init_ner()
+    # ts.calculate_similarity(df, text)
     # precision_test()
     # calculate_precision()
     # tfidf()
@@ -535,8 +535,8 @@ if __name__ == '__main__':
     # ts = TextSimilarity()
     # ts.create_embedding(docs, "product")
 
-    # query = "execute arbitrary code"
-    # df = pd.read_csv('./myData/learning/CVE2Technique/attack.csv')
-    # ts = TextSimilarity()
-    # ts.init_ner()
-    # ts.calculate_similarity_for_all(df['name'].to_list(), query)
+    query = "crash"
+    df = pd.read_csv('./myData/learning/CVE2Technique/attack.csv')
+    ts = TextSimilarity()
+    ts.init_ner()
+    ts.calculate_similarity_for_all(df['name'].to_list(), query)

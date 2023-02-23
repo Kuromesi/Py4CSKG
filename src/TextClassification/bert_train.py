@@ -118,7 +118,7 @@ if __name__ == '__main__':
     # Initialize the DataLoader
     logging.info("Loading the datasets...")
     dataset = BERTDataset(config)
-    dataset.load_data('./myData/learning/CVE2CWE/base/cve.train', './myData/learning/CVE2CWE/base/cve.test')
+    dataset.load_data('./myData/learning/CVE2CWE/cve.train', './myData/learning/CVE2CWE/cve.test')
 
     train_data = dataset.train_iterator
     val_data = dataset.val_iterator
@@ -131,7 +131,7 @@ if __name__ == '__main__':
     logging.info("Loading BERT model...")
 
     # Prepare model
-    model = BERT.from_pretrained(config.model_name, config, num_labels=config.output_size, ignore_mismatched_sizes=True)
+    model = BERT.from_pretrained(config.model_name, num_labels=config.output_size, ignore_mismatched_sizes=True)
     model.labels = labels
     model.loss_func = nn.CrossEntropyLoss()
     model.to(config.device)

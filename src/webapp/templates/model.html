@@ -33,7 +33,7 @@
                     <li class="menu__group"><a href="/kuromesi" class="menu__link r-link text-underlined">KUROMESI</a></li>
                     <li class="menu__group"><a href="/model" class="menu__link r-link text-underlined">MODELING</a></li>
                     <li class="menu__group"><a href="/predict" class="menu__link r-link text-underlined">QUERY</a></li>
-                    <li class="menu__group"><a href="/explore" class="menu__link r-link text-underlined">EXPLORE</a>
+                    <li class="menu__group"><a href="http://192.168.9.10:30004" class="menu__link r-link text-underlined">EXPLORE</a>
                     </li>
                 </ul>
             </nav>
@@ -122,7 +122,13 @@
                         </div>
                         <p>{[ cur_component.product ]}</p> -->
                         <div v-for="(v, k) in cur_component">
-                            <div class="group">
+                            <div class="group" v-if="k == 'product'">
+                                <input id="modeling" type="text" required v-model="product">
+                                <span class="highlight"></span>
+                                <span class="bar"></span>
+                                <label id="modeling">product</label>
+                            </div>
+                            <div class="group" v-else>
                                 <input id="modeling" type="text" required v-model="cur_component[k]">
                                 <span class="highlight"></span>
                                 <span class="bar"></span>
