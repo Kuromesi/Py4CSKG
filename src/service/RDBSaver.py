@@ -12,6 +12,7 @@ class RDBSaver():
         self.r.set(name, id)
 
     def checkNode(self, key):
+        self.r.select(2)
         return self.r.exists(key)
 
     def getNode(self, key):

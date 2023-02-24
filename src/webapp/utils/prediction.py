@@ -18,7 +18,7 @@ class NERPredict():
         config = BERTBiLSTMCRFConfig()
         self.tokenizer = AutoTokenizer.from_pretrained(config.model_name)
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        model_dir = "./trained_models/BERTBiLSTMCRF"
+        model_dir = "./trained_models/BERTBiLSTMCRFNER"
         self.model = BERTBiLSTMCRF.from_pretrained(model_dir, config)
         self.model.to(self.device)
         self.labels = ['O', 'B-vul', 'I-vul', 'B-cons', 'I-cons']

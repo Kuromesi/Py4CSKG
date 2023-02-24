@@ -79,14 +79,14 @@ def test():
 def predict():
     return render_template("predict.html")
 
-# cve2capec = CVE2CAPEC()
+cve2capec = CVE2CAPEC()
 @app.route('/predict/submit', methods=['POST'])
 def predict_submit():
-    # cve = request.get_data()
-    # cve = json.loads(cve)
-    # res = cve2capec.calculate_similarity(cve['cve'])
-    # graph = create_cve2net(res, cve['cve'])
-    graph = ""
+    cve = request.get_data()
+    cve = json.loads(cve)
+    res = cve2capec.calculate_similarity(cve['cve'])
+    graph = create_cve2net(res, cve['cve'])
+    # graph = ""
     return graph
 
 @app.errorhandler(404)

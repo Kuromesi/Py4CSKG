@@ -11,6 +11,7 @@ class R2N():
         self.rs.r.select(0)
         keys = self.rs.r.keys("*")
         keys = tqdm(keys)
+        keys.set_description("CREATING RELATIONS")
         for key in keys:
             key = key.decode()
             keys.set_postfix(key=key)
