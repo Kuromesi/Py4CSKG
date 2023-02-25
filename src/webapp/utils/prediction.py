@@ -11,7 +11,9 @@ import spacy, re
 from tqdm import tqdm, trange
 from gensim import corpora
 from gensim.models import TfidfModel
-from utils.models import *
+from models.CVE2CAPEC import *
+from models.BERT import *
+from utils.Dataset import *
 
 class NERPredict():
     def __init__(self) -> None:
@@ -182,7 +184,28 @@ class CVE2CAPEC():
         df = df.sort_values(by='similarity', ascending=False)
         return df
 
+class CVE2CWE():
+    def __init__(self) -> None:
+        self.model = BERT.from_pretrained('trained_models/BERTBiLSTMCRF')
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.model.to(self.device)
+        config = BERTConfig()
+        self.dataset = BERTDataset(config)
+        self.labels = loadLabels(config.label_path)
+        
+        
+    def predict(self, text):
+        text_vec = self.dataset.text2vec(text)
+        data = {'data': text_vec['input_ids'].cuda(), 'attention_mask': text_vec['attention_mask'].cuda()}
+        pred = self.model(data['data'], attention_mask=data['attention_mask'])[0]
+        pred = pred.cpu().data
+        pred = torch.max(pred, 1)[1]
+        return self.labels[pred[0]]
+
 if __name__ == '__main__':
-    cve2capec = CVE2CAPEC()
+    # cve2capec = CVE2CAPEC()
     text = "Buffer overflow in sccw allows local users to gain root access via the HOME environmental variable."
-    cve2capec.calculate_similarity(text)
+    # cve2capec.calculate_similarity(text)
+    
+    cve2cwe = CVE2CWE()
+    cve2cwe.predict(text)

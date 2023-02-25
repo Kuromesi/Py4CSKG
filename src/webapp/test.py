@@ -57,4 +57,4 @@ if __name__ == '__main__':
     # ma.vul_find("microsoft windows server 2008", "")
     graph = json.load(open(path))
     ma.convert_pyvis(graph)
-    ma.analyze()
+    graph = ma.analyze()

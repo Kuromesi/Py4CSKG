@@ -206,6 +206,17 @@ class CAPECTraverser(XmlTraverser):
                         self.rs.saveNodeId(mitigation_uri, self.ds.addNode(mitigation))
                         self.rs.saveRDF(src, mitigation_uri, "Has_Mitigation")
 
+                # Find indicators
+                indicators = atkpt.find_all('Indicator')
+                count = 1
+                for indicator in indicators:
+                    id = "Indicator:" + src + ".%d"%count
+                    if not self.rs.checkNode(id):
+                        des = indicator.text.strip()
+                        indicator_node = {'id': id, 'description': des, 'prop': "IOC"}
+                        self.rs.saveNodeId(id, self.ds.addNode(indicator_node))
+                        self.rs.saveRDF(src, id, "Has_IOC")
+                    count += 1
         # df.to_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv', index=False)       
 
 class CWETraverser(XmlTraverser):

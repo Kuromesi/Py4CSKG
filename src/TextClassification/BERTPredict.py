@@ -8,7 +8,7 @@ def BERT_classification_predict():
     model.to('cuda')
     config = BERTConfig()
     dataset = BERTDataset(config)
-    text = "A missing HTTP header (X-Frame-Options) in Kiwi Syslog Server has left customers vulnerable to click jacking. Clickjacking is an attack that occurs when an attacker uses a transparent iframe in a window to trick a user into clicking on an actionable item, such as a button or link, to another server in which they have an identical webpage. The attacker essentially hijacks the user activity intended for the original server and sends them to the other server. This is an attack on both the user and the server."
+    text = "Open redirect vulnerability in the web interface in Cisco Secure Access Control System (ACS) allows remote attackers to redirect users to arbitrary web sites and conduct phishing attacks via an unspecified parameter, aka Bug ID CSCuq74150."
     text_vec = dataset.text2vec(text)
     data = {'data': text_vec['input_ids'].cuda(), 'attention_mask': text_vec['attention_mask'].cuda()}
     pred = model(data['data'], attention_mask=data['attention_mask'])[0]
