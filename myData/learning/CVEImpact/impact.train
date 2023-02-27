@@ -1,0 +1,163 @@
+0 , execute arbitrary code as root
+0 , execute arbitrary code with root privileges
+0 , execute arbitrary code as the root user
+0 , execute arbitrary code as a root user
+0 , execute arbitrary code as LocalSystem
+0 , execute arbitrary code as SYSTEM
+0 , execute arbitrary code as Local Systemexecute arbitrary code with SYSTEM privileges
+0 , execute arbitrary code with LocalSystem privileges
+0 , execute dangerous commands as root
+0 , execute shell commands as the root user
+0 , execute arbitrary commands as root
+0 , execute arbitrary commands with root privileges
+0 , execute arbitrary commands with root-level privileges
+0 , execute commands as root
+0 , execute root commands
+0 , execute arbitrary os commands as root
+0 , execute arbitrary shell commands as root
+0 , execute arbitrary commands as SYSTEM
+0 , execute arbitrary commands with SYSTEM privileges
+0 , run commands as root
+0 , run arbitrary commands as root
+0 , run arbitrary commands as the root user
+0 , execute code with root privileges
+0 , run commands as root
+0 , load malicious firmware
+0 , succeed in uploading malicious Firmware
+0 , executed under the SYSTEM account
+0 , include and execute arbitrary local php files
+0 , execute arbitrary code
+0 , command injection
+0 , execute files
+0 , run arbitrary code
+0 , execute a malicious file
+0 , execution of arbitrary code
+0 , remote execution of arbitrary php code
+0 , execute code
+0 , code injection vulnerability
+0 , execute any code
+0 , malicious file could be then executed on the affected system
+0 , inject arbitrary commands
+0 , execute arbitrary files
+0 , inject arbitrary sql code
+0 , run the setuid executable
+0 , vbscript injection
+0 , execute administrative operations
+0 , performs arbitrary actions
+0 , submit arbitrary requests to an affected device
+0 , perform arbitrary actions on an affected device
+0 , executes an arbitrary program
+0 , attacker can upload a malicious payload
+0 , execute malicious code
+0 , modify sql commands to the portal server
+0 , execute arbitrary os commands
+0 , execute arbitrary code with administrator privileges
+0 , execute administrator commands
+0 , executed with administrator privileges
+0 , remote procedure calls on the affected system
+0 , run a specially crafted application on a targeted system
+0 , execute arbitrary code in a privileged context
+0 , execute arbitrary code with super-user privileges
+0 , run processes in an elevated context
+1 , gain root privilege
+1 , obtain root privilege
+1 , leading to root privilege
+1 , gains root privilege
+1 , gain SYSTEM privilege
+1 , obtain SYSTEM privilege
+1 , gain LocalSystem privilege
+1 , obtain LocalSystem privilege
+1 , gain full privilege
+1 , gain root access
+1 , gain root rights
+1 , gain root privileges
+1 , gain system level access to a remote shell session
+1 , gain administrator or system privileges
+1 , leading to root privileges
+1 , obtain the root password
+1 , take complete control of the device
+1 , take full control of the target system
+1 , account could be granted root- or system-level privileges
+1 , find the root credentials
+1 , backdoor root account
+1 , elevate the privileges to root
+1 , leading to remote root
+1 , take control of the affected device
+1 , gain complete control
+1 , gain full access to the affected system
+1 , obtain full access
+1 , gain complete control of the system
+1 , elevate privileges to the root user
+1 , obtain full control
+1 , gain super-user privileges
+1 , gain elevated privileges on the system
+1 , with the knowledge of the default password may login to the system
+1 , log in as an admin user of the affected device
+1 , log in as an admin or oper user of the affected device
+1 , log in to the affected device using default credentials
+1 , log in to an affected system as the admin user
+1 , log in to the device with the privileges of a limited user
+1 , devices have a hardcoded-key vulnerability
+1 , privilege escalation
+1 , escalation of privilege
+2 , an extended denial of service condition for the device
+2 , exhaust the memory resources of the machine
+2 , denial of service (dos) condition on an affected device
+2 , crash systemui
+2 , denial of service (dos) condition on the affected appliance
+2 , cause the device to hang or unexpectedly reload
+2 , denial of service (use-after-free) via a crafted application
+2 , cause an affected device to reload
+2 , cause an affected system to stop
+3 , devices allow remote attackers to read arbitrary files
+3 , compromise the systems confidentiality
+3 , read any file on the camera's linux filesystem
+3 , gain read-write access to system settings
+3 , all system settings can be read
+3 , leak information about any clients connected to it
+3 , read sensitive files on the system
+3 , access arbitrary files on an affected device
+3 , access system files
+3 , gain unauthorized read access to files on the host
+3 , obtain sensitive system information
+3 , obtain sensitive information from kernel memory
+3 , obtain privileged file system access
+3 , routers allow directory traversal sequences
+3 , packets can contain fragments of system memory
+3 , obtain kernel memory
+3 , read kernel memory
+3 , read system memory
+3 , reading system memory
+3 , read device memory
+3 , read host memory
+3 , access kernel memory
+3 , access sensitive kernel memory
+3 , access shared memory
+3 , host arbitrary files
+3 , enumerate user accounts
+3 , compromise an affected system
+4 , compromise the systems confidentiality or integrity
+4 , gain read-write access to system settings
+4 , all system settings can be read and changed
+4 , create arbitrary directories on the affected system
+4 , on ismartalarm cube devices, there is incorrect access control
+4 , bypass url filters that have been configured for an affected device
+4 , bypass configured filters on the device
+4 , modification of system files
+4 , obtain privileged file system access
+4 , change configuration settings
+4 , compromise the affected system
+4 , overwrite arbitrary kernel memory
+4 , modify kernel memory
+4 , overwrite kernel memory
+4 , modifying kernel memory
+4 , overwriting kernel memory
+4 , corrupt kernel memory
+4 , corrupt user memory
+4 , upload firmware changes
+4 , configuration parameter changes
+4 , obtain sensitive information from kernel memory
+4 , change the device's settings
+4 , configuration changes
+4 , modification of system states
+4 , host arbitrary files

@@ -22,3 +22,9 @@ CVE-2021-21482
 CVE-2021-0056 Insecure inherited permissions
 CVE-1999-0003 CWE-119 CVE-1999-0027
 CVE-2019-5314 CWE-74
+
+## NEO4J COMMANDS
+docker run -it --rm -v /shared/databases/neo4j/data/:/data neo4j:latest\
+neo4j-admin database import full --overwrite-destination\
+--nodes=/data/import/capec_vc.csv --nodes=/data/import/capec_pt.csv --nodes=/data/import/capec_misc.csv\ 
+--relationships=/data/import/capec_rel.csv --multiline-fields=True

@@ -113,6 +113,7 @@ class BERTDataset():
     def load_data(self, train_file, test_file=None, val_file=None):
         # tokenizer = lambda sent: [x.lemma_.lower() for x in NLP(sent) if x.lemma_.lower() != " "]
         # tokenizer = get_tokenizer('basic_english')
+        sort_key=lambda x: len(x[1])
         with open(train_file, 'r', encoding='utf-8') as datafile:     
                     data = [line.strip().split(',', maxsplit=1) for line in datafile if len(line.strip().split(',', maxsplit=1)) > 1]
                     data_text = list(map(lambda x: x[1], data))
@@ -120,31 +121,35 @@ class BERTDataset():
         train = list(zip(data_label, data_text))
         train_iter = to_map_style_dataset(iter(train))
         self.label_pipeline = lambda x: int(x) - 1
-
-        # Load test data
-        with open(test_file, 'r', encoding='utf-8') as datafile:     
-            data = [line.strip().split(',', maxsplit=1) for line in datafile]
-            data_text = list(map(lambda x: x[1], data))
-            data_label = list(map(lambda x: self.parse_label(x[0]), data))
-        test = list(zip(data_label, data_text))
-        test_dataset = to_map_style_dataset(iter(test))
-
-        num_train = int(len(train_iter) * 0.9)
+        
+        num_train = int(len(train_iter) * 0.95)
         train_dataset, valid_dataset = random_split(train_iter, [num_train, len(train_iter) - num_train])
         train_dataset = to_map_style_dataset(train_dataset)
         valid_dataset = to_map_style_dataset(valid_dataset)
-        sort_key=lambda x: len(x[1])
         self.train_iterator = BlockShuffleDataLoader(train_dataset, batch_size=self.config.batch_size,
                                     shuffle=True, collate_fn=self.collate_batch, sort_key=sort_key)
         self.val_iterator = BlockShuffleDataLoader(valid_dataset, batch_size=self.config.batch_size,
                                     shuffle=True, collate_fn=self.collate_batch, sort_key=sort_key)
-        self.test_iterator = BlockShuffleDataLoader(test_dataset, batch_size=self.config.batch_size,
-                                    shuffle=True, collate_fn=self.collate_batch, sort_key=sort_key)
+        
         self.train_size = len(train_iter)
         self.val_size = len(valid_dataset)
         print ("Loaded {} training examples".format(len(train_dataset)))
-        print ("Loaded {} test examples".format(len(test_dataset)))
         print ("Loaded {} validation examples".format(len(valid_dataset)))
+
+        # Load test data
+        if test_file:
+            with open(test_file, 'r', encoding='utf-8') as datafile:     
+                data = [line.strip().split(',', maxsplit=1) for line in datafile]
+                data_text = list(map(lambda x: x[1], data))
+                data_label = list(map(lambda x: self.parse_label(x[0]), data))
+            test = list(zip(data_label, data_text))
+            test_dataset = to_map_style_dataset(iter(test))
+            self.test_iterator = BlockShuffleDataLoader(test_dataset, batch_size=self.config.batch_size,
+                                    shuffle=True, collate_fn=self.collate_batch, sort_key=sort_key)
+            print ("Loaded {} test examples".format(len(test_dataset)))
+            
+
+        
 
     def text2vec(self, text):
         return self.tokenizer(text, padding=PADDING, truncation=True, return_tensors="pt", max_length=self.config.max_sen_len)

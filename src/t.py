@@ -1,5 +1,10 @@
-import numpy as np
+# from traversers.CVEImpact import *
 
-a = np.array([[1,4,3,5,2], [1,4,3,5,2]])
-b = np.argsort(a, axis=1)
-print(b)
+# cve = CVEImpact()
+# sentence = "/cgi-bin/wapopen in BOA Webserver 0.94.14rc21 allows the injection of \"../..\" using the FILECAMERA variable (sent by GET) to read files with root privileges."
+
+# cve.traverse()
+
+# from utils.save_cveimpact import *
+
+# save_cveimpact()

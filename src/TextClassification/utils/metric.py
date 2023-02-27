@@ -167,22 +167,6 @@ class NERScorer():
         f1, precision, recall = self.f1_score(all_y, all_preds)
         return accuracy, f1, precision, recall
 
-    def create_report(self, model, iterator):
-        all_preds = []
-        all_y = []
-        for idx, batch in enumerate(iterator):
-            if torch.cuda.is_available():
-                x = batch[1].cuda()
-                attention_mask = batch[2].cuda()
-                y = batch[0].cuda()
-            else:
-                x = batch[1]
-            y_pred, loss = model(x, attention_mask=attention_mask, labels=y)
-            y_pred = model.crf.decode(y_pred)
-            all_preds.extend(self.id2tag(y_pred))
-            all_y.extend(self.id2tag(batch[0].tolist()))
-        return self.classification_report(all_y, all_preds)
-
     def get_entities(self, seq, suffix=False):
         """Gets entities from sequence.
         Args:

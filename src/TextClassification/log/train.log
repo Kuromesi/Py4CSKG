@@ -246,3 +246,283 @@
 2023-02-22 12:22:44,917:INFO: Epoch 26/100
 2023-02-22 12:29:39,196:INFO: - Val metrics: precision: 73.75; f1: 72.81; loss: 04.14
 2023-02-22 12:29:39,198:INFO: Best val f1: 72.90
+2023-02-26 03:29:51,020:INFO: device: cuda
+2023-02-26 03:29:51,020:INFO: Loading the datasets...
+2023-02-26 03:30:02,531:INFO: Loading BERT model...
+2023-02-26 03:30:07,049:INFO: Starting training for 100 epoch(s)
+2023-02-26 04:03:30,236:INFO: device: cuda
+2023-02-26 04:03:30,237:INFO: Loading the datasets...
+2023-02-26 04:03:41,653:INFO: Loading BERT model...
+2023-02-26 04:03:46,086:INFO: Starting training for 100 epoch(s)
+2023-02-26 04:03:46,087:INFO: Epoch 1/100
+2023-02-26 04:06:27,841:INFO: device: cuda
+2023-02-26 04:06:27,841:INFO: Loading the datasets...
+2023-02-26 04:06:39,324:INFO: Loading BERT model...
+2023-02-26 04:06:43,710:INFO: Starting training for 100 epoch(s)
+2023-02-26 04:06:43,710:INFO: Epoch 1/100
+2023-02-26 04:07:30,298:INFO: device: cuda
+2023-02-26 04:07:30,299:INFO: Loading the datasets...
+2023-02-26 04:07:41,623:INFO: Loading BERT model...
+2023-02-26 04:07:46,085:INFO: Starting training for 100 epoch(s)
+2023-02-26 04:07:46,085:INFO: Epoch 1/100
+2023-02-26 04:08:07,916:INFO: device: cuda
+2023-02-26 04:08:07,917:INFO: Loading the datasets...
+2023-02-26 04:08:19,264:INFO: Loading BERT model...
+2023-02-26 04:08:23,768:INFO: Starting training for 100 epoch(s)
+2023-02-26 04:08:23,769:INFO: Epoch 1/100
+2023-02-26 04:09:34,492:INFO: device: cuda
+2023-02-26 04:09:34,493:INFO: Loading the datasets...
+2023-02-26 04:09:45,881:INFO: Loading BERT model...
+2023-02-26 04:09:50,264:INFO: Starting training for 100 epoch(s)
+2023-02-26 04:09:50,265:INFO: Epoch 1/100
+2023-02-26 04:10:25,480:INFO: device: cuda
+2023-02-26 04:10:25,481:INFO: Loading the datasets...
+2023-02-26 04:10:36,708:INFO: Loading BERT model...
+2023-02-26 04:10:41,152:INFO: Starting training for 100 epoch(s)
+2023-02-26 04:10:41,152:INFO: Epoch 1/100
+2023-02-26 04:12:10,464:INFO: device: cuda
+2023-02-26 04:12:10,465:INFO: Loading the datasets...
+2023-02-26 04:12:21,839:INFO: Loading BERT model...
+2023-02-26 04:12:26,288:INFO: Starting training for 100 epoch(s)
+2023-02-26 04:12:26,288:INFO: Epoch 1/100
+2023-02-26 04:13:46,084:INFO: device: cuda
+2023-02-26 04:13:46,085:INFO: Loading the datasets...
+2023-02-26 04:13:57,362:INFO: Loading BERT model...
+2023-02-26 04:14:01,804:INFO: Starting training for 100 epoch(s)
+2023-02-26 04:14:01,804:INFO: Epoch 1/100
+2023-02-26 04:14:04,286:INFO: - Val metrics: precision: 60.78; f1: 54.43; loss: 09.32
+2023-02-26 04:14:04,287:INFO: - Found new best F1
+2023-02-26 04:14:04,746:INFO: Epoch 2/100
+2023-02-26 04:14:06,407:INFO: - Val metrics: precision: 57.84; f1: 62.35; loss: 06.85
+2023-02-26 04:14:06,408:INFO: - Found new best F1
+2023-02-26 04:14:07,120:INFO: Epoch 3/100
+2023-02-26 04:14:08,864:INFO: - Val metrics: precision: 62.69; f1: 64.61; loss: 03.94
+2023-02-26 04:14:08,864:INFO: - Found new best F1
+2023-02-26 04:14:09,494:INFO: Epoch 4/100
+2023-02-26 04:14:11,286:INFO: - Val metrics: precision: 69.61; f1: 69.30; loss: 02.78
+2023-02-26 04:14:11,286:INFO: - Found new best F1
+2023-02-26 04:14:11,987:INFO: Epoch 5/100
+2023-02-26 04:14:13,708:INFO: - Val metrics: precision: 72.55; f1: 73.61; loss: 04.54
+2023-02-26 04:14:13,709:INFO: - Found new best F1
+2023-02-26 04:14:14,380:INFO: Epoch 6/100
+2023-02-26 04:14:16,114:INFO: - Val metrics: precision: 57.84; f1: 60.67; loss: 10.81
+2023-02-26 04:14:16,115:INFO: Epoch 7/100
+2023-02-26 04:14:17,801:INFO: - Val metrics: precision: 62.42; f1: 66.14; loss: 03.59
+2023-02-26 04:14:17,802:INFO: Epoch 8/100
+2023-02-26 04:14:19,527:INFO: - Val metrics: precision: 58.24; f1: 63.68; loss: 08.29
+2023-02-26 04:14:19,528:INFO: Epoch 9/100
+2023-02-26 04:14:21,232:INFO: - Val metrics: precision: 74.31; f1: 73.63; loss: 05.06
+2023-02-26 04:14:21,232:INFO: - Found new best F1
+2023-02-26 04:14:22,005:INFO: Epoch 10/100
+2023-02-26 04:14:23,777:INFO: - Val metrics: precision: 62.42; f1: 66.14; loss: 03.34
+2023-02-26 04:14:23,778:INFO: Epoch 11/100
+2023-02-26 04:14:25,464:INFO: - Val metrics: precision: 60.00; f1: 66.83; loss: 10.83
+2023-02-26 04:14:25,465:INFO: Epoch 12/100
+2023-02-26 04:14:27,170:INFO: - Val metrics: precision: 58.24; f1: 63.68; loss: 07.67
+2023-02-26 04:14:27,170:INFO: Epoch 13/100
+2023-02-26 04:14:28,882:INFO: - Val metrics: precision: 62.42; f1: 66.14; loss: 06.07
+2023-02-26 04:14:28,883:INFO: Epoch 14/100
+2023-02-26 04:14:30,587:INFO: - Val metrics: precision: 64.18; f1: 69.29; loss: 08.07
+2023-02-26 04:14:30,587:INFO: Epoch 15/100
+2023-02-26 04:14:32,292:INFO: - Val metrics: precision: 62.42; f1: 66.14; loss: 03.20
+2023-02-26 04:14:32,292:INFO: Best val f1: 73.63
+2023-02-26 04:15:42,589:INFO: device: cuda
+2023-02-26 04:15:42,590:INFO: Loading the datasets...
+2023-02-26 04:15:53,901:INFO: Loading BERT model...
+2023-02-26 04:17:02,240:INFO: device: cuda
+2023-02-26 04:17:02,240:INFO: Loading the datasets...
+2023-02-26 04:17:12,335:INFO: Loading BERT model...
+2023-02-26 04:17:17,293:INFO: Starting training for 100 epoch(s)
+2023-02-26 04:17:17,293:INFO: Epoch 1/100
+2023-02-26 04:17:20,724:INFO: - Val metrics: precision: 62.46; f1: 63.92; loss: 01.65
+2023-02-26 04:17:20,724:INFO: - Found new best F1
+2023-02-26 04:17:21,581:INFO: Epoch 2/100
+2023-02-26 04:17:24,461:INFO: - Val metrics: precision: 75.65; f1: 78.24; loss: 01.04
+2023-02-26 04:17:24,461:INFO: - Found new best F1
+2023-02-26 04:17:25,301:INFO: Epoch 3/100
+2023-02-26 04:17:28,150:INFO: - Val metrics: precision: 83.82; f1: 85.71; loss: 00.71
+2023-02-26 04:17:28,151:INFO: - Found new best F1
+2023-02-26 04:17:28,958:INFO: Epoch 4/100
+2023-02-26 04:17:31,771:INFO: - Val metrics: precision: 85.29; f1: 79.41; loss: 00.81
+2023-02-26 04:17:31,772:INFO: Epoch 5/100
+2023-02-26 04:17:34,593:INFO: - Val metrics: precision: 81.83; f1: 78.11; loss: 01.29
+2023-02-26 04:17:34,594:INFO: Epoch 6/100
+2023-02-26 04:17:37,393:INFO: - Val metrics: precision: 62.42; f1: 67.82; loss: 03.31
+2023-02-26 04:17:37,394:INFO: Epoch 7/100
+2023-02-26 04:17:40,196:INFO: - Val metrics: precision: 92.94; f1: 86.76; loss: 01.01
+2023-02-26 04:17:40,197:INFO: - Found new best F1
+2023-02-26 04:17:41,089:INFO: Epoch 8/100
+2023-02-26 04:17:43,974:INFO: - Val metrics: precision: 85.29; f1: 79.41; loss: 02.79
+2023-02-26 04:17:43,975:INFO: Epoch 9/100
+2023-02-26 04:17:46,783:INFO: - Val metrics: precision: 85.29; f1: 79.41; loss: 02.74
+2023-02-26 04:17:46,783:INFO: Epoch 10/100
+2023-02-26 04:17:49,600:INFO: - Val metrics: precision: 62.42; f1: 67.82; loss: 02.58
+2023-02-26 04:17:49,600:INFO: Epoch 11/100
+2023-02-26 04:17:52,406:INFO: - Val metrics: precision: 62.42; f1: 67.82; loss: 03.65
+2023-02-26 04:17:52,406:INFO: Epoch 12/100
+2023-02-26 04:17:55,209:INFO: - Val metrics: precision: 62.42; f1: 67.82; loss: 02.90
+2023-02-26 04:17:55,210:INFO: Epoch 13/100
+2023-02-26 04:17:58,001:INFO: - Val metrics: precision: 62.42; f1: 67.82; loss: 01.41
+2023-02-26 04:17:58,002:INFO: Epoch 14/100
+2023-02-26 04:18:00,760:INFO: - Val metrics: precision: 62.42; f1: 67.82; loss: 02.02
+2023-02-26 04:18:00,761:INFO: Epoch 15/100
+2023-02-26 04:18:03,654:INFO: - Val metrics: precision: 62.42; f1: 67.82; loss: 02.49
+2023-02-26 04:18:03,655:INFO: Epoch 16/100
+2023-02-26 04:18:06,470:INFO: - Val metrics: precision: 62.42; f1: 67.82; loss: 04.67
+2023-02-26 04:18:06,471:INFO: Epoch 17/100
+2023-02-26 04:18:09,191:INFO: - Val metrics: precision: 62.42; f1: 67.82; loss: 02.52
+2023-02-26 04:18:09,192:INFO: Best val f1: 86.76
+2023-02-26 04:23:19,560:INFO: device: cuda
+2023-02-26 04:23:19,561:INFO: Loading the datasets...
+2023-02-26 04:23:30,856:INFO: Loading BERT model...
+2023-02-26 04:23:35,262:INFO: Starting training for 100 epoch(s)
+2023-02-26 04:23:35,263:INFO: Epoch 1/100
+2023-02-26 04:23:37,782:INFO: - Val metrics: precision: 60.78; f1: 54.43; loss: 09.32
+2023-02-26 04:23:37,782:INFO: - Found new best F1
+2023-02-26 04:23:38,479:INFO: Epoch 2/100
+2023-02-26 04:23:40,246:INFO: - Val metrics: precision: 57.84; f1: 62.35; loss: 06.85
+2023-02-26 04:23:40,246:INFO: - Found new best F1
+2023-02-26 04:23:40,882:INFO: Epoch 3/100
+2023-02-26 04:23:42,617:INFO: - Val metrics: precision: 62.69; f1: 64.61; loss: 03.94
+2023-02-26 04:23:42,618:INFO: - Found new best F1
+2023-02-26 04:23:43,249:INFO: Epoch 4/100
+2023-02-26 04:23:44,920:INFO: - Val metrics: precision: 69.61; f1: 69.30; loss: 02.78
+2023-02-26 04:23:44,920:INFO: - Found new best F1
+2023-02-26 04:23:45,604:INFO: Epoch 5/100
+2023-02-26 04:23:47,361:INFO: - Val metrics: precision: 72.55; f1: 73.61; loss: 04.54
+2023-02-26 04:23:47,361:INFO: - Found new best F1
+2023-02-26 04:23:48,105:INFO: Epoch 6/100
+2023-02-26 04:23:49,864:INFO: - Val metrics: precision: 57.84; f1: 60.67; loss: 10.81
+2023-02-26 04:23:49,864:INFO: Epoch 7/100
+2023-02-26 04:23:51,524:INFO: - Val metrics: precision: 62.42; f1: 66.14; loss: 03.59
+2023-02-26 04:23:51,524:INFO: Epoch 8/100
+2023-02-26 04:23:53,181:INFO: - Val metrics: precision: 58.24; f1: 63.68; loss: 08.29
+2023-02-26 04:23:53,181:INFO: Epoch 9/100
+2023-02-26 04:23:54,831:INFO: - Val metrics: precision: 74.31; f1: 73.63; loss: 05.06
+2023-02-26 04:23:54,832:INFO: - Found new best F1
+2023-02-26 04:23:55,460:INFO: Epoch 10/100
+2023-02-26 04:23:57,224:INFO: - Val metrics: precision: 62.42; f1: 66.14; loss: 03.34
+2023-02-26 04:23:57,224:INFO: Epoch 11/100
+2023-02-26 04:23:59,010:INFO: - Val metrics: precision: 60.00; f1: 66.83; loss: 10.83
+2023-02-26 04:23:59,011:INFO: Epoch 12/100
+2023-02-26 04:24:00,541:INFO: - Val metrics: precision: 58.24; f1: 63.68; loss: 07.67
+2023-02-26 04:24:00,542:INFO: Epoch 13/100
+2023-02-26 04:24:02,203:INFO: - Val metrics: precision: 62.42; f1: 66.14; loss: 06.07
+2023-02-26 04:24:02,204:INFO: Epoch 14/100
+2023-02-26 04:24:03,857:INFO: - Val metrics: precision: 64.18; f1: 69.29; loss: 08.07
+2023-02-26 04:24:03,857:INFO: Epoch 15/100
+2023-02-26 04:24:05,513:INFO: - Val metrics: precision: 62.42; f1: 66.14; loss: 03.20
+2023-02-26 04:24:05,513:INFO: Best val f1: 73.63
+2023-02-26 05:13:27,736:INFO: device: cuda
+2023-02-26 05:13:27,737:INFO: Loading the datasets...
+2023-02-26 05:13:39,861:INFO: Loading BERT model...
+2023-02-26 05:13:44,450:INFO: Starting training for 100 epoch(s)
+2023-02-26 05:13:44,451:INFO: Epoch 1/100
+2023-02-26 05:13:46,969:INFO: - Val metrics: precision: 60.78; f1: 54.43; loss: 09.32
+2023-02-26 05:13:46,970:INFO: - Found new best F1
+2023-02-26 05:13:47,662:INFO: Epoch 2/100
+2023-02-26 05:13:49,459:INFO: - Val metrics: precision: 57.84; f1: 62.35; loss: 06.85
+2023-02-26 05:13:49,460:INFO: - Found new best F1
+2023-02-26 05:13:50,163:INFO: Epoch 3/100
+2023-02-26 05:13:51,959:INFO: - Val metrics: precision: 62.69; f1: 64.61; loss: 03.94
+2023-02-26 05:13:51,959:INFO: - Found new best F1
+2023-02-26 05:13:52,727:INFO: Epoch 4/100
+2023-02-26 05:13:54,505:INFO: - Val metrics: precision: 69.61; f1: 69.30; loss: 02.78
+2023-02-26 05:13:54,505:INFO: - Found new best F1
+2023-02-26 05:13:55,213:INFO: Epoch 5/100
+2023-02-26 05:13:57,014:INFO: - Val metrics: precision: 72.55; f1: 73.61; loss: 04.54
+2023-02-26 05:13:57,014:INFO: - Found new best F1
+2023-02-26 05:13:57,694:INFO: Epoch 6/100
+2023-02-26 05:13:59,476:INFO: - Val metrics: precision: 57.84; f1: 60.67; loss: 10.81
+2023-02-26 05:13:59,477:INFO: Epoch 7/100
+2023-02-26 05:14:01,182:INFO: - Val metrics: precision: 62.42; f1: 66.14; loss: 03.59
+2023-02-26 05:14:01,183:INFO: Epoch 8/100
+2023-02-26 05:14:02,874:INFO: - Val metrics: precision: 58.24; f1: 63.68; loss: 08.29
+2023-02-26 05:14:02,875:INFO: Epoch 9/100
+2023-02-26 05:14:04,578:INFO: - Val metrics: precision: 74.31; f1: 73.63; loss: 05.06
+2023-02-26 05:14:04,578:INFO: - Found new best F1
+2023-02-26 05:14:05,280:INFO: Epoch 10/100
+2023-02-26 05:14:07,061:INFO: - Val metrics: precision: 62.42; f1: 66.14; loss: 03.34
+2023-02-26 05:14:07,061:INFO: Epoch 11/100
+2023-02-26 05:14:08,751:INFO: - Val metrics: precision: 60.00; f1: 66.83; loss: 10.83
+2023-02-26 05:14:08,752:INFO: Epoch 12/100
+2023-02-26 05:14:10,303:INFO: - Val metrics: precision: 58.24; f1: 63.68; loss: 07.67
+2023-02-26 05:14:10,304:INFO: Epoch 13/100
+2023-02-26 05:14:11,983:INFO: - Val metrics: precision: 62.42; f1: 66.14; loss: 06.07
+2023-02-26 05:14:11,983:INFO: Epoch 14/100
+2023-02-26 05:14:13,669:INFO: - Val metrics: precision: 64.18; f1: 69.29; loss: 08.07
+2023-02-26 05:14:13,670:INFO: Epoch 15/100
+2023-02-26 05:14:15,379:INFO: - Val metrics: precision: 62.42; f1: 66.14; loss: 03.20
+2023-02-26 05:14:15,379:INFO: Best val f1: 73.63
+2023-02-26 05:15:23,916:INFO: device: cuda
+2023-02-26 05:15:23,917:INFO: Loading the datasets...
+2023-02-26 05:15:36,342:INFO: Loading BERT model...
+2023-02-26 05:15:40,926:INFO: Starting training for 100 epoch(s)
+2023-02-26 05:15:40,927:INFO: Epoch 1/100
+2023-02-26 05:15:43,603:INFO: - Val metrics: precision: 72.22; f1: 74.07; loss: 04.07
+2023-02-26 05:15:43,603:INFO: - Found new best F1
+2023-02-26 05:15:44,325:INFO: Epoch 2/100
+2023-02-26 05:15:46,389:INFO: - Val metrics: precision: 94.44; f1: 82.83; loss: 02.37
+2023-02-26 05:15:46,390:INFO: - Found new best F1
+2023-02-26 05:15:47,111:INFO: Epoch 3/100
+2023-02-26 05:15:49,325:INFO: - Val metrics: precision: 70.37; f1: 58.89; loss: 08.39
+2023-02-26 05:15:49,325:INFO: Epoch 4/100
+2023-02-26 05:15:51,435:INFO: - Val metrics: precision: 77.78; f1: 77.78; loss: 08.18
+2023-02-26 05:15:51,436:INFO: Epoch 5/100
+2023-02-26 05:15:53,568:INFO: - Val metrics: precision: 72.22; f1: 40.74; loss: 28.79
+2023-02-26 05:15:53,569:INFO: Epoch 6/100
+2023-02-26 05:15:55,706:INFO: - Val metrics: precision: 69.44; f1: 48.89; loss: 15.28
+2023-02-26 05:15:55,707:INFO: Epoch 7/100
+2023-02-26 05:15:57,839:INFO: - Val metrics: precision: 70.37; f1: 58.89; loss: 06.16
+2023-02-26 05:15:57,840:INFO: Epoch 8/100
+2023-02-26 05:15:59,959:INFO: - Val metrics: precision: 70.37; f1: 58.89; loss: 08.25
+2023-02-26 05:15:59,959:INFO: Epoch 9/100
+2023-02-26 05:16:02,071:INFO: - Val metrics: precision: 77.78; f1: 77.78; loss: 02.34
+2023-02-26 05:16:02,071:INFO: Epoch 10/100
+2023-02-26 05:16:04,209:INFO: - Val metrics: precision: 77.78; f1: 77.78; loss: 09.76
+2023-02-26 05:16:04,210:INFO: Epoch 11/100
+2023-02-26 05:16:06,395:INFO: - Val metrics: precision: 77.78; f1: 71.72; loss: 11.54
+2023-02-26 05:16:06,396:INFO: Epoch 12/100
+2023-02-26 05:16:08,529:INFO: - Val metrics: precision: 77.78; f1: 77.78; loss: 07.21
+2023-02-26 05:16:08,529:INFO: Best val f1: 82.83
+2023-02-26 05:26:34,081:INFO: device: cuda
+2023-02-26 05:26:34,082:INFO: Loading the datasets...
+2023-02-26 05:26:44,931:INFO: Loading BERT model...
+2023-02-26 05:26:50,154:INFO: Starting training for 100 epoch(s)
+2023-02-26 05:26:50,155:INFO: Epoch 1/100
+2023-02-26 05:26:53,843:INFO: - Val metrics: precision: 92.59; f1: 80.98; loss: 01.92
+2023-02-26 05:26:53,844:INFO: - Found new best F1
+2023-02-26 05:26:54,691:INFO: Epoch 2/100
+2023-02-26 05:26:58,042:INFO: - Val metrics: precision: 72.22; f1: 68.01; loss: 02.06
+2023-02-26 05:26:58,043:INFO: Epoch 3/100
+2023-02-26 05:27:01,318:INFO: - Val metrics: precision: 77.78; f1: 77.78; loss: 01.20
+2023-02-26 05:27:01,319:INFO: Epoch 4/100
+2023-02-26 05:27:04,053:INFO: - Val metrics: precision: 77.78; f1: 77.78; loss: 01.26
+2023-02-26 05:27:04,054:INFO: Epoch 5/100
+2023-02-26 05:27:06,987:INFO: - Val metrics: precision: 77.78; f1: 77.78; loss: 00.56
+2023-02-26 05:27:06,988:INFO: Epoch 6/100
+2023-02-26 05:27:09,958:INFO: - Val metrics: precision: 77.78; f1: 77.78; loss: 00.88
+2023-02-26 05:27:09,959:INFO: Epoch 7/100
+2023-02-26 05:27:13,197:INFO: - Val metrics: precision: 94.44; f1: 82.83; loss: 02.24
+2023-02-26 05:27:13,198:INFO: - Found new best F1
+2023-02-26 05:27:14,029:INFO: Epoch 8/100
+2023-02-26 05:27:17,121:INFO: - Val metrics: precision: 72.22; f1: 68.01; loss: 03.68
+2023-02-26 05:27:17,122:INFO: Epoch 9/100
+2023-02-26 05:27:20,030:INFO: - Val metrics: precision: 72.22; f1: 68.01; loss: 02.50
+2023-02-26 05:27:20,031:INFO: Epoch 10/100
+2023-02-26 05:27:22,962:INFO: - Val metrics: precision: 72.22; f1: 68.01; loss: 00.59
+2023-02-26 05:27:22,963:INFO: Epoch 11/100
+2023-02-26 05:27:25,871:INFO: - Val metrics: precision: 72.22; f1: 68.01; loss: 01.05
+2023-02-26 05:27:25,872:INFO: Epoch 12/100
+2023-02-26 05:27:28,810:INFO: - Val metrics: precision: 72.22; f1: 68.01; loss: 03.67
+2023-02-26 05:27:28,811:INFO: Epoch 13/100
+2023-02-26 05:27:31,543:INFO: - Val metrics: precision: 77.78; f1: 77.78; loss: 03.74
+2023-02-26 05:27:31,544:INFO: Epoch 14/100
+2023-02-26 05:27:34,459:INFO: - Val metrics: precision: 77.78; f1: 77.78; loss: 01.10
+2023-02-26 05:27:34,460:INFO: Epoch 15/100
+2023-02-26 05:27:37,354:INFO: - Val metrics: precision: 72.22; f1: 68.01; loss: 02.04
+2023-02-26 05:27:37,355:INFO: Epoch 16/100
+2023-02-26 05:27:40,280:INFO: - Val metrics: precision: 77.78; f1: 77.78; loss: 02.69
+2023-02-26 05:27:40,281:INFO: Epoch 17/100
+2023-02-26 05:27:43,213:INFO: - Val metrics: precision: 77.78; f1: 77.78; loss: 01.77
+2023-02-26 05:27:43,214:INFO: Best val f1: 82.83

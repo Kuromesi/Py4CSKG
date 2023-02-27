@@ -91,15 +91,16 @@ def train_and_evaluate(model, train_data_iterator, val_data_iterator,  optimizer
         if (patience_counter >= config.patience_num and epoch > config.min_epochs) or epoch == config.max_epochs:
             logging.info("Best val f1: {:05.2f}".format(best_val_f1))
             break
-    logging.info(scorer.create_report(model, train_data_iterator))
-    logging.info(scorer.create_report(model, val_data_iterator))
+    # logging.info(scorer.create_report(model, train_data_iterator))
+    # logging.info(scorer.create_report(model, val_data_iterator))
     if test_data_iterator:
         logging.info(scorer.create_report(model, test_data_iterator))
 
 if __name__ == '__main__':
     
     # Load configuration
-    config = BERTConfig()
+    config = BERTImpactConfig()
+    # config = BERTConfig()
     tagger_model_dir = 'trained_models/' + config.name
 
     # Use GPUs if available
@@ -118,11 +119,12 @@ if __name__ == '__main__':
     # Initialize the DataLoader
     logging.info("Loading the datasets...")
     dataset = BERTDataset(config)
-    dataset.load_data('./myData/learning/CVE2CWE/cve.train', './myData/learning/CVE2CWE/cve.test')
+    # dataset.load_data('./myData/learning/CVEImpact/impact.train', './myData/learning/CVE2CWE/cve.test')
+    dataset.load_data('./myData/learning/CVEImpact/impact.train')
 
     train_data = dataset.train_iterator
     val_data = dataset.val_iterator
-    test_data = dataset.test_iterator
+    # test_data = dataset.test_iterator
     # Specify the training and validation dataset sizes
     config.train_size = dataset.train_size
     config.val_size = dataset.val_size
@@ -193,4 +195,5 @@ if __name__ == '__main__':
     logging.info("Starting training for {} epoch(s)".format(config.max_epochs))
     scorer = BERTMultiClassScorer()
     # train_and_evaluate(model, train_data, val_data, optimizer, scheduler, config, tagger_model_dir, scorer, args.restore_dir, test_data_iterator=test_data, use_crf=True)
-    train_and_evaluate(model, train_data, val_data, optimizer, scheduler, config, tagger_model_dir, scorer, test_data_iterator=test_data, use_crf=True)
+    # train_and_evaluate(model, train_data, val_data, optimizer, scheduler, config, tagger_model_dir, scorer, test_data_iterator=test_data, use_crf=True)
+    train_and_evaluate(model, train_data, val_data, optimizer, scheduler, config, tagger_model_dir, scorer, use_crf=True)

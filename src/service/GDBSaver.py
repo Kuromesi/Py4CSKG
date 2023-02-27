@@ -24,9 +24,10 @@ class GDBSaver:
             return 0
         
     def addSlashes(self, string):
-        string = string.replace("\\", "\\\\")
-        string = string.replace("\'", "\\\'")
-        string = string.replace("\"", "\\\"")
+        if isinstance(string, str):
+            string = string.replace("\\", "\\\\")
+            string = string.replace("\'", "\\\'")
+            string = string.replace("\"", "\\\"")
         return string
 
     def addNode(self, kvpairs):

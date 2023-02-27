@@ -50,7 +50,7 @@ class NERPredict():
 if __name__ == "__main__":
     
     ner = NERPredict()
-    sentence = "In NetHack before 3.6.5, an invalid argument to the -w command line option can cause a buffer overflow resulting in a crash or remote code execution/privilege escalation. This vulnerability affects systems that have NetHack installed suid/sgid and shared systems that allow users to influence command line options. Users should upgrade to NetHack 3.6.5."
+    sentence = "A memory corruption vulnerability exists in InDesign 15.1.1 (and earlier versions). Insecure handling of a malicious indd file could be abused to cause an out-of-bounds memory access, potentially resulting in code execution in the context of the current user."
     res = ner.predict(sentence)
     ids = res['ids']
     print(res['res'])

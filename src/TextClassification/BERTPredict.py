@@ -4,11 +4,11 @@ from config.BERTConfig import *
 
 
 def BERT_classification_predict():
-    model = BERT.from_pretrained('trained_models/BERTBiLSTMCRF')
+    model = BERT.from_pretrained('trained_models/BERTImpact')
     model.to('cuda')
-    config = BERTConfig()
+    config = BERTImpactConfig()
     dataset = BERTDataset(config)
-    text = "Open redirect vulnerability in the web interface in Cisco Secure Access Control System (ACS) allows remote attackers to redirect users to arbitrary web sites and conduct phishing attacks via an unspecified parameter, aka Bug ID CSCuq74150."
+    text = "memory corruption"
     text_vec = dataset.text2vec(text)
     data = {'data': text_vec['input_ids'].cuda(), 'attention_mask': text_vec['attention_mask'].cuda()}
     pred = model(data['data'], attention_mask=data['attention_mask'])[0]
