@@ -46,3 +46,21 @@ docker run -it --rm -v /shared/databases/neo4j/data/:/data neo4j:latest \
 neo4j-admin database import full --overwrite-destination \
 --nodes=/data/import/nodes/cve_cve.*.csv --nodes=/data/import/nodes/cve_cpe.*.csv \
 --multiline-fields=true --ignore-empty-strings=true --skip-duplicate-nodes=true --skip-bad-relationships=true --auto-skip-subsequent-headers=true
+
+## RULES
+[]: represent list
+(): represent nodes, id etc. e.g. (component), (component.id)
+    ontology:
+        component, firmware, hardware, software, os, entry
+{}: represent functions
+    \#: defend, this comonent is designed to perform some defensive functions ,e.g. #{component.*} which means restrict access of all nodes
+    @: compromised, 
+    ->: lead to
+    <-: require
+    !: not, disable some functions, e.g. @(software.id)->!#{component*}
+    <=>: communicate
+$: asset, default values are userPrivilege, rootPrivilege, appPrivilege, appCodeExec, systemCodeExec
+
+some examples:
+    (\$<appPrivilege>)<-@->(:<component>.<firewall>)!\#(component.*)
+    \#(:<entry>.<id>)

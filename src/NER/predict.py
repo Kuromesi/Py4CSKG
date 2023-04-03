@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 from tqdm import trange, tqdm
-from models import *
-from bert_crf import *
+from NER.models import *
+from NER.bert_crf import *
 from torchcrf import CRF
 from transformers import AutoTokenizer
 

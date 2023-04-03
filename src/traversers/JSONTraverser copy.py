@@ -226,11 +226,11 @@ class CVETraverser():
                     
 
                     # Find related CWE
-                    # cwes = cve['problemtype']['problemtype_data'][0]['description']
-                    # for cwe in cwes:
-                    #     cwe = cwe['value']
-                        # if cwe != "NVD-CWE-noinfo" and cwe != "NVD-CWE-Other":
-                        #     self.rel_df.loc[len(self.rel_df.index)] = [cwe, src, "Observed_Example"]
+                    cwes = cve['problemtype']['problemtype_data'][0]['description']
+                    for cwe in cwes:
+                        cwe = cwe['value']
+                        if cwe != "NVD-CWE-noinfo" and cwe != "NVD-CWE-Other":
+                            self.rel_df.loc[len(self.rel_df.index)] = [cwe, src, "Observed_Example"]
 
                     # Find CPE
                     if 'configurations' in cur and 'nodes' in cur['configurations']:

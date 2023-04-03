@@ -8,7 +8,7 @@ def BERT_classification_predict():
     model.to('cuda')
     config = BERTImpactConfig()
     dataset = BERTDataset(config)
-    text = "memory corruption"
+    text = "obtain Network Device Administrator privileges"
     text_vec = dataset.text2vec(text)
     data = {'data': text_vec['input_ids'].cuda(), 'attention_mask': text_vec['attention_mask'].cuda()}
     pred = model(data['data'], attention_mask=data['attention_mask'])[0]

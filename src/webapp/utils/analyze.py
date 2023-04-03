@@ -22,13 +22,13 @@ class ModelAnalyzer():
         color_map = []
         nodes = []
         node_type = {
-            'software': [],
-            'hardware': [],
-            'os': [],
-            'firmware': [],
-            'component': [],
-            'defender': [],
-            'entry': []
+            'software': {},
+            'hardware': {},
+            'os': {},
+            'firmware': {},
+            'component': {},
+            'defender': {},
+            'entry': {}
         }
         for node in graph['nodes']:
             # color_map.append(node.pop('color'))
@@ -37,8 +37,8 @@ class ModelAnalyzer():
             id = node['id']
             nodes.append((id, node))
             if node['type'] not in node_type:
-                node_type[node['type']] = []
-            node_type[node['type']].append({id: node}) # Classified with corresponding ontologies
+                node_type[node['type']] = {}
+            node_type[node['type']].update({id: node}) # Classified with corresponding ontologies
             
         # Edges
         edges = []
@@ -129,42 +129,41 @@ class ModelAnalyzer():
         l3 = set()
         _nodes = tqdm(nodes)
         _nodes.set_description("FINDING VULNERABILITIES")
-        for node in _nodes:
-            for key in node:
-                product = node[key]['product']
-                version = node[key]['version']
-                _nodes.set_postfix(product=product)
-                vul_report = self.vul_find(product, version)
-                
-                app_code_exec = vul_report.loc[vul_report['CVE-Impact'] == "Application arbitrary code execution"]
-                app_privilege = vul_report.loc[vul_report['CVE-Impact'] == "Gain application privilege"]
-                system_code_exec = vul_report.loc[vul_report['CVE-Impact'] == "System arbitrary code execution"]
-                cia_impact = vul_report.loc[vul_report['CVE-Impact'] == "System CIA loss"]
-                user_privilege = vul_report.loc[vul_report['CVE-Impact'] == "Gain user privilege"]
-                root_privilege = vul_report.loc[vul_report['CVE-Impact'] == "Gain root privilege"]
-                privilege_escalation = vul_report.loc[vul_report['CVE-Impact'] == "Privilege escalation"]
-                
-                # System root
-                if  not user_privilege.empty and not privilege_escalation.empty or not root_privilege.empty:
-                    l1.add(key)
+        for key in _nodes:
+            product = nodes[key]['product']
+            version = nodes[key]['version']
+            _nodes.set_postfix(product=product)
+            vul_report = self.vul_find(product, version)
+            
+            app_code_exec = vul_report.loc[vul_report['CVE-Impact'] == "Application arbitrary code execution"]
+            app_privilege = vul_report.loc[vul_report['CVE-Impact'] == "Gain application privilege"]
+            system_code_exec = vul_report.loc[vul_report['CVE-Impact'] == "System arbitrary code execution"]
+            cia_impact = vul_report.loc[vul_report['CVE-Impact'] == "System CIA loss"]
+            user_privilege = vul_report.loc[vul_report['CVE-Impact'] == "Gain user privilege"]
+            root_privilege = vul_report.loc[vul_report['CVE-Impact'] == "Gain root privilege"]
+            privilege_escalation = vul_report.loc[vul_report['CVE-Impact'] == "Privilege escalation"]
+            
+            # System root
+            if  not user_privilege.empty and not privilege_escalation.empty or not root_privilege.empty:
+                l1.add(key)
+                neighbors = [n for n in self.G.neighbors(key)]
+                l1.update(neighbors)
+            
+            # System user
+            elif not user_privilege.empty:
+                l2.add(key)
+                neighbors = [n for n in self.G.neighbors(key)]
+                l2.update(neighbors)
+            
+            else:
+                if not system_code_exec.empty:
+                    l3.add(key)
                     neighbors = [n for n in self.G.neighbors(key)]
-                    l1.update(neighbors)
-                
-                # System user
-                elif not user_privilege.empty:
-                    l2.add(key)
-                    neighbors = [n for n in self.G.neighbors(key)]
-                    l2.update(neighbors)
-                
+                    l3.update(neighbors)
                 else:
-                    if not system_code_exec.empty:
-                        l3.add(key)
-                        neighbors = [n for n in self.G.neighbors(key)]
-                        l3.update(neighbors)
-                    else:
-                        l3.add(key)
-                        neighbors = [n for n in self.G.neighbors(key) if n in self.graph['node_type']["entry"]]
-                        l3.update(neighbors)
+                    l3.add(key)
+                    neighbors = [n for n in self.G.neighbors(key) if n in self.graph['node_type']["entry"]]
+                    l3.update(neighbors)
         l3 = l3 - l2 - l1
         l2 = l2 - l1
         return {'root': list(l1), 'user': list(l2), 'other': list(l3)}
@@ -180,8 +179,11 @@ class ModelAnalyzer():
         node_type = self.graph['node_type']
         
         # Find vulnerabilities
-        
-        result = self.__find_vul_nodes(node_type['software'] + node_type['hardware'] + node_type['os'])
+        nodes = {}
+        nodes.update(node_type['software'])
+        nodes.update(node_type['hardware'])
+        nodes.update(node_type['os'])
+        result = self.__find_vul_nodes(nodes)
         # self.__find_vul_nodes(node_type['hardware'], vul_nodes)
         # self.__find_vul_nodes(node_type['os'], vul_nodes)
         
