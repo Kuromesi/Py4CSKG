@@ -3,7 +3,7 @@ import spacy
 # import numpy as np
 # from utils.PathFinder import *
 # from utils.CVEExtractor import *
-# from utils.utils import *
+from utils.utils import *
 # from models.trainer import Trainer
 # from utils.cweTree import *
 
@@ -12,13 +12,13 @@ spacy.prefer_gpu()
 def cosine_distance(x, y):
     return np.dot(x, y.T) / (np.linalg.norm(x) * np.linalg.norm(y))
 
-nlp = spacy.load('./data/v1/output/model-best')
-txt = "The SSI printenv command in Apache Tomcat 9.0.0.M1 to 9.0.0.17, 8.5.0 to 8.5.39 and 7.0.0 to 7.0.93 echoes user provided data without escaping and is, therefore, vulnerable to XSS. SSI is disabled by default. The printenv command is intended for debugging and is unlikely to be present in a production website."
+# nlp = spacy.load('./data/v1/output/model-best')
+# txt = "The SSI printenv command in Apache Tomcat 9.0.0.M1 to 9.0.0.17, 8.5.0 to 8.5.39 and 7.0.0 to 7.0.93 echoes user provided data without escaping and is, therefore, vulnerable to XSS. SSI is disabled by default. The printenv command is intended for debugging and is unlikely to be present in a production website."
 
 
-tmp = nlp(txt)
-for ent in tmp.ents:
-    print(ent.text, ent.label_)
+# tmp = nlp(txt)
+# for ent in tmp.ents:
+#     print(ent.text, ent.label_)
 # trainer = Trainer()
 
 # nlp = spacy.load('en_core_web_lg')
@@ -91,3 +91,5 @@ for ent in tmp.ents:
 # label2id_base('./myData/learning/CVE2CWE', 'original.txt')
 # id2label('./myData/learning/CVE2CWE', 'cve.train')
 # toML('myData/learning/CVE2CWE/base/cve.train', 'myData/learning/CVE2CWE/base/cve.csv')
+
+count_words()

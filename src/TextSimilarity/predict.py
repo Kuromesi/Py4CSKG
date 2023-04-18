@@ -15,6 +15,7 @@ class NERPredict():
         self.model = BERTBiLSTMCRF.from_pretrained(model_dir, config)
         self.model.to(self.device)
         self.labels = ['O', 'B-vul', 'I-vul', 'B-cons', 'I-cons']
+        # self.labels = ['O', 'B-cons', 'I-cons']
 
     def idx2tag(self, id):
         tags = [[self.labels[y] for y in x if y > -1] for x in id]

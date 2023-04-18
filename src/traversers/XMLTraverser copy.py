@@ -121,7 +121,7 @@ class CAPECTraverser(XmlTraverser):
                         if related_weakness != "\n":
                             dest = "CWE-" + related_weakness['CWE_ID']
                             relation = related_weakness.name
-                            # self.rel_df.loc[len(self.rel_df.index)] = [src, dest, relation]
+                            self.rel_df.loc[len(self.rel_df.index)] = [src, dest, relation]
                             
                 # Find mitigations
                 mitigations = atkpt.find('Mitigations')
@@ -357,7 +357,7 @@ class ATTACKTraverser(XmlTraverser):
 if __name__ == "__main__":
     # capect = CAPECTraverser('data/CAPEC/CAPEC.xml')
     # capect.traverse()
-    attackt = ATTACKTraverser('data/attack/enterprise.xml', 'data/attack/tactic.json')
+    attackt = ATTACKTraverser('data/attack/enterpriseN.xml', 'data/attack/tactic.json')
     attackt.traverse()
     # cwet = CWETraverser('data/CWE/CWE.xml')
     # cwet.traverse()

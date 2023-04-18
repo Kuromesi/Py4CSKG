@@ -232,7 +232,7 @@ class TextSimilarity():
         docs_embedding = self.batch_embedding(docs, docs_weight, weighted=True).detach().numpy()
         name_embedding = self.batch_embedding(capec_df['name'].tolist()).detach().numpy()
         docs_embedding = 8e-01 * name_embedding + docs_embedding
-        query_embedding = self.batch_weighted_embedding(query, weighted=False).detach().numpy()
+        query_embedding = self.batch_weighted_embedding(query, weighted=True).detach().numpy()
 
         sim = cosine_similarity(docs_embedding, query_embedding)
         
@@ -502,11 +502,13 @@ if __name__ == '__main__':
 #     print("Sentence:", sentence)
 #     print("Embedding:", embedding)
 #     print("")
-    # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-    # ts = TextSimilarity()
-    # text = "switch"
-    # ts.init_ner()
-    # ts.calculate_similarity(df, text)
+    
+    df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+    ts = TextSimilarity()
+    # text = "The Bluetooth Classic implementation on Actions ATS2815 chipsets does not properly handle the reception of continuous unsolicited LMP responses, allowing attackers in radio range to trigger a denial of service and shutdown of a device by flooding the target device with LMP_features_res packets."
+    text = "smb"
+    ts.init_ner()
+    ts.calculate_similarity(df, text)
     # precision_test()
     # calculate_precision()
     # tfidf()
@@ -516,16 +518,16 @@ if __name__ == '__main__':
     # PRECISION TEST
     # spacy.prefer_gpu()
     # NLP = spacy.load('en_core_web_trf')
-    # ts = TextSimilarity()
+    ts = TextSimilarity()
     # ts.init_ner()
-    # ts._precision_test(fuzzy_num=1)
+    # ts._precision_test(fuzzy_num=5)
     # calculate_precision()
 
     # TFIDF SIMILARITY
-    # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-    # tis = TFIDFSimilarity()
-    # query = "In setSyncSampleParams of SampleTable.cpp, there is possible resource exhaustion due to a missing bounds check. This could lead to remote denial of service with no additional execution privileges needed."
-    # tis.calculate_similarity(query)
+    df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+    tis = TFIDFSimilarity()
+    query = "global positioning system"
+    tis.calculate_similarity(query)
     # tis.precision_test(fuzzy_num=30)
     # calculate_precision()
     # comparison_result_single()
@@ -535,8 +537,8 @@ if __name__ == '__main__':
     # ts = TextSimilarity()
     # ts.create_embedding(docs, "product")
 
-    query = "crash"
-    df = pd.read_csv('./myData/learning/CVE2Technique/attack.csv')
-    ts = TextSimilarity()
-    ts.init_ner()
-    ts.calculate_similarity_for_all(df['name'].to_list(), query)
+    # query = "crash"
+    # df = pd.read_csv('./myData/learning/CVE2Technique/attack.csv')
+    # ts = TextSimilarity()
+    # ts.init_ner()
+    # ts.calculate_similarity_for_all(df['name'].to_list(), query)

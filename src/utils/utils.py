@@ -265,3 +265,9 @@ def find_weakness():
         df.loc[len(df.index)] = [node[0].get('id'), count]
     df = df.sort_values(by='COUNT', ascending=False)
     df.to_csv('./myData/thesis/cwe_count.csv', index=False)
+
+def count_words():
+    df = pd.read_csv("./myData/learning/CVE2CAPEC/result_weight.csv")
+    cves = df['cve_des'].tolist()
+    with open('./myData/learning/CVE2CAPEC/temp.txt', 'w') as f:
+        f.writelines(cves)

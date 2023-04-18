@@ -1,7 +1,12 @@
 import sys, os
+import pandas as pd
+from service.GDBSaver import *
+from tqdm import tqdm 
+
 def generate(rootPath):
     '''
-    Generate CVE impact type train data, refer to https://github.com/CSIRT-MU/VulnerabilityCategorization.
+    Generate CVE impact type training data to train a model for impact classification.
+    Refer to https://github.com/CSIRT-MU/VulnerabilityCategorization.
     '''
 
     code_exec = [
@@ -196,7 +201,19 @@ def generate(rootPath):
             label = i
             for phrase in data_class[i]:
                 f.writelines("%d , %s\n"%(label, phrase))
-                
+
+def save_cveimpact():
+    gs = GDBSaver()
+    query = "MATCH (n:Vulnerability) RETURN n"
+    nodes = gs.sendQuery(query)
+    df = pd.DataFrame(columns=['CVE-ID', 'Impact'])
+    nodes = tqdm(nodes)
+    for node in nodes:
+        node = node[0]
+        nodes.set_postfix(id=node['id'])
+        df.loc[len(df.index)] = [node['id'], node['impact']]
+    df.to_csv('data/CVEImpact.csv', index=False)                
+
 if __name__ == '__main__':
     path = './myData/learning/CVEImpact'
     generate(path)

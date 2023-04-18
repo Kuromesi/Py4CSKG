@@ -5,8 +5,34 @@ from sklearn import datasets
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import numpy as np
+from googlesearch import search
+import urllib
+from bs4 import BeautifulSoup
+import os
+os.environ["http_proxy"] = "http://127.0.0.1:2340"
+os.environ["https_proxy"] = "http://127.0.0.1:2340"
+
+CWE = "cwe.mitre.org"
+CAPEC = "capec.mitre.org"
+
+def google_scrape(url):
+    thepage = urllib.request.urlopen(url)
+    soup = BeautifulSoup(thepage, "html.parser")
+    return soup.title.text
+
+def knowledge_search():
+    query = "information disclosure \"cwe.mitre.org\""
+    for url in search(query, num_results=5):
+        if "cwe.mitre.org" not in url:
+            break
+        a = google_scrape(url)
+        print (a)
+        print (url)
 
 class Cluster:
+    '''
+    Cluster nodes which have same description, useless
+    '''
     def __init__(self):
         self.gdb = GDBSaver()
         self.rdb = RDBSaver()
@@ -117,6 +143,3 @@ class Cluster:
         for ent in text.ents:
             print(ent.text, ent.label_)
 
-if __name__=="__main__":
-    nlp = NLP()
-    

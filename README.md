@@ -44,8 +44,20 @@ neo4j-admin database import full --overwrite-destination \
 
 docker run -it --rm -v /shared/databases/neo4j/data/:/data neo4j:latest \
 neo4j-admin database import full --overwrite-destination \
+--nodes=/data/import/nodes/.*.csv \
+--relationships=/data/import/relations/.*.csv \
+--multiline-fields=true --ignore-empty-strings=true --skip-duplicate-nodes=true --skip-bad-relationships=true --auto-skip-subsequent-headers=true
+
+docker run -it --rm -v /shared/databases/neo4j/data/:/data neo4j:latest \
+neo4j-admin database import full --overwrite-destination \
 --nodes=/data/import/nodes/cve_cve.*.csv --nodes=/data/import/nodes/cve_cpe.*.csv \
 --multiline-fields=true --ignore-empty-strings=true --skip-duplicate-nodes=true --skip-bad-relationships=true --auto-skip-subsequent-headers=true
+
+### DELETE DUPLICATE RELATIONS
+match ()-[r]->() 
+match (s)-[r]->(e) 
+with s,e,type(r) as typ, tail(collect(r)) as coll 
+foreach(x in coll | delete x)
 
 ## RULES
 []: represent list
