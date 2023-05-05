@@ -15,9 +15,11 @@ class ModelAnalyzer():
         self.cve2cwe = CVE2CWE()
     
     def convert_pyvis(self, graph:dict):
-        '''
-        Receive pyvis json format graph from frontend and convert it into networkx grapg.
-        '''
+        """Receive pyvis json format graph from frontend and convert it into networkx grapg.
+
+        Args:
+            graph (dict): pyvis graph
+        """        
         # Nodes
         color_map = []
         nodes = []
@@ -59,7 +61,17 @@ class ModelAnalyzer():
         self.graph = graph
         self.G = G
 
-    def vul_find(self, product, version):
+    def vul_find(self, product:str, version:str) -> pd.DataFrame:
+        """Find related vulnerabilities of a specific product and return vul_report like below:
+        Product, CVE-ID, CVE-Description, CVE-Impact, Access
+
+        Args:
+            product (str): product, exactly the same // n.product='product'
+            version (str): version of the product
+
+        Returns:
+            pd.DataFrame: vul_report
+        """        
         query = "MATCH (n:Platform) WHERE n.product='%s' AND n.vulnerable='True' RETURN n"%product
         nodes = self.gs.sendQuery(query)
         vul_products = []
@@ -70,11 +82,11 @@ class ModelAnalyzer():
             version_start = node['versionStart']
             version_end = node['versionEnd']
             if cmp_version(version, version_start) != -1 and cmp_version(version, version_end) != 1:
-                vul_products.append(node['uri'])
+                vul_products.append(node['id'])
         if vul_products:
             query = "MATCH (n:Vulnerability)-[]-(a:Platform) WHERE"
             for vul_product in vul_products:
-                query += " a.uri='%s' OR"%vul_product
+                query += " a.id='%s' OR"%vul_product
             query = query.strip("OR") + "RETURN n"
             nodes = self.gs.sendQuery(query)
             for node in nodes:
@@ -82,7 +94,7 @@ class ModelAnalyzer():
                 # if node['id'] not in vuls:
                 #     vuls[node['id']] = node
                 cvss = json.loads(node['baseMetricV2'])
-                vul_report.loc[len(vul_report.index)] = [product, node['id'], node['des'], node['impact'], cvss['cvssV2']['accessVector']]
+                vul_report.loc[len(vul_report.index)] = [product, node['id'], node['description'], node['impact'], cvss['cvssV2']['accessVector']]
         self.vul_analyze(vul_report)
         # for product in vul_product:
         #     query = "MATCH (n:Vulnerability)-[]-(a:Platform) WHERE a.uri='%s' RETURN n"%product
@@ -93,10 +105,12 @@ class ModelAnalyzer():
         #             vuls[node['id']] = node
         return vul_report
     
-    def vul_analyze(self, vul_report):
-        '''
-        Find related CAPEC, CWE, ATT&CK, CVSS and make a summary.
-        '''
+    def vul_analyze(self, vul_report:pd.DataFrame):
+        """Find related CAPEC, CWE, ATT&CK, CVSS and make a summary.
+
+        Args:
+            vul_report (pd.DataFrame): vul_report
+        """        
         
         # Related CWE analysis
         cwe_df = pd.DataFrame(columns=['CWE-ID', 'Name', 'Description', 'Count'])

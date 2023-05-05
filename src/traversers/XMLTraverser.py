@@ -1,5 +1,5 @@
-from service.GDBSaver import GDBSaver
-from service.RDBSaver import RDBSaver
+# from service.GDBSaver import GDBSaver
+# from service.RDBSaver import RDBSaver
 from bs4 import BeautifulSoup
 import pandas as pd
 import re
@@ -9,8 +9,8 @@ from tqdm import tqdm
 CVE = re.compile(r'CVE-\d*-\d*')
 
 class XmlTraverser: 
-    ds = GDBSaver()
-    rs = RDBSaver()
+    # ds = GDBSaver()
+    # rs = RDBSaver()
     def init(self): 
         
         self.root = None
@@ -378,98 +378,105 @@ class ATTACKTraverser(XmlTraverser):
     def __init__(self, path: str, tactic_url: str):
         self.TYPE = "Vulnerability"
         self.tactic_url = tactic_url
-        self.ds = GDBSaver()
-        self.rs = RDBSaver()
+        # self.ds = GDBSaver()
+        # self.rs = RDBSaver()
         with open(path, "r", encoding='utf-8') as file:
             self.soup = BeautifulSoup(file, "xml")
 
     def traverse(self):
-        self.tactic_traverse(self.tactic_url)
+        df = pd.DataFrame(columns=['id', 'name', 'description'])
+        # self.tactic_traverse(self.tactic_url)
         technique = tqdm(self.soup.find_all('Technique'))
         technique.set_description("TRAVERSING ATT&CK TECHNIQUES")
         for tech in technique:
             technique.set_postfix(id=tech['id'])
             attrs = {}
             attrs['id'] = self.string_proc(tech['id'])
-            if (not self.rs.checkNode(attrs['id'])):
+            # if (not self.rs.checkNode(attrs['id'])):
             
-                attrs['name'] = self.string_proc(tech['name'])
-                attrs['des'] = self.string_proc(tech.next)
-                attrs['type'] = 'SubTechnique' if "." in attrs['id'] else "Technique"
-                attrs['prop'] = "Technique"
-                attrs['complete'] = str(tech)
-                if tech.find('Platforms'):
-                    attrs['platforms'] = self.string_proc(tech.find('Platforms').text)
-                if tech.find('Permissions_Required'):
-                    attrs['permissions_required'] = self.string_proc(tech.find('Permissions_Required').text)
-                if tech.find('Effective_Permissions'):
-                    attrs['effective_permissions'] = self.string_proc(tech.find('Effective_Permissions').text)
-                if tech.find('Impact_Type'):
-                    attrs['impact_type'] = self.string_proc(tech.find('Impact_Type').text)
-                # Add the node to the graph database
-                srcID = self.ds.addNode(attrs)
-                self.rs.saveNodeId(attrs['id'], srcID)
-                if tech.get('id') and '.' in tech.get('id'):
-                    techId = attrs['id'].split('.')[0]
-                    self.rs.saveRDF(techId, attrs['id'], "Has_SubTechnique")
+            attrs['name'] = self.string_proc(tech['name'])
+            # attrs['des'] = self.string_proc(tech.next)
+            attrs['des'] = tech.next.strip('\n')
+            attrs['type'] = 'SubTechnique' if "." in attrs['id'] else "Technique"
+            attrs['prop'] = "Technique"
+            attrs['complete'] = str(tech)
+            for tmp in attrs['des'].split('\n'):
+                tmp = tmp.strip()
+                if tmp and not tmp[-1] == ':':
+                    df.loc[len(df.index)] = [attrs['id'], attrs['name'], tmp]
+            if tech.find('Platforms'):
+                attrs['platforms'] = self.string_proc(tech.find('Platforms').text)
+            if tech.find('Permissions_Required'):
+                attrs['permissions_required'] = self.string_proc(tech.find('Permissions_Required').text)
+            if tech.find('Effective_Permissions'):
+                attrs['effective_permissions'] = self.string_proc(tech.find('Effective_Permissions').text)
+            if tech.find('Impact_Type'):
+                attrs['impact_type'] = self.string_proc(tech.find('Impact_Type').text)
+        df.to_csv('./data/attack/attack.csv', index=False)
+                # # Add the node to the graph database
+                # srcID = self.ds.addNode(attrs)
+                # self.rs.saveNodeId(attrs['id'], srcID)
+                # if tech.get('id') and '.' in tech.get('id'):
+                #     techId = attrs['id'].split('.')[0]
+                #     self.rs.saveRDF(techId, attrs['id'], "Has_SubTechnique")
 
-                # Find tactics
-                tactics = tech.find('Tactics')
-                if not tactics:
-                    tactics = tech.find('Tactic')
-                tactic = tactics.text.split(', ')
-                for tac in tactic:
-                    # Save RDF
-                    self.rs.saveRDF(tac.strip(), attrs['id'], 'Has_Technique')
+                # # Find tactics
+                # tactics = tech.find('Tactics')
+                # if not tactics:
+                #     tactics = tech.find('Tactic')
+                # tactic = tactics.text.split(', ')
+                # for tac in tactic:
+                #     # Save RDF
+                #     self.rs.saveRDF(tac.strip(), attrs['id'], 'Has_Technique')
                 
-                # Find capec
-                capec = tech.find('CAPEC_ID')
-                if capec:
-                    capec = capec.text.split(', ')
-                    for cap in capec:
-                        self.rs.saveRDF(cap.strip(), attrs['id'], 'In_CAPEC')
+                # # Find capec
+                # capec = tech.find('CAPEC_ID')
+                # if capec:
+                #     capec = capec.text.split(', ')
+                #     for cap in capec:
+                #         self.rs.saveRDF(cap.strip(), attrs['id'], 'In_CAPEC')
                         
-                # Find examples
-                examples = tech.find_all('Example')
-                if examples:
-                    for example in examples:
-                        id = example['id']
-                        if (not self.rs.checkNode(id)):
-                            name = example['name']
-                            group_type = "Software" if id[0] == "S" else "Group"
-                            group = {'id': id, 'name': name, 'type': group_type, 'prop': "Threats"}
-                            self.rs.saveNodeId(id, self.ds.addNode(group))
-                        uri = id + ":" +attrs['id']
-                        if (not self.rs.checkNode(uri)):
-                            des = self.string_proc(example.next)
-                            procedure = {'id': uri, 'description': des, 'prop': "Procedure"}
-                            self.rs.saveNodeId(uri, self.ds.addNode(procedure))
-                            self.rs.saveRDF(id, uri, "Has_Procedure")
-                            self.rs.saveRDF(uri, attrs['id'], "Utilize")
+                # # Find examples
+                # examples = tech.find_all('Example')
+                # if examples:
+                #     for example in examples:
+                #         id = example['id']
+                #         if (not self.rs.checkNode(id)):
+                #             name = example['name']
+                #             group_type = "Software" if id[0] == "S" else "Group"
+                #             group = {'id': id, 'name': name, 'type': group_type, 'prop': "Threats"}
+                #             self.rs.saveNodeId(id, self.ds.addNode(group))
+                #         uri = id + ":" +attrs['id']
+                #         if (not self.rs.checkNode(uri)):
+                #             des = self.string_proc(example.next)
+                #             procedure = {'id': uri, 'description': des, 'prop': "Procedure"}
+                #             self.rs.saveNodeId(uri, self.ds.addNode(procedure))
+                #             self.rs.saveRDF(id, uri, "Has_Procedure")
+                #             self.rs.saveRDF(uri, attrs['id'], "Utilize")
                     
-                # Find mitigations
-                mitigations = tech.find_all('Mitigation')
-                if mitigations:
-                    for mitigation in mitigations:
-                        id = mitigation['id']
-                        if (not self.rs.checkNode(id)):
-                            name = mitigation['name']
-                            des = self.string_proc(mitigation.text)
-                            mitigation_node = {'id': id, 'name': name, 'description': des, 'prop': "Mitigation"}
-                            self.rs.saveNodeId(id, self.ds.addNode(mitigation_node))
-                            self.rs.saveRDF(attrs['id'], id, "Has_Mitigation")
+                # # Find mitigations
+                # mitigations = tech.find_all('Mitigation')
+                # if mitigations:
+                #     for mitigation in mitigations:
+                #         id = mitigation['id']
+                #         if (not self.rs.checkNode(id)):
+                #             name = mitigation['name']
+                #             des = self.string_proc(mitigation.text)
+                #             mitigation_node = {'id': id, 'name': name, 'description': des, 'prop': "Mitigation"}
+                #             self.rs.saveNodeId(id, self.ds.addNode(mitigation_node))
+                #             self.rs.saveRDF(attrs['id'], id, "Has_Mitigation")
                         
-                # Find detections
-                detections = tech.find_all('Detection')
-                if detections:
-                    for detection in detections:
-                        id = detection['id']
-                        if (not self.rs.checkNode(id)):
-                            name = detection['name']
-                            des = self.string_proc(detection.text)
-                            detection_node = {'id': id, 'name': name, 'description': des, 'prop': "IOC"}
-                            self.rs.saveNodeId(id, self.ds.addNode(detection_node))
-                            self.rs.saveRDF(attrs['id'], id, "Has_IOC")
+                # # Find detections
+                # detections = tech.find_all('Detection')
+                # if detections:
+                #     for detection in detections:
+                #         id = detection['id']
+                #         if (not self.rs.checkNode(id)):
+                #             name = detection['name']
+                #             des = self.string_proc(detection.text)
+                #             detection_node = {'id': id, 'name': name, 'description': des, 'prop': "IOC"}
+                #             self.rs.saveNodeId(id, self.ds.addNode(detection_node))
+                #             self.rs.saveRDF(attrs['id'], id, "Has_IOC")
                         
 
 
@@ -499,7 +506,7 @@ class ATTACKTraverser(XmlTraverser):
 if __name__ == "__main__":
     # capect = CAPECTraverser('data/CAPEC.xml')
     # capect.traverse()
-    attackt = ATTACKTraverser('data/ATTACK_Enterprise.xml', 'data/tactic.json')
+    attackt = ATTACKTraverser('data/attack/enterpriseN.xml', 'data/attack/tactic.json')
     attackt.traverse()
     # cwet = CWETraverser('data/CWE.xml')
     # cwet.traverse()

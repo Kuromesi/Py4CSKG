@@ -5,6 +5,8 @@ import numpy as np
 from service.GDBSaver import *
 from utils.NLP import *
 import json
+from NER.predict import *
+from tqdm import tqdm, trange
 
 def id2label(rootPath, subPath):
     path = os.path.join(rootPath, 'classification.labels')
@@ -271,3 +273,27 @@ def count_words():
     cves = df['cve_des'].tolist()
     with open('./myData/learning/CVE2CAPEC/temp.txt', 'w') as f:
         f.writelines(cves)
+        
+class GetTrainData():
+    """Collect CVE description for NER 
+    """    
+    def __init__(self) -> None:
+        self.ner = NERPredict()
+        self.df = pd.DataFrame(columns=['id', 'des', 'NER'])
+        self.gs = GDBSaver()
+
+    def find(self):
+        query = "MATCH (n:Vulnerability) RETURN n ORDER BY rand() LIMIT 200"
+        results = self.gs.sendQuery(query)
+        results = tqdm(results)
+        results.set_description("Processing CVE...")
+        for res in results:
+            res = res[0]
+            id = res['id']
+            results.set_postfix(id=id)
+            des = res['description']
+            ner_res = self.ner.predict(des)
+            self.df.loc[len(self.df.index)] = [id, des, ner_res['res']]
+            
+        self.df.to_csv('./myData/learning/CVE2CAPEC/NER.csv', index=False)
+        

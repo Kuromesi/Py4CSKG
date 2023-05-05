@@ -5,6 +5,6 @@
 
 # cve.traverse()
 
-# from utils.save_cveimpact import *
+from utils.cveImpact import *
 
-# save_cveimpact()
+save_cveimpact()

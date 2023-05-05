@@ -83,22 +83,37 @@ class CVEImpact():
         pred = torch.max(pred, 1)[1]
         return self.impact_type[pred[0]]
     
-    def get_impact(self, sentence, cvss):
+    def get_impact(self, sentence, cvss2, cvss3=None):
         data_type = self.predict(sentence)
         impact = ""
-        if cvss['cvssV2']['confidentialityImpact'] == "COMPLETE" and cvss['cvssV2']['integrityImpact'] == "COMPLETE" and cvss['cvssV2']['availabilityImpact'] == "COMPLETE":
-            if "code_exec" in data_type:
-                impact = "System arbitrary code execution"
+        if cvss3:
+            if cvss3['cvssV3']['confidentialityImpact'] == "HIGH" and cvss3['cvssV3']['integrityImpact'] == "HIGH" and cvss3['cvssV3']['availabilityImpact'] == "HIGH":
+                if "code_exec" in data_type:
+                    impact = "System arbitrary code execution"
+                else:
+                    if "privilege_escalation" in data_type:
+                        impact = "Privilege escalation" if cvss3['cvssV3']['attackVector'] == "LOCAL" else "Gain root privilege"
+                    else:
+                        impact = "System CIA loss"
             else:
                 if "privilege_escalation" in data_type:
-                    impact = "Privilege escalation" if cvss['cvssV2']['accessVector'] == "LOCAL" else "Gain root privilege"
+                    impact = "Gain user privilege" if cvss2['obtainUserPrivilege'] else "Gain application privilege"
                 else:
-                    impact = "System CIA loss"
-        else:
-            if "privilege_escalation" in data_type:
-                impact = "Gain user privilege" if cvss['obtainUserPrivilege'] else "Gain application privilege"
+                    impact = "Application arbitrary code execution" if "code_exec" in data_type else "System CIA loss"
+        else:        
+            if cvss2['cvssV2']['confidentialityImpact'] == "COMPLETE" and cvss2['cvssV2']['integrityImpact'] == "COMPLETE" and cvss2['cvssV2']['availabilityImpact'] == "COMPLETE":
+                if "code_exec" in data_type:
+                    impact = "System arbitrary code execution"
+                else:
+                    if "privilege_escalation" in data_type:
+                        impact = "Privilege escalation" if cvss2['cvssV2']['accessVector'] == "LOCAL" else "Gain root privilege"
+                    else:
+                        impact = "System CIA loss"
             else:
-                impact = "Application arbitrary code execution" if "code_exec" in data_type else "System CIA loss"
+                if "privilege_escalation" in data_type:
+                    impact = "Gain user privilege" if cvss2['obtainUserPrivilege'] else "Gain application privilege"
+                else:
+                    impact = "Application arbitrary code execution" if "code_exec" in data_type else "System CIA loss"
         return impact
                 
     def traverse(self):
@@ -110,11 +125,14 @@ class CVEImpact():
             res = res[0]
             id = res['id']
             results.set_postfix(id=id)
-            if 'impact' in res:
-                continue
-            if res['baseMetricV2'] != 'None':
+            # if 'impact' in res:
+            #     continue
+            if 'baseMetricV2' in res:
                 node_id = res.id
-                impact = self.get_impact(res['des'], json.loads(res['baseMetricV2']))
+                if 'baseMetricV3' in res:
+                    impact = self.get_impact(res['description'], json.loads(res['baseMetricV2']), json.loads(res['baseMetricV3']))
+                else:
+                    impact = self.get_impact(res['description'], json.loads(res['baseMetricV2']))
                 query = "MATCH (n:Vulnerability) WHERE id(n)=%d SET n.impact='%s'"%(node_id, impact)
                 self.gs.sendQuery(query)
 

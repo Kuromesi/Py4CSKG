@@ -53,6 +53,12 @@ neo4j-admin database import full --overwrite-destination \
 --nodes=/data/import/nodes/cve_cve.*.csv --nodes=/data/import/nodes/cve_cpe.*.csv \
 --multiline-fields=true --ignore-empty-strings=true --skip-duplicate-nodes=true --skip-bad-relationships=true --auto-skip-subsequent-headers=true
 
+### FULL-TEXT INDEX
+CREATE FULLTEXT INDEX vulDes FOR (n:Vulnerability) ON EACH [n.description]
+
+CALL db.index.fulltext.queryNodes("vulDes", "sql injection") YIELD node, score
+RETURN node.id, node.description, score limit 25
+
 ### DELETE DUPLICATE RELATIONS
 match ()-[r]->() 
 match (s)-[r]->(e) 

@@ -12,10 +12,10 @@ from tqdm import tqdm, trange
 from gensim import corpora
 from gensim.models import TfidfModel
 from predict import *
-import os
+import os, math
 
 class TextSimilarity():
-    def __init__(self) -> None: 
+    def __init__(self, docs) -> None: 
         model_name = "sentence-transformers/all-MiniLM-L6-v2" # jackaduma/SecBERT bert-base-uncased roberta-large-nli-stsb-mean-tokens all-MiniLM-L6-v2 bert-large-nli-stsb-mean-tokens
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         # bert_config = BertConfig.from_pretrained(model_name)
@@ -23,6 +23,15 @@ class TextSimilarity():
         self.batch_size = 16
         self.device = "cpu" if torch.cuda.is_available() else "cpu"
         self.bert.to(self.device)
+        
+        self.docs = docs
+    
+    def init_weight(self, docs):
+        self.docs_weight = self.transform_tfidf(docs['processed'].tolist())
+        # query_weight = self.transform_tfidf(cves['des'].tolist())
+
+        self.docs_embedding = self.batch_embedding(docs['processed'].tolist(), self.docs_weight, weighted=True).detach().numpy()
+               
 
     def init_ner(self):
         self.ner = NERPredict()
@@ -120,6 +129,8 @@ class TextSimilarity():
         corpus_vec = []
         for corp in corpus:
             text = ""
+            if not isinstance(corp, str):
+                corp = ""
             for i in self.tokenizer.encode(corp, truncation=True, max_length=512):
                 text += str(i) + " "
             corpus_vec.append(text.strip())
@@ -128,7 +139,7 @@ class TextSimilarity():
         tfidf = tv.idf_
         return {'feature': features, 'tfidf': tfidf}
 
-    def calculate_similarity(self, docs:pd.DataFrame, query):
+    def calculate_similarity(self, query):
         '''
         BERT
         '''
@@ -144,21 +155,20 @@ class TextSimilarity():
         # tfidf = tv['employ']
         cves = pd.read_csv('./myData/learning/CVE2CAPEC/cve_nlp.csv', index_col=0)
 
-        docs_weight = self.transform_tfidf(docs['processed'].tolist())
-        # query_weight = self.transform_tfidf(cves['des'].tolist())
-
-        docs_embedding = self.batch_embedding(docs['processed'].tolist(), docs_weight, weighted=True).detach().numpy()
+        
         # np.save('./data/capec_embedding.npy', docs_embedding)
         query_embedding = self.weighted_embedding(query, weighted=True)['embedding'].detach().numpy()
         df = pd.DataFrame(columns=['id', 'name','similarity'])
-        for i in range(len(docs_embedding)):
-            doc_vec = docs_embedding[i]
+        for i in range(len(self.docs_embedding)):
+            doc_vec = self.docs_embedding[i]
             sim = cosine_similarity([doc_vec], [query_embedding[0]])[0][0]
-            doc_id = docs['id'].loc[i]
-            doc_name = docs['name'].loc[i]
+            doc_id = self.docs['id'].loc[i]
+            doc_name = self.docs['name'].loc[i]
             df.loc[len(df.index)] = [doc_id, doc_name, sim]
         df = df.sort_values(by='similarity', ascending=False)
-        print(df)
+        df.drop_duplicates(subset=['id'], keep='first', inplace=True)
+        # print(df)
+        return df
 
     def precision_test(self, fuzzy_num=0):
         '''
@@ -312,6 +322,8 @@ class TextSimilarity():
         print(df)
 
 class TFIDFSimilarity():
+    def __init__(self) -> None:
+        self.NLP = spacy.load('en_core_web_trf')
     
     def calculate(self, docs, query):
         tv = TfidfVectorizer()
@@ -351,6 +363,7 @@ class TFIDFSimilarity():
             sim = np.append(sim, self.calculate(doc_name, q), axis=0)
         
         if fuzzy_num:
+            # Recall@N
             index = np.argsort(sim, axis=1)
             for i in range(len(index)):
                 ind = index[i][-fuzzy_num: ]
@@ -378,31 +391,37 @@ class TFIDFSimilarity():
         doc_name = []
         for i in range(len(docs)):
             doc_name.append(docs[i] + " " + names[i])
-        query = preprocess(query)
+        query = preprocess(query, self.NLP)
         sents = docs + [query]
         tv = TfidfVectorizer()
-        tv.fit_transform(sents)
+        tfidf_matrix = tv.fit_transform(sents)
         docs_vec = tv.transform(docs).toarray()
         query_vec = tv.transform([query]).toarray()
+        
+        feature_names = tv.get_feature_names_out()
+        tfidf_array = tfidf_matrix[464].toarray()[0]
+        word_tfidf = dict(zip(feature_names, tfidf_array))
+        words = docs[464].split()
+        tmpd = {}
+        for word in words:
+            tmpd[word] = word_tfidf[word]
         sim = cosine_similarity(query_vec, docs_vec)
         df = pd.DataFrame(columns=['id', 'name','similarity'])
         index = np.argsort(sim, axis=1)
         for ind in index[0]:
             df.loc[len(df.index)] = [capec_df['id'].loc[ind], capec_df['name'].loc[ind], sim[0][ind]]
         df = df.sort_values(by='similarity', ascending=False)
-        print(df)
+        # print(df)
+        return df
         
-
-
-
 def calculate_precision():
     df = pd.read_csv('./myData/learning/CVE2CAPEC/result_weight.csv')
     t = f1_score(y_true=df['true'].tolist(), y_pred=df['pred'].tolist(), average='micro')
     print(t)
 
-def preprocess(text):
+def preprocess(text, NLP):
     # Official model
-    NLP = spacy.load('en_core_web_trf')
+    
     text = NLP(text)
     tmp = ""
     for token in text:
@@ -413,21 +432,24 @@ def preprocess(text):
     return tmp.strip()
 
 def tfidf():
-    df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
+    # df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
+    df = pd.read_csv('./data/attack/attack.csv')
     corpus = df['description'].tolist()
     bar = trange(len(corpus))
+    NLP = spacy.load('en_core_web_trf')
     for i in bar:
         bar.set_postfix(ID=df['id'].loc[i])
-        corpus[i] = preprocess(corpus[i])
+        corpus[i] = preprocess(corpus[i], NLP)
     df['processed'] = corpus
-    df.to_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv', index=False)
-    tv=TfidfVectorizer()#初始化一个空的tv。
-    tv_fit=tv.fit_transform(corpus)#用训练数据充实tv,也充实了tv_fit。
-    print("fit后，所有的词汇如下：")
-    print(tv.get_feature_names())
-    print("fit后，训练数据的向量化表示为：")
-    a = tv_fit.toarray()
-    print(tv_fit.toarray())
+    # df.to_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv', index=False)
+    df.to_csv('./data/attack/attack_nlp.csv', index=False)
+    # tv=TfidfVectorizer()#初始化一个空的tv。
+    # tv_fit=tv.fit_transform(corpus)#用训练数据充实tv,也充实了tv_fit。
+    # print("fit后，所有的词汇如下：")
+    # print(tv.get_feature_names())
+    # print("fit后，训练数据的向量化表示为：")
+    # a = tv_fit.toarray()
+    # print(tv_fit.toarray())
 
 def calculate(sim, capec_df, fuzzy_num, true):
     pred = []
@@ -502,13 +524,15 @@ if __name__ == '__main__':
 #     print("Sentence:", sentence)
 #     print("Embedding:", embedding)
 #     print("")
-    
+    # tfidf()
     df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-    ts = TextSimilarity()
+    df = pd.read_csv('./data/attack/attack_nlp.csv')
+    ts = TextSimilarity(df)
     # text = "The Bluetooth Classic implementation on Actions ATS2815 chipsets does not properly handle the reception of continuous unsolicited LMP responses, allowing attackers in radio range to trigger a denial of service and shutdown of a device by flooding the target device with LMP_features_res packets."
-    text = "smb"
+    text = "shared folder"
     ts.init_ner()
-    ts.calculate_similarity(df, text)
+    ts.init_weight(df)
+    ts.calculate_similarity(text)
     # precision_test()
     # calculate_precision()
     # tfidf()
@@ -518,16 +542,16 @@ if __name__ == '__main__':
     # PRECISION TEST
     # spacy.prefer_gpu()
     # NLP = spacy.load('en_core_web_trf')
-    ts = TextSimilarity()
+    # ts = TextSimilarity()
     # ts.init_ner()
     # ts._precision_test(fuzzy_num=5)
     # calculate_precision()
 
     # TFIDF SIMILARITY
-    df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-    tis = TFIDFSimilarity()
-    query = "global positioning system"
-    tis.calculate_similarity(query)
+    # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+    # tis = TFIDFSimilarity()
+    # query = "eQ-3 Homematic CCU2 2.47.20 and CCU3 3.47.18 with the E-Mail AddOn through 1.6.8.c installed allow Remote Code Execution by unauthenticated attackers with access to the web interface via the save.cgi script for payload upload and the testtcl.cgi script for its execution."
+    # tis.calculate_similarity(query)
     # tis.precision_test(fuzzy_num=30)
     # calculate_precision()
     # comparison_result_single()

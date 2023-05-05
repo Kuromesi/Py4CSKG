@@ -51,10 +51,10 @@ def convert_pyvis(path):
     
 
 if __name__ == '__main__':
-    path = "src/webapp/data/Demonstration_new/graph.json"
+    # path = "src/webapp/data/Demonstration_new/graph.json"
     # convert_pyvis(path)
     ma = ModelAnalyzer()
-    # ma.vul_find("microsoft windows server 2008", "")
-    graph = json.load(open(path))
-    ma.convert_pyvis(graph)
-    graph = ma.analyze()
+    ma.vul_find("yxcms yxcms", "1.4.7")
+    # graph = json.load(open(path))
+    # ma.convert_pyvis(graph)
+    # graph = ma.analyze()
