@@ -1,10 +1,10 @@
-# from traversers.CVEImpact import *
+from traversers.CVEImpact import *
 
-# cve = CVEImpact()
-# sentence = "/cgi-bin/wapopen in BOA Webserver 0.94.14rc21 allows the injection of \"../..\" using the FILECAMERA variable (sent by GET) to read files with root privileges."
+cve = CVEImpact()
+sentence = "	protected/apps/admin/controller/photoController.php in YXcms 1.4.7 allows remote attackers to delete arbitrary files via the index.php?r=admin/photo/delpic picname parameter."
+cve.predict(sentence)
+cve.traverse()
 
-# cve.traverse()
+# from utils.cveImpact import *
 
-from utils.cveImpact import *
-
-save_cveimpact()
+# save_cveimpact()

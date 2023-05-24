@@ -13,6 +13,7 @@ from gensim import corpora
 from gensim.models import TfidfModel
 from predict import *
 import os, math
+import json
 
 class TextSimilarity():
     def __init__(self, docs) -> None: 
@@ -36,7 +37,7 @@ class TextSimilarity():
     def init_ner(self):
         self.ner = NERPredict()
 
-    def embedding(self, text, weight=None, weighted=True):
+    def embedding(self, text, weight=None, weighted=False):
         tokens = self.tokenizer(text, padding=True, return_tensors="pt", truncation=True, max_length=512).to(self.device)
         attention_mask = tokens['attention_mask'].to(self.device)
         tokens_ids = tokens['input_ids'].to(self.device)
@@ -90,7 +91,7 @@ class TextSimilarity():
                 res = self.ner.predict(text)
                 l = res['weight']
                 for i in range(len(weight)):
-                    weight[i][l[i]] = 10
+                    weight[i][l[i]] = 20
                 weight = weight.unsqueeze(-1).expand(embedding.size()).float()
                 masked_embeddings = embedding * mask * weight
             else:
@@ -139,6 +140,18 @@ class TextSimilarity():
         tfidf = tv.idf_
         return {'feature': features, 'tfidf': tfidf}
 
+    def test_similarity(self, query1, query2):
+        """Test similarities between two sentences.
+
+        Args:
+            query1 (_type_): _description_
+            query2 (_type_): _description_
+        """
+        query1_embedding = self.embedding(query1)['embedding'].detach().numpy()
+        query2_embedding = self.embedding(query2)['embedding'].detach().numpy()
+        sim = cosine_similarity(query2_embedding, query1_embedding)
+        print(sim)        
+    
     def calculate_similarity(self, query):
         '''
         BERT
@@ -399,12 +412,17 @@ class TFIDFSimilarity():
         query_vec = tv.transform([query]).toarray()
         
         feature_names = tv.get_feature_names_out()
-        tfidf_array = tfidf_matrix[464].toarray()[0]
+        tfidf_array = tfidf_matrix[554].toarray()[0]
         word_tfidf = dict(zip(feature_names, tfidf_array))
-        words = docs[464].split()
+        words = query.split()
         tmpd = {}
-        for word in words:
-            tmpd[word] = word_tfidf[word]
+        for key in word_tfidf:
+            if word_tfidf[key] != 0:
+                tmpd[key] = word_tfidf[key]
+        with open('./data/tfidf.json', 'w') as f:
+            json.dump(tmpd, f)
+        # for word in words:
+        #     tmpd[word] = word_tfidf[word]
         sim = cosine_similarity(query_vec, docs_vec)
         df = pd.DataFrame(columns=['id', 'name','similarity'])
         index = np.argsort(sim, axis=1)
@@ -494,8 +512,9 @@ def comparison_result_single():
     spacy.prefer_gpu()
     NLP = spacy.load('en_core_web_trf')
     capec_df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-    ts = TextSimilarity()
+    ts = TextSimilarity(capec_df)
     ts.init_ner()
+    ts.init_weight(capec_df)
     f1_bert = []
     res = ts._precision_test(fuzzy_num=1)
     sim_ts = np.transpose(res['sim'])
@@ -504,7 +523,7 @@ def comparison_result_single():
     for i in trange(30):
         f1_bert.append(calculate(sim_ts, capec_df, i + 1, true)['f1'])
     df = pd.read_csv('./myData/learning/CVE2CAPEC/comparison.csv')
-    df['bert_weight20'] = f1_bert
+    df['bert_weight200'] = f1_bert
     df.to_csv('./myData/learning/CVE2CAPEC/comparison.csv', index=False)
 
 if __name__ == '__main__':
@@ -525,14 +544,16 @@ if __name__ == '__main__':
 #     print("Embedding:", embedding)
 #     print("")
     # tfidf()
+    # comparison_result_single()
     df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-    df = pd.read_csv('./data/attack/attack_nlp.csv')
-    ts = TextSimilarity(df)
-    # text = "The Bluetooth Classic implementation on Actions ATS2815 chipsets does not properly handle the reception of continuous unsolicited LMP responses, allowing attackers in radio range to trigger a denial of service and shutdown of a device by flooding the target device with LMP_features_res packets."
-    text = "shared folder"
-    ts.init_ner()
-    ts.init_weight(df)
-    ts.calculate_similarity(text)
+    # df = pd.read_csv('./data/attack/attack_nlp.csv')
+    # ts = TextSimilarity(df)
+    text = "An issue was discovered in SageCRM 7.x before 7.3 SP3. The Component Manager functionality, provided by SageCRM, permits additional components to be added to the application to enhance provided functionality. This functionality allows a zip file to be uploaded, containing a valid .ecf component file, which will be extracted to the inf directory outside of the webroot. By creating a zip file containing an empty .ecf file, to pass file-validation checks, any other file provided in zip file will be extracted onto the filesystem. In this case, a web shell with the filename '..\WWWRoot\CustomPages\aspshell.asp' was included within the zip file that, when extracted, traversed back out of the inf directory and into the SageCRM webroot. This permitted remote interaction with the underlying filesystem with the highest privilege level, SYSTEM."
+    # text = "shared folder"
+    # ts.test_similarity("test", "global positioning system")
+    # ts.init_ner()
+    # ts.init_weight(df)
+    # ts.calculate_similarity(text)
     # precision_test()
     # calculate_precision()
     # tfidf()
@@ -548,11 +569,12 @@ if __name__ == '__main__':
     # calculate_precision()
 
     # TFIDF SIMILARITY
-    # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-    # tis = TFIDFSimilarity()
-    # query = "eQ-3 Homematic CCU2 2.47.20 and CCU3 3.47.18 with the E-Mail AddOn through 1.6.8.c installed allow Remote Code Execution by unauthenticated attackers with access to the web interface via the save.cgi script for payload upload and the testtcl.cgi script for its execution."
-    # tis.calculate_similarity(query)
-    # tis.precision_test(fuzzy_num=30)
+    df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+    tis = TFIDFSimilarity()
+    query = "An issue was discovered in SageCRM 7.x before 7.3 SP3. The Component Manager functionality, provided by SageCRM, permits additional components to be added to the application to enhance provided functionality. This functionality allows a zip file to be uploaded, containing a valid .ecf component file, which will be extracted to the inf directory outside of the webroot. By creating a zip file containing an empty .ecf file, to pass file-validation checks, any other file provided in zip file will be extracted onto the filesystem. In this case, a web shell with the filename '..\WWWRoot\CustomPages\aspshell.asp' was included within the zip file that, when extracted, traversed back out of the inf directory and into the SageCRM webroot. This permitted remote interaction with the underlying filesystem with the highest privilege level, SYSTEM."
+    preprocess(query, tis.NLP)
+    tis.calculate_similarity(query)
+    tis.precision_test(fuzzy_num=30)
     # calculate_precision()
     # comparison_result_single()
 

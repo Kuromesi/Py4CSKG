@@ -17,10 +17,11 @@ class CVEImpact():
         config = BERTBiLSTMCRFConfig()
         self.tokenizer = AutoTokenizer.from_pretrained(config.model_name)
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        model_dir = "./trained_models/BERTBiLSTMCRFNER"
+        model_dir = "./trained_models/BERTBiLSTMCRF79"
         self.model = BERTBiLSTMCRF.from_pretrained(model_dir, config)
         self.model.to(self.device)
-        self.labels = ['O', 'B-vul', 'I-vul', 'B-cons', 'I-cons']
+        self.labels = ['O', 'B-cons', 'I-cons']
+        # self.labels = ['O', 'B-vul', 'I-vul', 'B-cons', 'I-cons']
         
         self.classifier = BERT.from_pretrained('trained_models/BERTImpact')
         self.classifier.to(self.device)
@@ -63,6 +64,7 @@ class CVEImpact():
                 if words:
                     classification_data.append(words)
                     words = []
+        classification_data.append(words)
         data_type = []
         if classification_data:
             for classification_datum in classification_data:
@@ -84,6 +86,54 @@ class CVEImpact():
         return self.impact_type[pred[0]]
     
     def get_impact(self, sentence, cvss2, cvss3=None):
+        """use CVSS v2 CIA impact
+
+        Args:
+            sentence (_type_): _description_
+            cvss2 (_type_): _description_
+            cvss3 (_type_, optional): _description_. Defaults to None.
+
+        Returns:
+            _type_: _description_
+        """        
+        data_type = self.predict(sentence)
+        impact = ""
+                
+        if cvss2['cvssV2']['confidentialityImpact'] == "COMPLETE" and cvss2['cvssV2']['integrityImpact'] == "COMPLETE" and cvss2['cvssV2']['availabilityImpact'] == "COMPLETE":
+            if "code_exec" in data_type:
+                impact = "System arbitrary code execution"
+            else:
+                if "privilege_escalation" in data_type:
+                    impact = "Privilege escalation" if cvss2['cvssV2']['accessVector'] == "LOCAL" else "Gain root privilege"
+                else:
+                    impact = "System CIA loss"
+        else:
+            if "privilege_escalation" in data_type:
+                impact = "Gain user privilege" if cvss2['obtainUserPrivilege'] else "Gain application privilege"
+            else:
+                if "code_exec" in data_type:
+                    if cvss3:
+                        if cvss3['cvssV3']['confidentialityImpact'] == "HIGH" and cvss3['cvssV3']['integrityImpact'] == "HIGH" and cvss3['cvssV3']['availabilityImpact'] == "HIGH":
+                            impact = "System arbitrary code execution"
+                        else:
+                            impact = "Application arbitrary code execution"  
+                    else:
+                        impact = "Application arbitrary code execution"  
+                else: 
+                    impact = "System CIA loss"
+        return impact
+    
+    def _get_impact(self, sentence, cvss2, cvss3=None):
+        """use CVSS v3 CIA impact
+
+        Args:
+            sentence (_type_): _description_
+            cvss2 (_type_): _description_
+            cvss3 (_type_, optional): _description_. Defaults to None.
+
+        Returns:
+            _type_: _description_
+        """        
         data_type = self.predict(sentence)
         impact = ""
         if cvss3:

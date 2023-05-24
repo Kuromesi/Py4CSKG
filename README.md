@@ -82,3 +82,6 @@ $: asset, default values are userPrivilege, rootPrivilege, appPrivilege, appCode
 some examples:
     (\$<appPrivilege>)<-@->(:<component>.<firewall>)!\#(component.*)
     \#(:<entry>.<id>)
+
+## ATTACK EXAMPLES
+wannacry CVE-2017-0144

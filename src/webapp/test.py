@@ -54,7 +54,7 @@ if __name__ == '__main__':
     # path = "src/webapp/data/Demonstration_new/graph.json"
     # convert_pyvis(path)
     ma = ModelAnalyzer()
-    ma.vul_find("yxcms yxcms", "1.4.7")
+    ma.vul_find("phpmyadmin phpmyadmin", "4.8.0")
     # graph = json.load(open(path))
     # ma.convert_pyvis(graph)
     # graph = ma.analyze()

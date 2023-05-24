@@ -11,11 +11,11 @@ class NERPredict():
         config = BERTBiLSTMCRFConfig()
         self.tokenizer = AutoTokenizer.from_pretrained(config.model_name)
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        model_dir = "./trained_models/BERTBiLSTMCRFNER"
+        model_dir = "./trained_models/BERTBiLSTMCRF79"
         self.model = BERTBiLSTMCRF.from_pretrained(model_dir, config)
         self.model.to(self.device)
-        self.labels = ['O', 'B-vul', 'I-vul', 'B-cons', 'I-cons']
-        # self.labels = ['O', 'B-cons', 'I-cons']
+        # self.labels = ['O', 'B-vul', 'I-vul', 'B-cons', 'I-cons']
+        self.labels = ['O', 'B-cons', 'I-cons']
 
     def idx2tag(self, id):
         tags = [[self.labels[y] for y in x if y > -1] for x in id]
@@ -51,7 +51,7 @@ class NERPredict():
 if __name__ == "__main__":
     
     ner = NERPredict()
-    sentence = "The RBAC component in Cisco Secure Access Control System (ACS) allows remote authenticated users to obtain Network Device Administrator privileges for Create, Delete, Read, and Update operations via crafted HTTP requests, aka Bug ID CSCuq79034."
+    sentence = "An issue was discovered in SageCRM 7.x before 7.3 SP3. The Component Manager functionality, provided by SageCRM, permits additional components to be added to the application to enhance provided functionality. This functionality allows a zip file to be uploaded, containing a valid .ecf component file, which will be extracted to the inf directory outside of the webroot. By creating a zip file containing an empty .ecf file, to pass file-validation checks, any other file provided in zip file will be extracted onto the filesystem. In this case, a web shell with the filename '..\WWWRoot\CustomPages\aspshell.asp' was included within the zip file that, when extracted, traversed back out of the inf directory and into the SageCRM webroot. This permitted remote interaction with the underlying filesystem with the highest privilege level, SYSTEM."
     res = ner.predict(sentence)
     ids = res['ids']
     print(res['res'])

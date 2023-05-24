@@ -11,10 +11,11 @@ class NERPredict():
         config = BERTBiLSTMCRFConfig()
         self.tokenizer = AutoTokenizer.from_pretrained(config.model_name)
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        model_dir = "./trained_models/BERTBiLSTMCRFNER"
+        model_dir = "./trained_models/BERTBiLSTMCRFNER79"
         self.model = BERTBiLSTMCRF.from_pretrained(model_dir, config)
         self.model.to(self.device)
-        self.labels = ['O', 'B-vul', 'I-vul', 'B-cons', 'I-cons']
+        # self.labels = ['O', 'B-vul', 'I-vul', 'B-cons', 'I-cons']
+        self.labels = ['O', 'B-vul', 'I-vul']
 
     def idx2tag(self, id):
         tags = [[self.labels[y] for y in x if y > -1] for x in id]
@@ -50,7 +51,7 @@ class NERPredict():
 if __name__ == "__main__":
     
     ner = NERPredict()
-    sentence = "The RBAC component in Cisco Secure Access Control System (ACS) allows remote authenticated users to obtain Network Device Administrator privileges for Create, Delete, Read, and Update operations via crafted HTTP requests, aka Bug ID CSCuq79034."
+    sentence = "In HashiCorp Vagrant VMware Fusion plugin (aka vagrant-vmware-fusion) 5.0.0, a local attacker or malware can silently subvert the plugin update process in order to escalate to root privileges."
     res = ner.predict(sentence)
     ids = res['ids']
     print(res['res'])
