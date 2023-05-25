@@ -11,9 +11,9 @@ import spacy, re
 from tqdm import tqdm, trange
 from gensim import corpora
 from gensim.models import TfidfModel
-from models.CVE2CAPEC import *
-from models.BERT import *
-from utils.Dataset import *
+from webapp.models.CVE2CAPEC import *
+from webapp.models.BERT import *
+from webapp.utils.Dataset import *
 
 class NERPredict():
     def __init__(self) -> None:
@@ -192,7 +192,6 @@ class CVE2CWE():
         config = BERTConfig()
         self.dataset = BERTDataset(config)
         self.labels = loadLabels(config.label_path)
-        
         
     def predict(self, text):
         text_vec = self.dataset.text2vec(text)

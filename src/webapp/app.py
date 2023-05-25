@@ -1,13 +1,20 @@
+import sys, os
+BASE_DIR=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(BASE_DIR))
+
 from flask import Flask
 from flask import request, render_template
 import json, html
-from service.utils import *
-from utils.prediction import *
-from utils.draw import *
-from utils.search import *
-from utils.analyze import *
+from webapp.utils.project import *
+from webapp.utils.prediction import *
+from webapp.utils.draw import *
+from webapp.utils.search import *
+from webapp.utils.analyze import *
+from webapp.routes import *
 
 app = Flask(__name__)
+app.register_blueprint(model)
+app.register_blueprint(predict)
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -28,66 +35,9 @@ def signin():
         return '<h3>Hello, admin!</h3>'
     return '<h3>Bad username or password.</h3>'
 
-@app.route('/model', methods=['GET'])
-def model():
-    # project = load_project('./src/webapp/data/test_project')
-    # nodes = project['nodes']
-    # edges = project['edges']
-    return render_template("model.html")
-
-@app.route('/model/submit', methods=['POST'])
-def model_submit():
-    data = json.loads(request.get_data())
-    graph = data['graph']
-    path = os.path.join('./src/webapp/data/', data['path'])
-    if not os.path.exists(path):
-        os.mkdir(path)
-    with open(os.path.join(path, "graph.json"), 'w', encoding='utf-8') as f:
-        json.dump(graph, f)
-    return "Saved!"
-
-@app.route('/model/list', methods=['POST'])
-def model_list():
-    projects = os.listdir('./src/webapp/data/')
-    return projects
-
-@app.route('/model/load', methods=['POST'])
-def model_load():
-    path = request.get_data().decode("utf-8")
-    project = load_project(os.path.join('./src/webapp/data', path))
-    return project
-
-@app.route('/model/keyword', methods=['POST'])
-def model_keyword():
-    data = json.loads(request.get_data())
-    query = data['query']
-    recommended = search_product(query)
-    return recommended
-
-# ma = ModelAnalyzer()
-@app.route('/model/analyze', methods=['POST'])
-def model_analyze():
-    data = json.loads(request.get_data())
-    return "ok"
-
-
 @app.route('/test', methods=['GET'])
 def test():
     return render_template("test.html")
-
-@app.route('/predict', methods=['GET'])
-def predict():
-    return render_template("predict.html")
-
-cve2capec = CVE2CAPEC()
-@app.route('/predict/submit', methods=['POST'])
-def predict_submit():
-    cve = request.get_data()
-    cve = json.loads(cve)
-    res = cve2capec.calculate_similarity(cve['cve'])
-    graph = create_cve2net(res, cve['cve'])
-    # graph = ""
-    return graph
 
 @app.errorhandler(404)
 def page_not_found(e):

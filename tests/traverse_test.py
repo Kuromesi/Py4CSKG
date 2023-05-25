@@ -1,3 +1,7 @@
+import sys, os
+BASE_DIR=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(BASE_DIR, 'src'))
+
 from traversers.XMLTraverser import *
 from traversers.JSONTraverser import *
 from service.R2N import *

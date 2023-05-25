@@ -1,8 +1,14 @@
+import sys, os
+BASE_DIR=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASE_DIR)
+
 from CVE2CAPEC import *
 import pandas as pd
 from tqdm import tqdm
 
 class Compare:
+    """Compare the results overlapped of different methods (requirement of ZT).
+    """    
     def __init__(self) -> None:
         self.df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
         self.ts = TextSimilarity(self.df)

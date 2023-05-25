@@ -4,9 +4,9 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from service.GDBSaver import GDBSaver
 from service.RDBSaver import RDBSaver
-from utils.version_compare import *
+from webapp.utils.version_compare import *
 import pandas as pd
-from utils.prediction import *
+from webapp.utils.prediction import *
 
 class ModelAnalyzer():
     def __init__(self) -> None:

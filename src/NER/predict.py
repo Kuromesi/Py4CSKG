@@ -7,15 +7,13 @@ from torchcrf import CRF
 from transformers import AutoTokenizer
 
 class NERPredict():
-    def __init__(self) -> None:
-        config = BERTBiLSTMCRFConfig()
+    def __init__(self, config, model_dir, labels) -> None:
         self.tokenizer = AutoTokenizer.from_pretrained(config.model_name)
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        model_dir = "./trained_models/BERTBiLSTMCRFNER79"
         self.model = BERTBiLSTMCRF.from_pretrained(model_dir, config)
         self.model.to(self.device)
         # self.labels = ['O', 'B-vul', 'I-vul', 'B-cons', 'I-cons']
-        self.labels = ['O', 'B-vul', 'I-vul']
+        self.labels = labels
 
     def idx2tag(self, id):
         tags = [[self.labels[y] for y in x if y > -1] for x in id]
