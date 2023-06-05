@@ -13,8 +13,10 @@ from webapp.utils.analyze import *
 from webapp.routes import *
 
 app = Flask(__name__)
-app.register_blueprint(model)
-app.register_blueprint(predict)
+
+def init_blueprint():
+    app.register_blueprint(model)
+    app.register_blueprint(predict)
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -44,4 +46,5 @@ def page_not_found(e):
     return render_template("404.html")
 
 if __name__ == '__main__':
+    init_blueprint()
     app.run(host="0.0.0.0", port=4000)

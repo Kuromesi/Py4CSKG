@@ -2,10 +2,9 @@ from flask import Blueprint
 from flask import request, render_template
 import json
 from webapp.utils.project import *
-from webapp.utils.prediction import *
 from webapp.utils.draw import *
 from webapp.utils.search import *
-from webapp.utils.analyze import *
+from analyzer.analyze import *
 
 model = Blueprint('model', __name__)
 

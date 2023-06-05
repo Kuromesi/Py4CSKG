@@ -16,8 +16,8 @@ class CVE2CWE():
         pred = self.bert(data['data'], attention_mask=data['attention_mask'])[0]
         pred = pred.cpu().data
         pred = torch.max(pred, 1)[1]
-        
-        print(self.bert_labels[pred[0]])
+        return self.bert_labels[pred[0]]
+        # print(self.bert_labels[pred[0]])
 
 if __name__ == "__main__":
     BERT_classification_predict()

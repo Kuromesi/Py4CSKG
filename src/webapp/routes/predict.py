@@ -1,19 +1,21 @@
 from flask import Blueprint
 from flask import request, render_template
 import json
-from webapp.utils.project import *
-from webapp.utils.prediction import *
+from TextSimilarity.cve2capec import *
 from webapp.utils.draw import *
-from webapp.utils.search import *
-from webapp.utils.analyze import *
+from analyzer.analyze import *
 
 predict = Blueprint('predict', __name__)
+
+def cve2capecFactory():
+    df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+    return TextSimilarity(df, weight_path='./data/embeddings/capec_embedding.npy')
 
 @predict.route('/predict', methods=['GET'])
 def predict_page():
     return render_template("predict.html")
 
-cve2capec = CVE2CAPEC()
+cve2capec = cve2capecFactory()
 @predict.route('/predict/submit', methods=['POST'])
 def predict_submit():
     cve = request.get_data()

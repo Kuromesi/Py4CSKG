@@ -5,13 +5,13 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 from tqdm import tqdm, trange
-from TextSimilarity.predict import *
+from TextSimilarity.predict import NERFactory
 import os
 
 class TextSimilarity():
     """def __init__(self, docs), docs are dataframe type object, can be CAPEC, ATT&CK etc.
     """    
-    def __init__(self, docs) -> None:
+    def __init__(self, docs, weight_path=None) -> None:
         model_name = "sentence-transformers/all-MiniLM-L6-v2" # jackaduma/SecBERT bert-base-uncased roberta-large-nli-stsb-mean-tokens all-MiniLM-L6-v2 bert-large-nli-stsb-mean-tokens
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         # bert_config = BertConfig.from_pretrained(model_name)
@@ -21,11 +21,14 @@ class TextSimilarity():
         self.bert.to(self.device)
         self.docs = docs
         self.init_ner()
-        self.init_weight()
+        self.init_weight(weight_path)
     
-    def init_weight(self, docs):
-        self.docs_weight = self.transform_tfidf(docs['processed'].tolist())
-        self.docs_embedding = self.batch_embedding(docs['processed'].tolist(), self.docs_weight, weighted=True).detach().numpy()
+    def init_weight(self, weight_path=None):
+        if weight_path:
+            self.docs_embedding = np.load(weight_path)
+        else:
+            self.docs_weight = self.transform_tfidf(self.docs['processed'].tolist())
+            self.docs_embedding = self.batch_embedding(self.docs['processed'].tolist(), self.docs_weight, weighted=True).detach().numpy()
                
     def init_ner(self):
         self.ner = NERFactory()
@@ -138,13 +141,14 @@ class TextSimilarity():
         BERT
         '''
         query_embedding = self.weighted_embedding(query, weighted=True)['embedding'].detach().numpy()
-        df = pd.DataFrame(columns=['id', 'name','similarity'])
+        df = pd.DataFrame(columns=['id', 'name', 'description', 'similarity'])
         for i in range(len(self.docs_embedding)):
             doc_vec = self.docs_embedding[i]
             sim = cosine_similarity([doc_vec], [query_embedding[0]])[0][0]
             doc_id = self.docs['id'].loc[i]
             doc_name = self.docs['name'].loc[i]
-            df.loc[len(df.index)] = [doc_id, doc_name, sim]
+            doc_des = self.docs['description'].loc[i]
+            df.loc[len(df.index)] = [doc_id, doc_name, doc_des, sim]
         df = df.sort_values(by='similarity', ascending=False)
         df.drop_duplicates(subset=['id'], keep='first', inplace=True)
         return df
