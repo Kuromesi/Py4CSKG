@@ -84,4 +84,17 @@ some examples:
     \#(:<entry>.<id>)
 
 ## ATTACK EXAMPLES
-wannacry CVE-2017-0144
+### wannacry 
+CVE-2017-0144 System arbitrary code execution 
+https://success.trendmicro.com/dcx/s/solution/1117391-preventing-wannacry-wcry-ransomware-attacks-using-trend-micro-products?language=en_US&sfdcIFrameOrigin=null
+
+### Stuxnet
+CVE-2010-2568 System arbitrary code execution
+CVE-2008-4250 System arbitrary code execution
+CVE-2010-2729 System arbitrary code execution
+
+CVE-2010-2743 Privilege escalation
+
+### Ukraine power grid
+CVE-2014-4114 System arbitrary code execution 
+https://www.boozallen.com/content/dam/boozallen/documents/2016/09/ukraine-report-when-the-lights-went-out.pdf

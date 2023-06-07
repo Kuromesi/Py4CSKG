@@ -1,8 +1,9 @@
 import torch
 import torch.nn as nn
 from tqdm import trange, tqdm
-from TextSimilarity.models import *
-from TextSimilarity.bert_crf import *
+from NER.models import *
+from NER.bert_crf import *
+from NER.predict import *
 from torchcrf import CRF
 from transformers import AutoTokenizer
 from TextClassification.BERT import *
@@ -17,11 +18,11 @@ class CVEImpact():
         config = BERTBiLSTMCRFConfig()
         self.tokenizer = AutoTokenizer.from_pretrained(config.model_name)
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        model_dir = "./trained_models/BERTBiLSTMCRF79"
+        model_dir = "./trained_models/BERTBiLSTMCRFNER"
         self.model = BERTBiLSTMCRF.from_pretrained(model_dir, config)
         self.model.to(self.device)
-        self.labels = ['O', 'B-cons', 'I-cons']
-        # self.labels = ['O', 'B-vul', 'I-vul', 'B-cons', 'I-cons']
+        # self.labels = ['O', 'B-cons', 'I-cons']
+        self.labels = ['O', 'B-vul', 'I-vul', 'B-cons', 'I-cons']
         
         self.classifier = BERT.from_pretrained('trained_models/BERTImpact')
         self.classifier.to(self.device)
@@ -112,13 +113,13 @@ class CVEImpact():
                 impact = "Gain user privilege" if cvss2['obtainUserPrivilege'] else "Gain application privilege"
             else:
                 if "code_exec" in data_type:
-                    if cvss3:
-                        if cvss3['cvssV3']['confidentialityImpact'] == "HIGH" and cvss3['cvssV3']['integrityImpact'] == "HIGH" and cvss3['cvssV3']['availabilityImpact'] == "HIGH":
-                            impact = "System arbitrary code execution"
-                        else:
-                            impact = "Application arbitrary code execution"  
-                    else:
-                        impact = "Application arbitrary code execution"  
+                    # if cvss3:
+                    #     if cvss3['cvssV3']['confidentialityImpact'] == "HIGH" and cvss3['cvssV3']['integrityImpact'] == "HIGH" and cvss3['cvssV3']['availabilityImpact'] == "HIGH":
+                    #         impact = "System arbitrary code execution"
+                    #     else:
+                    #         impact = "Application arbitrary code execution"  
+                    # else:
+                    impact = "Application arbitrary code execution"  
                 else: 
                     impact = "System CIA loss"
         return impact

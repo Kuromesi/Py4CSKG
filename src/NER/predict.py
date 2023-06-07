@@ -49,7 +49,7 @@ class NERPredict():
 if __name__ == "__main__":
     
     ner = NERPredict()
-    sentence = "In HashiCorp Vagrant VMware Fusion plugin (aka vagrant-vmware-fusion) 5.0.0, a local attacker or malware can silently subvert the plugin update process in order to escalate to root privileges."
+    sentence = "The kernel-mode drivers in Microsoft Windows XP SP3 do not properly perform indexing of a function-pointer table during the loading of keyboard layouts from disk, which allows local users to gain privileges via a crafted application, as demonstrated in the wild in July 2010 by the Stuxnet worm, aka \"Win32k Keyboard Layout Vulnerability.\"  NOTE: this might be a duplicate of CVE-2010-3888 or CVE-2010-3889."
     res = ner.predict(sentence)
     ids = res['ids']
     print(res['res'])

@@ -33,6 +33,7 @@ class ModelAnalyzer():
             'defender': {},
             'entry': {}
         }
+        node_dict = {}
         for node in graph['nodes']:
             # color_map.append(node.pop('color'))
             # id = node.pop('id')
@@ -42,7 +43,7 @@ class ModelAnalyzer():
             if node['type'] not in node_type:
                 node_type[node['type']] = {}
             node_type[node['type']].update({id: node}) # Classified with corresponding ontologies
-            
+            node_dict.update({id: node})
         # Edges
         edges = []
         for edge in graph['edges']:
@@ -61,6 +62,7 @@ class ModelAnalyzer():
             }
         self.graph = graph
         self.G = G
+        self.node_dict = node_dict
 
     def vul_find(self, product:str, version:str) -> pd.DataFrame:
         """Find related vulnerabilities of a specific product and return vul_report like below:
@@ -96,7 +98,7 @@ class ModelAnalyzer():
                 #     vuls[node['id']] = node
                 cvss = json.loads(node['baseMetricV2'])
                 vul_report.loc[len(vul_report.index)] = [product, node['id'], node['description'], node['impact'], cvss['cvssV2']['accessVector']]
-        self.vul_analyze(vul_report)
+        # self.vul_analyze(vul_report)
         # for product in vul_product:
         #     query = "MATCH (n:Vulnerability)-[]-(a:Platform) WHERE a.uri='%s' RETURN n"%product
         #     nodes = self.gs.sendQuery(query)
@@ -144,21 +146,24 @@ class ModelAnalyzer():
             # CVSS analysis
         print(1)
             
-                                                         
-            
-        
-
     def __find_vul_nodes(self, nodes):
-        l1 = set()
-        l2 = set()
-        l3 = set()
+        l1 = set() # level1, system root
+        l2 = set() # level2, system user
+        l3 = set() # level3, application, system CIA
+        l4 = set() # not vulnerable nodes
         _nodes = tqdm(nodes)
         _nodes.set_description("FINDING VULNERABILITIES")
-        for key in _nodes:
+        for key in nodes:
             product = nodes[key]['product']
             version = nodes[key]['version']
             _nodes.set_postfix(product=product)
             vul_report = self.vul_find(product, version)
+            
+            if vul_report.empty:
+                l4.add(key)
+                neighbors = [n for n in self.G.neighbors(key)]
+                l4.update(neighbors)
+                continue
             
             app_code_exec = vul_report.loc[vul_report['CVE-Impact'] == "Application arbitrary code execution"]
             app_privilege = vul_report.loc[vul_report['CVE-Impact'] == "Gain application privilege"]
@@ -189,9 +194,11 @@ class ModelAnalyzer():
                     l3.add(key)
                     neighbors = [n for n in self.G.neighbors(key) if n in self.graph['node_type']["entry"]]
                     l3.update(neighbors)
+                    
+        l4 = l4 - l3 - l2 - l1
         l3 = l3 - l2 - l1
         l2 = l2 - l1
-        return {'root': list(l1), 'user': list(l2), 'other': list(l3)}
+        return {'root': list(l1), 'user': list(l2), 'other': list(l3), 'no': list(l4)}
                     
                 
                 
@@ -199,6 +206,42 @@ class ModelAnalyzer():
                 #     vul_nodes.append(key)
                 #     neighbors = [n for n in self.G.neighbors(key)]
                 #     vul_nodes.extend(neighbors)
+    
+    def redraw(self, result):
+        """Redraw the original graph, change the node color and etc.
+
+        Args:
+            result (dict): _description_
+        """        
+        vul_node_attrs = {}
+        for vul_node in result['root']:
+            vul_node_attrs[vul_node] = {'color': "#ff0000"}
+        for vul_node in result['user']:
+            vul_node_attrs[vul_node] = {'color': "#ffff00"}
+        for vul_node in result['other']:
+            vul_node_attrs[vul_node] = {'color': "#ff9966"}
+        nx.set_node_attributes(self.G, vul_node_attrs)
+        
+    def new_graph(self, result):
+        DG = nx.DiGraph()
+        nodes = []
+        edges = []
+        for node in result['root']:
+            nodes.append((node, self.node_dict[node]))
+            edge = [(n, node) for n in self.G.neighbors(node)]
+            edges.extend(edge)
+        for node in result['user']:
+            nodes.append((node, self.node_dict[node]))
+            edge = [(n, node) for n in self.G.neighbors(node)]
+            edges.extend(edge)
+        for node in result['other']:
+            nodes.append((node, self.node_dict[node]))
+            edge = [(n, node) for n in self.G.neighbors(node)]
+            edges.extend(edge)
+        DG.add_nodes_from(nodes)
+        DG.add_edges_from(edges)
+        return DG
+        
     
     def analyze(self):
         node_type = self.graph['node_type']
@@ -212,14 +255,12 @@ class ModelAnalyzer():
         # self.__find_vul_nodes(node_type['hardware'], vul_nodes)
         # self.__find_vul_nodes(node_type['os'], vul_nodes)
         
-        vul_node_attrs = {}
-        for vul_node in result['root']:
-            vul_node_attrs[vul_node] = {'color': "#ff0000"}
-        for vul_node in result['user']:
-            vul_node_attrs[vul_node] = {'color': "#ffff00"}
-        for vul_node in result['other']:
-            vul_node_attrs[vul_node] = {'color': "#ff9966"}
-        nx.set_node_attributes(self.G, vul_node_attrs)
+        DG = self.new_graph(result)
+        nt = Network()
+        nt.from_nx(DG)
+        nt.show('tmp/dg.html')
+        # redraw the original graph
+        self.redraw(result)
         
         
                     
