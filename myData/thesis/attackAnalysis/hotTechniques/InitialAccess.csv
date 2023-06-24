@@ -1,0 +1,20 @@
+Technique,count
+Phishing: Spearphishing Attachment,118
+Phishing: Spearphishing Link,63
+Valid Accounts,41
+Drive-by Compromise,36
+Exploit Public-Facing Application,31
+External Remote Services,27
+Replication Through Removable Media,22
+Valid Accounts: Domain Accounts,17
+Valid Accounts: Local Accounts,13
+Supply Chain Compromise: Compromise Software Supply Chain,10
+Phishing: Spearphishing via Service,9
+Trusted Relationship,8
+Valid Accounts: Cloud Accounts,7
+Phishing,3
+Valid Accounts: Default Accounts,2
+Supply Chain Compromise: Compromise Software Dependencies and Development Tools,1
+Hardware Additions,1
+Supply Chain Compromise: Compromise Hardware Supply Chain,0
+Supply Chain Compromise,0

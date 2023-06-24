@@ -1,0 +1,180 @@
+Technique,count
+Obfuscated Files or Information,327
+Indicator Removal: File Deletion,234
+Deobfuscate/Decode Files or Information,222
+Masquerading: Match Legitimate Name or Location,152
+Modify Registry,135
+Obfuscated Files or Information: Software Packing,85
+System Binary Proxy Execution: Rundll32,81
+Impair Defenses: Disable or Modify Tools,75
+Masquerading: Masquerade Task or Service,66
+Process Injection,61
+Process Injection: Dynamic-link Library Injection,58
+Subvert Trust Controls: Code Signing,57
+Abuse Elevation Control Mechanism: Bypass User Account Control,50
+Hijack Execution Flow: DLL Side-Loading,49
+Virtualization/Sandbox Evasion: System Checks,48
+Masquerading,46
+Hide Artifacts: Hidden Files and Directories,44
+Indicator Removal: Timestomp,42
+Valid Accounts,41
+Hide Artifacts: Hidden Window,35
+Virtualization/Sandbox Evasion: Time Based Evasion,35
+Obfuscated Files or Information: Binary Padding,33
+System Binary Proxy Execution: Regsvr32,30
+Impair Defenses: Disable or Modify System Firewall,29
+Hijack Execution Flow: DLL Search Order Hijacking,29
+Process Injection: Process Hollowing,28
+Obfuscated Files or Information: Steganography,27
+Indicator Removal: Clear Windows Event Logs,26
+System Binary Proxy Execution: Mshta,26
+Rootkit,25
+Indicator Removal,23
+System Binary Proxy Execution: Msiexec,21
+Virtualization/Sandbox Evasion,18
+Valid Accounts: Domain Accounts,17
+Obfuscated Files or Information: Indicator Removal from Tools,17
+Access Token Manipulation,17
+Use Alternate Authentication Material: Pass the Hash,14
+Access Token Manipulation: Token Impersonation/Theft,14
+Hide Artifacts: NTFS File Attributes,14
+Valid Accounts: Local Accounts,13
+Access Token Manipulation: Create Process with Token,12
+BITS Jobs,12
+File and Directory Permissions Modification: Linux and Mac File and Directory Permissions Modification,11
+Template Injection,11
+Execution Guardrails,10
+Reflective Code Loading,10
+Pre-OS Boot: Bootkit,9
+Process Injection: Asynchronous Procedure Call,9
+Indicator Removal: Clear Persistence,9
+File and Directory Permissions Modification: Windows File and Directory Permissions Modification,8
+Masquerading: Invalid Code Signature,8
+Traffic Signaling,8
+Obfuscated Files or Information: Compile After Delivery,7
+Indicator Removal: Clear Command History,7
+Valid Accounts: Cloud Accounts,7
+Process Injection: Portable Executable Injection,7
+Hijack Execution Flow: Dynamic Linker Hijacking,6
+Execution Guardrails: Environmental Keying,6
+System Binary Proxy Execution: Compiled HTML File,6
+Use Alternate Authentication Material: Pass the Ticket,6
+Masquerading: Rename System Utilities,6
+Subvert Trust Controls: Gatekeeper Bypass,5
+Masquerading: Right-to-Left Override,5
+Obfuscated Files or Information: Embedded Payloads,5
+Debugger Evasion,5
+Hide Artifacts: Hidden File System,5
+Subvert Trust Controls: Code Signing Policy Modification,5
+Domain Policy Modification: Group Policy Modification,5
+System Binary Proxy Execution: InstallUtil,5
+Deploy Container,4
+Indicator Removal: Clear Linux or Mac System Logs,4
+XSL Script Processing,4
+Impair Defenses: Disable Windows Event Logging,4
+Indicator Removal: Network Share Connection Removal,4
+Use Alternate Authentication Material: Application Access Token,4
+Subvert Trust Controls: Install Root Certificate,4
+Hide Artifacts,4
+Virtualization/Sandbox Evasion: User Activity Based Checks,4
+Pre-OS Boot: System Firmware,3
+System Binary Proxy Execution: Control Panel,3
+Indirect Command Execution,3
+Subvert Trust Controls: Mark-of-the-Web Bypass,3
+Trusted Developer Utilities Proxy Execution: MSBuild,3
+Obfuscated Files or Information: Dynamic API Resolution,3
+Access Token Manipulation: Parent PID Spoofing,3
+Hide Artifacts: Run Virtual Instance,3
+Hijack Execution Flow,3
+Impair Defenses: Indicator Blocking,3
+Process Injection: Process Doppelgänging,3
+Hide Artifacts: Hidden Users,3
+Abuse Elevation Control Mechanism: Sudo and Sudo Caching,3
+Modify Authentication Process,3
+Process Injection: Thread Execution Hijacking,3
+Masquerading: Double File Extension,3
+Modify Authentication Process: Domain Controller Authentication,2
+Hijack Execution Flow: Path Interception by Search Order Hijacking,2
+Hijack Execution Flow: Path Interception by PATH Environment Variable,2
+Modify Authentication Process: Password Filter DLL,2
+Modify Authentication Process: Hybrid Identity,2
+Obfuscated Files or Information: HTML Smuggling,2
+Access Token Manipulation: SID-History Injection,2
+Valid Accounts: Default Accounts,2
+Indicator Removal: Clear Mailbox Data,2
+Hijack Execution Flow: Path Interception by Unquoted Path,2
+Modify Authentication Process: Pluggable Authentication Modules,2
+Impair Defenses: Impair Command History Logging,2
+Process Injection: Extra Window Memory Injection,2
+System Binary Proxy Execution: Odbcconf,2
+Hide Artifacts: Resource Forking,2
+Domain Policy Modification: Domain Trust Modification,2
+Use Alternate Authentication Material,2
+Hide Artifacts: Process Argument Spoofing,2
+Pre-OS Boot: Component Firmware,2
+System Binary Proxy Execution: CMSTP,2
+Abuse Elevation Control Mechanism: Setuid and Setgid,2
+Impair Defenses,2
+Hijack Execution Flow: KernelCallbackTable,2
+Process Injection: Thread Local Storage,1
+Hijack Execution Flow: Dylib Hijacking,1
+Abuse Elevation Control Mechanism: Elevated Execution with Prompt,1
+System Binary Proxy Execution,1
+Hide Artifacts: Email Hiding Rules,1
+Process Injection: ListPlanting,1
+Rogue Domain Controller,1
+Modify Cloud Compute Infrastructure: Delete Cloud Instance,1
+Exploitation for Defense Evasion,1
+Masquerading: Space after Filename,1
+Use Alternate Authentication Material: Web Session Cookie,1
+Impair Defenses: Safe Mode Boot,1
+System Binary Proxy Execution: Verclsid,1
+Modify Authentication Process: Network Device Authentication,1
+Modify Cloud Compute Infrastructure: Create Cloud Instance,1
+Obfuscated Files or Information: Stripped Payloads,1
+Plist File Modification,1
+System Script Proxy Execution: PubPrn,1
+Modify System Image: Patch System Image,1
+Hijack Execution Flow: COR_PROFILER,1
+Hijack Execution Flow: Services Registry Permissions Weakness,1
+Hijack Execution Flow: Services File Permissions Weakness,1
+Modify Authentication Process: Multi-Factor Authentication,1
+Traffic Signaling: Port Knocking,1
+Subvert Trust Controls,1
+Traffic Signaling: Socket Filters,1
+Access Token Manipulation: Make and Impersonate Token,1
+Indicator Removal: Clear Network Connection History and Configurations,1
+System Binary Proxy Execution: Regsvcs/Regasm,1
+Impair Defenses: Disable or Modify Cloud Firewall,0
+Impair Defenses: Disable Cloud Logs,0
+Modify Cloud Compute Infrastructure: Revert Cloud Instance,0
+Network Boundary Bridging: Network Address Translation Traversal,0
+Impair Defenses: Downgrade Attack,0
+Domain Policy Modification,0
+System Binary Proxy Execution: Mavinject,0
+Hide Artifacts: VBA Stomping,0
+Modify System Image,0
+Modify System Image: Downgrade System Image,0
+Trusted Developer Utilities Proxy Execution,0
+System Binary Proxy Execution: MMC,0
+Process Injection: Proc Memory,0
+Modify Cloud Compute Infrastructure: Create Snapshot,0
+Modify Cloud Compute Infrastructure,0
+File and Directory Permissions Modification,0
+Weaken Encryption,0
+Weaken Encryption: Reduce Key Space,0
+Weaken Encryption: Disable Crypto Hardware,0
+Hijack Execution Flow: Executable Installer File Permissions Weakness,0
+Unused/Unsupported Cloud Regions,0
+System Script Proxy Execution,0
+Pre-OS Boot,0
+Pre-OS Boot: ROMMONkit,0
+Pre-OS Boot: TFTP Boot,0
+Build Image on Host,0
+Direct Volume Access,0
+Subvert Trust Controls: SIP and Trust Provider Hijacking,0
+Process Injection: VDSO Hijacking,0
+Network Boundary Bridging,0
+Process Injection: Ptrace System Calls,0
+Modify Authentication Process: Reversible Encryption,0
+Abuse Elevation Control Mechanism,0

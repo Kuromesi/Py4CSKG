@@ -1,0 +1,40 @@
+Technique,count
+Ingress Tool Transfer,406
+Application Layer Protocol: Web Protocols,308
+Encrypted Channel: Symmetric Cryptography,135
+Data Encoding: Standard Encoding,90
+Non-Application Layer Protocol,63
+Encrypted Channel: Asymmetric Cryptography,57
+Fallback Channels,49
+Application Layer Protocol: DNS,46
+Web Service: Bidirectional Communication,46
+Proxy,44
+Non-Standard Port,38
+Web Service,29
+Dynamic Resolution: Domain Generation Algorithms,22
+Proxy: Internal Proxy,21
+Proxy: Multi-hop Proxy,21
+Remote Access Software,20
+Application Layer Protocol: Mail Protocols,20
+Proxy: External Proxy,19
+Protocol Tunneling,19
+Web Service: Dead Drop Resolver,17
+Application Layer Protocol: File Transfer Protocols,16
+Dynamic Resolution,14
+Data Obfuscation: Junk Data,14
+Data Obfuscation: Protocol Impersonation,13
+Application Layer Protocol,12
+Encrypted Channel,12
+Data Obfuscation: Steganography,11
+Multi-Stage Channels,9
+Data Encoding: Non-Standard Encoding,9
+Traffic Signaling,8
+Data Obfuscation,7
+Web Service: One-Way Communication,5
+Proxy: Domain Fronting,5
+Data Encoding,5
+Dynamic Resolution: Fast Flux DNS,5
+Communication Through Removable Media,3
+Dynamic Resolution: DNS Calculation,1
+Traffic Signaling: Port Knocking,1
+Traffic Signaling: Socket Filters,1

@@ -1,0 +1,22 @@
+Technique,count
+Remote Services: Remote Desktop Protocol,43
+Remote Services: SMB/Windows Admin Shares,42
+Lateral Tool Transfer,25
+Exploitation of Remote Services,23
+Replication Through Removable Media,22
+Remote Services: SSH,15
+Use Alternate Authentication Material: Pass the Hash,14
+Taint Shared Content,10
+Remote Services: VNC,10
+Remote Services: Windows Remote Management,6
+Use Alternate Authentication Material: Pass the Ticket,6
+Internal Spearphishing,5
+Use Alternate Authentication Material: Application Access Token,4
+Software Deployment Tools,4
+Remote Services: Distributed Component Object Model,3
+Remote Services,3
+Use Alternate Authentication Material,2
+Remote Service Session Hijacking: RDP Hijacking,2
+Use Alternate Authentication Material: Web Session Cookie,1
+Remote Service Session Hijacking,0
+Remote Service Session Hijacking: SSH Hijacking,0

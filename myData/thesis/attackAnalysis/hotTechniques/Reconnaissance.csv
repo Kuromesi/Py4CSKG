@@ -1,0 +1,44 @@
+Technique,count
+Gather Victim Identity Information: Email Addresses,13
+Phishing for Information: Spearphishing Link,10
+Active Scanning: Vulnerability Scanning,9
+Gather Victim Identity Information: Credentials,6
+Gather Victim Identity Information,5
+Phishing for Information: Spearphishing Attachment,4
+Search Victim-Owned Websites,4
+Gather Victim Org Information: Identify Roles,3
+Gather Victim Org Information: Business Relationships,3
+Gather Victim Identity Information: Employee Names,3
+Search Open Websites/Domains: Social Media,3
+Phishing for Information,2
+Gather Victim Network Information: Domain Properties,2
+Gather Victim Network Information: IP Addresses,2
+Gather Victim Org Information,2
+Gather Victim Host Information: Software,2
+Search Open Websites/Domains: Code Repositories,1
+Search Open Websites/Domains: Search Engines,1
+Search Open Websites/Domains,1
+Search Closed Sources: Purchase Technical Data,1
+Search Closed Sources,1
+Active Scanning: Wordlist Scanning,1
+Gather Victim Host Information: Client Configurations,1
+Gather Victim Network Information,1
+Active Scanning: Scanning IP Blocks,1
+Search Open Technical Databases: WHOIS,0
+Phishing for Information: Spearphishing Service,0
+Active Scanning,0
+Gather Victim Org Information: Identify Business Tempo,0
+Search Closed Sources: Threat Intel Vendors,0
+Gather Victim Org Information: Determine Physical Locations,0
+Search Open Technical Databases,0
+Search Open Technical Databases: DNS/Passive DNS,0
+Search Open Technical Databases: Digital Certificates,0
+Gather Victim Host Information: Hardware,0
+Search Open Technical Databases: CDNs,0
+Search Open Technical Databases: Scan Databases,0
+Gather Victim Network Information: Network Security Appliances,0
+Gather Victim Network Information: Network Topology,0
+Gather Victim Network Information: Network Trust Dependencies,0
+Gather Victim Network Information: DNS,0
+Gather Victim Host Information,0
+Gather Victim Host Information: Firmware,0

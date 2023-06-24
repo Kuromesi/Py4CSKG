@@ -1,0 +1,97 @@
+Technique,count
+Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder,221
+Scheduled Task/Job: Scheduled Task,132
+Create or Modify System Process: Windows Service,114
+Process Injection,61
+Process Injection: Dynamic-link Library Injection,58
+Abuse Elevation Control Mechanism: Bypass User Account Control,50
+Hijack Execution Flow: DLL Side-Loading,49
+Valid Accounts,41
+Exploitation for Privilege Escalation,31
+Boot or Logon Autostart Execution: Shortcut Modification,29
+Hijack Execution Flow: DLL Search Order Hijacking,29
+Process Injection: Process Hollowing,28
+Create or Modify System Process: Launch Agent,18
+Valid Accounts: Domain Accounts,17
+Access Token Manipulation,17
+Event Triggered Execution: Windows Management Instrumentation Event Subscription,15
+Access Token Manipulation: Token Impersonation/Theft,14
+Valid Accounts: Local Accounts,13
+Scheduled Task/Job: Cron,12
+Access Token Manipulation: Create Process with Token,12
+Event Triggered Execution: Component Object Model Hijacking,11
+Process Injection: Asynchronous Procedure Call,9
+Boot or Logon Autostart Execution: Winlogon Helper DLL,9
+Create or Modify System Process: Launch Daemon,8
+Valid Accounts: Cloud Accounts,7
+Event Triggered Execution: Accessibility Features,7
+Process Injection: Portable Executable Injection,7
+Hijack Execution Flow: Dynamic Linker Hijacking,6
+Boot or Logon Initialization Scripts: Logon Script (Windows),6
+Scheduled Task/Job: At,6
+Create or Modify System Process: Systemd Service,6
+Domain Policy Modification: Group Policy Modification,5
+Boot or Logon Autostart Execution,5
+Escape to Host,5
+Scheduled Task/Job,4
+Event Triggered Execution: Application Shimming,4
+Boot or Logon Initialization Scripts: RC Scripts,4
+Event Triggered Execution: AppInit DLLs,4
+Hijack Execution Flow,3
+Event Triggered Execution: Image File Execution Options Injection,3
+Boot or Logon Autostart Execution: Print Processors,3
+Abuse Elevation Control Mechanism: Sudo and Sudo Caching,3
+Access Token Manipulation: Parent PID Spoofing,3
+Process Injection: Thread Execution Hijacking,3
+Boot or Logon Autostart Execution: Login Items,3
+Process Injection: Process Doppelgänging,3
+Boot or Logon Autostart Execution: Security Support Provider,3
+Boot or Logon Autostart Execution: Kernel Modules and Extensions,3
+Access Token Manipulation: SID-History Injection,2
+Valid Accounts: Default Accounts,2
+Process Injection: Extra Window Memory Injection,2
+Abuse Elevation Control Mechanism: Setuid and Setgid,2
+Boot or Logon Autostart Execution: XDG Autostart Entries,2
+Hijack Execution Flow: Path Interception by PATH Environment Variable,2
+Hijack Execution Flow: Path Interception by Search Order Hijacking,2
+Hijack Execution Flow: Path Interception by Unquoted Path,2
+Event Triggered Execution: Change Default File Association,2
+Event Triggered Execution: Unix Shell Configuration Modification,2
+Domain Policy Modification: Domain Trust Modification,2
+Boot or Logon Autostart Execution: LSASS Driver,2
+Hijack Execution Flow: KernelCallbackTable,2
+Abuse Elevation Control Mechanism: Elevated Execution with Prompt,1
+Create or Modify System Process,1
+Hijack Execution Flow: Dylib Hijacking,1
+Boot or Logon Initialization Scripts: Startup Items,1
+Process Injection: Thread Local Storage,1
+Boot or Logon Initialization Scripts,1
+Boot or Logon Autostart Execution: Active Setup,1
+Hijack Execution Flow: Services Registry Permissions Weakness,1
+Event Triggered Execution: PowerShell Profile,1
+Boot or Logon Autostart Execution: Authentication Package,1
+Process Injection: ListPlanting,1
+Access Token Manipulation: Make and Impersonate Token,1
+Event Triggered Execution: Netsh Helper DLL,1
+Hijack Execution Flow: Services File Permissions Weakness,1
+Hijack Execution Flow: COR_PROFILER,1
+Event Triggered Execution: AppCert DLLs,1
+Event Triggered Execution: Screensaver,1
+Event Triggered Execution: Installer Packages,1
+Process Injection: Ptrace System Calls,0
+Boot or Logon Autostart Execution: Port Monitors,0
+Event Triggered Execution: Emond,0
+Boot or Logon Autostart Execution: Re-opened Applications,0
+Scheduled Task/Job: Systemd Timers,0
+Scheduled Task/Job: Container Orchestration Job,0
+Domain Policy Modification,0
+Boot or Logon Initialization Scripts: Login Hook,0
+Boot or Logon Autostart Execution: Time Providers,0
+Process Injection: Proc Memory,0
+Boot or Logon Initialization Scripts: Network Logon Script,0
+Event Triggered Execution: LC_LOAD_DYLIB Addition,0
+Event Triggered Execution: Trap,0
+Event Triggered Execution,0
+Hijack Execution Flow: Executable Installer File Permissions Weakness,0
+Process Injection: VDSO Hijacking,0
+Abuse Elevation Control Mechanism,0

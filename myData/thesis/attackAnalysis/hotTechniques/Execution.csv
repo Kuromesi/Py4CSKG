@@ -1,0 +1,35 @@
+Technique,count
+Command and Scripting Interpreter: Windows Command Shell,305
+Command and Scripting Interpreter: PowerShell,157
+Native API,151
+User Execution: Malicious File,150
+Scheduled Task/Job: Scheduled Task,132
+Command and Scripting Interpreter: Visual Basic,106
+Windows Management Instrumentation,96
+User Execution: Malicious Link,64
+System Services: Service Execution,55
+Exploitation for Client Execution,50
+Command and Scripting Interpreter: JavaScript,41
+Command and Scripting Interpreter: Python,39
+Command and Scripting Interpreter,33
+Command and Scripting Interpreter: Unix Shell,31
+Inter-Process Communication: Dynamic Data Exchange,20
+Shared Modules,16
+Inter-Process Communication: Component Object Model,13
+Scheduled Task/Job: Cron,12
+Scheduled Task/Job: At,6
+Container Administration Command,5
+System Services: Launchctl,5
+Scheduled Task/Job,4
+Software Deployment Tools,4
+Command and Scripting Interpreter: AppleScript,4
+Deploy Container,4
+Inter-Process Communication,2
+User Execution,1
+System Services,1
+User Execution: Malicious Image,1
+Scheduled Task/Job: Systemd Timers,0
+Inter-Process Communication: XPC Services,0
+Command and Scripting Interpreter: Network Device CLI,0
+Serverless Execution,0
+Scheduled Task/Job: Container Orchestration Job,0

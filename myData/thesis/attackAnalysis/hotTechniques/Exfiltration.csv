@@ -1,0 +1,18 @@
+Technique,count
+Exfiltration Over C2 Channel,134
+Exfiltration Over Alternative Protocol: Exfiltration Over Unencrypted Non-C2 Protocol,26
+Exfiltration Over Web Service: Exfiltration to Cloud Storage,25
+Automated Exfiltration,21
+Scheduled Transfer,17
+Data Transfer Size Limits,15
+Exfiltration Over Alternative Protocol,7
+Exfiltration Over Physical Medium: Exfiltration over USB,7
+Exfiltration Over Web Service,4
+Exfiltration Over Alternative Protocol: Exfiltration Over Asymmetric Encrypted Non-C2 Protocol,3
+Exfiltration Over Web Service: Exfiltration to Code Repository,1
+Exfiltration Over Other Network Medium: Exfiltration Over Bluetooth,1
+Exfiltration Over Physical Medium,0
+Exfiltration Over Other Network Medium,0
+Automated Exfiltration: Traffic Duplication,0
+Exfiltration Over Alternative Protocol: Exfiltration Over Symmetric Encrypted Non-C2 Protocol,0
+Transfer Data to Cloud Account,0

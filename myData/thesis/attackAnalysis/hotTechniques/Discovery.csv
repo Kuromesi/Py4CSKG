@@ -1,0 +1,44 @@
+Technique,count
+System Information Discovery,335
+File and Directory Discovery,278
+Process Discovery,240
+System Network Configuration Discovery,227
+System Owner/User Discovery,186
+Software Discovery: Security Software Discovery,103
+Query Registry,97
+System Network Connections Discovery,82
+Remote System Discovery,74
+System Time Discovery,71
+System Service Discovery,58
+Network Share Discovery,51
+Network Service Discovery,50
+Account Discovery: Local Account,50
+Virtualization/Sandbox Evasion: System Checks,48
+Peripheral Device Discovery,45
+Account Discovery: Domain Account,38
+Software Discovery,36
+Virtualization/Sandbox Evasion: Time Based Evasion,35
+Application Window Discovery,29
+Permission Groups Discovery: Local Groups,27
+Permission Groups Discovery: Domain Groups,24
+System Location Discovery: System Language Discovery,22
+Virtualization/Sandbox Evasion,18
+Domain Trust Discovery,15
+Network Sniffing,15
+Browser Bookmark Discovery,12
+System Network Configuration Discovery: Internet Connection Discovery,12
+Account Discovery: Email Account,11
+System Location Discovery,9
+Password Policy Discovery,9
+Permission Groups Discovery,9
+Debugger Evasion,5
+Group Policy Discovery,4
+Virtualization/Sandbox Evasion: User Activity Based Checks,4
+Account Discovery,3
+Account Discovery: Cloud Account,3
+Container and Resource Discovery,3
+Permission Groups Discovery: Cloud Groups,2
+Cloud Service Discovery,2
+Cloud Storage Object Discovery,1
+Cloud Infrastructure Discovery,0
+Cloud Service Dashboard,0

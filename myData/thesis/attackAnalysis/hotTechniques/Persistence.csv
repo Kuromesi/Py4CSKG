@@ -1,0 +1,113 @@
+Technique,count
+Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder,221
+Scheduled Task/Job: Scheduled Task,132
+Create or Modify System Process: Windows Service,114
+Hijack Execution Flow: DLL Side-Loading,49
+Valid Accounts,41
+Server Software Component: Web Shell,30
+Hijack Execution Flow: DLL Search Order Hijacking,29
+Boot or Logon Autostart Execution: Shortcut Modification,29
+External Remote Services,27
+Create Account: Local Account,23
+Create or Modify System Process: Launch Agent,18
+Valid Accounts: Domain Accounts,17
+Event Triggered Execution: Windows Management Instrumentation Event Subscription,15
+Valid Accounts: Local Accounts,13
+BITS Jobs,12
+Scheduled Task/Job: Cron,12
+Event Triggered Execution: Component Object Model Hijacking,11
+Boot or Logon Autostart Execution: Winlogon Helper DLL,9
+Pre-OS Boot: Bootkit,9
+Create or Modify System Process: Launch Daemon,8
+Traffic Signaling,8
+Account Manipulation,8
+Create Account: Domain Account,7
+Event Triggered Execution: Accessibility Features,7
+Compromise Client Software Binary,7
+Valid Accounts: Cloud Accounts,7
+Hijack Execution Flow: Dynamic Linker Hijacking,6
+Scheduled Task/Job: At,6
+Boot or Logon Initialization Scripts: Logon Script (Windows),6
+Create or Modify System Process: Systemd Service,6
+Boot or Logon Autostart Execution,5
+Account Manipulation: SSH Authorized Keys,5
+Event Triggered Execution: Application Shimming,4
+Boot or Logon Initialization Scripts: RC Scripts,4
+Event Triggered Execution: AppInit DLLs,4
+Browser Extensions,4
+Scheduled Task/Job,4
+Boot or Logon Autostart Execution: Login Items,3
+Office Application Startup: Office Template Macros,3
+Boot or Logon Autostart Execution: Print Processors,3
+Server Software Component: IIS Components,3
+Account Manipulation: Additional Email Delegate Permissions,3
+Pre-OS Boot: System Firmware,3
+Modify Authentication Process,3
+Hijack Execution Flow,3
+Create Account: Cloud Account,3
+Event Triggered Execution: Image File Execution Options Injection,3
+Boot or Logon Autostart Execution: Security Support Provider,3
+Boot or Logon Autostart Execution: Kernel Modules and Extensions,3
+Office Application Startup: Add-ins,2
+Hijack Execution Flow: Path Interception by Search Order Hijacking,2
+Hijack Execution Flow: Path Interception by PATH Environment Variable,2
+Server Software Component: SQL Stored Procedures,2
+Pre-OS Boot: Component Firmware,2
+Hijack Execution Flow: Path Interception by Unquoted Path,2
+Office Application Startup: Outlook Home Page,2
+Hijack Execution Flow: KernelCallbackTable,2
+Boot or Logon Autostart Execution: XDG Autostart Entries,2
+Event Triggered Execution: Change Default File Association,2
+Account Manipulation: Device Registration,2
+Valid Accounts: Default Accounts,2
+Create Account,2
+Boot or Logon Autostart Execution: LSASS Driver,2
+Modify Authentication Process: Hybrid Identity,2
+Modify Authentication Process: Domain Controller Authentication,2
+Modify Authentication Process: Pluggable Authentication Modules,2
+Account Manipulation: Additional Cloud Roles,2
+Office Application Startup,2
+Event Triggered Execution: Unix Shell Configuration Modification,2
+Modify Authentication Process: Password Filter DLL,2
+Hijack Execution Flow: Dylib Hijacking,1
+Office Application Startup: Outlook Forms,1
+Server Software Component: Transport Agent,1
+Create or Modify System Process,1
+Office Application Startup: Outlook Rules,1
+Boot or Logon Initialization Scripts: Startup Items,1
+Boot or Logon Initialization Scripts,1
+Boot or Logon Autostart Execution: Active Setup,1
+Office Application Startup: Office Test,1
+Traffic Signaling: Socket Filters,1
+Modify Authentication Process: Multi-Factor Authentication,1
+Event Triggered Execution: Screensaver,1
+Event Triggered Execution: PowerShell Profile,1
+Boot or Logon Autostart Execution: Authentication Package,1
+Hijack Execution Flow: Services File Permissions Weakness,1
+Modify Authentication Process: Network Device Authentication,1
+Account Manipulation: Additional Cloud Credentials,1
+Event Triggered Execution: Netsh Helper DLL,1
+Event Triggered Execution: Installer Packages,1
+Event Triggered Execution: AppCert DLLs,1
+Traffic Signaling: Port Knocking,1
+Hijack Execution Flow: COR_PROFILER,1
+Hijack Execution Flow: Services Registry Permissions Weakness,1
+Implant Internal Image,0
+Boot or Logon Initialization Scripts: Login Hook,0
+Boot or Logon Autostart Execution: Port Monitors,0
+Scheduled Task/Job: Systemd Timers,0
+Event Triggered Execution: Emond,0
+Scheduled Task/Job: Container Orchestration Job,0
+Boot or Logon Initialization Scripts: Network Logon Script,0
+Hijack Execution Flow: Executable Installer File Permissions Weakness,0
+Boot or Logon Autostart Execution: Re-opened Applications,0
+Boot or Logon Autostart Execution: Time Providers,0
+Modify Authentication Process: Reversible Encryption,0
+Event Triggered Execution: LC_LOAD_DYLIB Addition,0
+Event Triggered Execution: Trap,0
+Server Software Component: Terminal Services DLL,0
+Pre-OS Boot: TFTP Boot,0
+Pre-OS Boot: ROMMONkit,0
+Pre-OS Boot,0
+Server Software Component,0
+Event Triggered Execution,0

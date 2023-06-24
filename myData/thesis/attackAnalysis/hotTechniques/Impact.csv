@@ -1,0 +1,27 @@
+Technique,count
+Data Encrypted for Impact,43
+Inhibit System Recovery,29
+Service Stop,28
+Data Destruction,23
+System Shutdown/Reboot,13
+Resource Hijacking,12
+Disk Wipe: Disk Structure Wipe,11
+Disk Wipe: Disk Content Wipe,6
+Data Manipulation: Transmitted Data Manipulation,4
+Defacement: Internal Defacement,4
+Account Access Removal,4
+Endpoint Denial of Service,3
+Firmware Corruption,2
+Network Denial of Service,2
+Data Manipulation: Stored Data Manipulation,2
+Endpoint Denial of Service: Application or System Exploitation,1
+Defacement: External Defacement,1
+Data Manipulation: Runtime Data Manipulation,1
+Endpoint Denial of Service: OS Exhaustion Flood,0
+Endpoint Denial of Service: Service Exhaustion Flood,0
+Endpoint Denial of Service: Application Exhaustion Flood,0
+Disk Wipe,0
+Network Denial of Service: Reflection Amplification,0
+Network Denial of Service: Direct Network Flood,0
+Data Manipulation,0
+Defacement,0

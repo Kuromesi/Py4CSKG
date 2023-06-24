@@ -1,0 +1,38 @@
+Technique,count
+Data from Local System,168
+Screen Capture,136
+Input Capture: Keylogging,130
+Data Staged: Local Data Staging,87
+Archive Collected Data: Archive via Utility,52
+Automated Collection,52
+Archive Collected Data,47
+Archive Collected Data: Archive via Custom Method,35
+Clipboard Data,34
+Video Capture,31
+Audio Capture,28
+Data from Removable Media,22
+Email Collection: Remote Email Collection,15
+Email Collection: Local Email Collection,14
+Archive Collected Data: Archive via Library,13
+Data from Network Shared Drive,12
+Input Capture: Credential API Hooking,11
+Browser Session Hijacking,11
+Input Capture: GUI Input Capture,10
+Data Staged: Remote Data Staging,10
+Adversary-in-the-Middle: LLMNR/NBT-NS Poisoning and SMB Relay,7
+Data from Information Repositories,7
+Data from Information Repositories: Sharepoint,5
+Data Staged,4
+Input Capture,4
+Email Collection: Email Forwarding Rule,3
+Data from Cloud Storage,2
+Adversary-in-the-Middle,2
+Data from Information Repositories: Code Repositories,2
+Email Collection,2
+Data from Information Repositories: Confluence,1
+Input Capture: Web Portal Capture,1
+Adversary-in-the-Middle: ARP Cache Poisoning,1
+Data from Configuration Repository: Network Device Configuration Dump,0
+Data from Configuration Repository: SNMP (MIB Dump),0
+Data from Configuration Repository,0
+Adversary-in-the-Middle: DHCP Spoofing,0

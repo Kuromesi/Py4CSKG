@@ -1,0 +1,44 @@
+Technique,count
+Obtain Capabilities: Tool,68
+Acquire Infrastructure: Domains,34
+Stage Capabilities: Upload Malware,19
+Acquire Infrastructure: Web Services,17
+Develop Capabilities: Malware,15
+Establish Accounts: Email Accounts,14
+Obtain Capabilities: Malware,13
+Establish Accounts: Social Media Accounts,10
+Acquire Infrastructure: Server,8
+Compromise Infrastructure: Server,8
+Compromise Infrastructure: Domains,8
+Compromise Accounts: Email Accounts,7
+Obtain Capabilities: Code Signing Certificates,5
+Stage Capabilities: Drive-by Target,5
+Acquire Infrastructure: Virtual Private Server,5
+Obtain Capabilities: Digital Certificates,4
+Stage Capabilities: Upload Tool,3
+Develop Capabilities: Digital Certificates,3
+Establish Accounts,2
+Develop Capabilities: Code Signing Certificates,2
+Compromise Infrastructure: Web Services,2
+Acquire Infrastructure: DNS Server,2
+Compromise Infrastructure: Botnet,2
+Compromise Accounts: Social Media Accounts,1
+Obtain Capabilities: Exploits,1
+Obtain Capabilities: Vulnerabilities,1
+Compromise Infrastructure: Virtual Private Server,1
+Stage Capabilities,1
+Develop Capabilities,1
+Stage Capabilities: Link Target,1
+Compromise Infrastructure: Serverless,0
+Stage Capabilities: SEO Poisoning,0
+Establish Accounts: Cloud Accounts,0
+Develop Capabilities: Exploits,0
+Compromise Accounts,0
+Acquire Infrastructure,0
+Acquire Infrastructure: Botnet,0
+Acquire Infrastructure: Serverless,0
+Compromise Accounts: Cloud Accounts,0
+Compromise Infrastructure,0
+Obtain Capabilities,0
+Stage Capabilities: Install Digital Certificate,0
+Compromise Infrastructure: DNS Server,0
