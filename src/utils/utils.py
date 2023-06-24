@@ -297,3 +297,19 @@ class GetTrainData():
             
         self.df.to_csv('./myData/learning/CVE2CAPEC/NER.csv', index=False)
         
+
+def HotTechniqueSummary():
+    """Get the most used techniques in every tactic
+    """    
+    query = "MATCH (n:Tactic) RETURN n"
+    gdb = GDBSaver()
+    tactics = gdb.sendQuery(query)
+    for tactic in tactics:
+        df = pd.DataFrame(columns=['Technique', 'count'])
+        query = "MATCH (n:Technique)-[]-(t:Tactic) WHERE t.name=\"%s\" return n"%tactic['name']
+        techniques = gdb.sendQuery(query)
+        for technique in techniques:
+            query = "MATCH (n:Technique)-[]-(p:Procedure) WHERE n.name=\"%s\" return COUNT(p)"%technique['name']
+            cnt = gdb.sendQuery(query)
+            df.loc[len(df.index)] = [technique['name'], cnt[0]]
+        df.to_csv('./myData/thesis/attackAnalysis/hotTechniques/%s.csv'%technique['name'].replace(" ", ""), index=False)
