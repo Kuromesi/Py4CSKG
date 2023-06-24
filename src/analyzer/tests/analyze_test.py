@@ -2,7 +2,7 @@ import sys, os
 BASE_DIR=os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(os.path.join(BASE_DIR))
 
-from TextSimilarity.cve2capec import *
+from TextSimilarity.TextSimilarity import *
 from TextClassification.cve2cwe import *
 from analyzer.analyze import *
 

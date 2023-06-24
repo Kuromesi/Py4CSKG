@@ -6,7 +6,7 @@ from service.GDBSaver import GDBSaver
 from service.RDBSaver import RDBSaver
 from webapp.utils.version_compare import *
 import pandas as pd
-from TextSimilarity.cve2capec import *
+from TextSimilarity.TextSimilarity import *
 from TextClassification.cve2cwe import *
 
 class ModelAnalyzer():

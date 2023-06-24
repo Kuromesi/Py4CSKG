@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask import request, render_template
 import json
-from TextSimilarity.cve2capec import *
+from TextSimilarity.TextSimilarity import *
 from webapp.utils.draw import *
 from analyzer.analyze import *
 
