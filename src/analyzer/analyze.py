@@ -8,61 +8,59 @@ from webapp.utils.version_compare import *
 import pandas as pd
 from TextSimilarity.TextSimilarity import *
 from TextClassification.cve2cwe import *
+from graph.GraphProcessor import GraphProcessor
+
+PRIVS = ['None', 'Low', 'High']
+CONS = {
+    'root': [""]
+}
 
 class ModelAnalyzer():
-    def __init__(self, cev2capec, cve2cwe) -> None:
+    def __init__(self, cev2capec, cve2cwe, graph) -> None:
         self.gs = GDBSaver()
         self.cve2capec = cev2capec
         self.cve2cwe = cve2cwe
-    
-    def convert_pyvis(self, graph:dict):
-        """Receive pyvis json format graph from frontend and convert it into networkx grapg.
+        self.gp = GraphProcessor()
+        res = self.gp.convert_pyvis(graph)
+        self.graph = res
+        self.G = res["graph"]
 
-        Args:
-            graph (dict): pyvis graph
-        """        
-        # Nodes
-        color_map = []
-        nodes = []
-        node_type = {
-            'software': {},
-            'hardware': {},
-            'os': {},
-            'firmware': {},
-            'component': {},
-            'defender': {},
-            'entry': {}
-        }
-        node_dict = {}
-        for node in graph['nodes']:
-            # color_map.append(node.pop('color'))
-            # id = node.pop('id')
-            color_map.append(node['color'])
-            id = node['id']
-            nodes.append((id, node))
-            if node['type'] not in node_type:
-                node_type[node['type']] = {}
-            node_type[node['type']].update({id: node}) # Classified with corresponding ontologies
-            node_dict.update({id: node})
-        # Edges
-        edges = []
-        for edge in graph['edges']:
-            if 'from' in edge and 'to' in edge:
-                src = edge.pop('from')
-                dest = edge.pop('to')
-                edges.append((src, dest, edge))
-        
-        G = nx.Graph()    
-        G.add_nodes_from(nodes)
-        G.add_edges_from(edges)
-        
-        graph = {
-            'graph': G,
-            'node_type': node_type
+    def find_attack_path(self, src, dst):
+        visited = set()
+        self.__dfs_path(src, dst, visited)
+        # privilege state transition, None, application, user, root, escalating
+        pass
+
+    def __dfs_path(self, node, dst, visited):
+        if node in visited:
+            return
+        neighbors = self.gp.get_neighbors(neighbors, {"type": "Node"}) # And example
+
+    def get_graph_impact(self):
+        """Get impact for nodes in graph
+        """
+        impact_map = {}
+        for node in self.G.nodes:
+            attrs = self.G.nodes[node]
+            report = self.vul_find(attrs['product'], attrs['version'])
+            tmp_map = {
+                'root': {},
+                'escalating': {},
+                'user': {},
+                'app': {},
+                'cia': {}
             }
-        self.graph = graph
-        self.G = G
-        self.node_dict = node_dict
+
+            impact_map.update({node: tmp_map})
+
+
+    def __get_max_possibility_vul(self, report:pd.DataFrame, cond:list):
+        rows = report[report['CVE-Impact'].isin(cond)]
+        for priv in PRIVS:
+            if rows[rows['PrivilegesRequired'] == priv]:
+                rows = rows.loc[rows['ImpactScore'].idxmax()]
+                break
+        return rows
 
     def vul_find(self, product:str, version:str) -> pd.DataFrame:
         """Find related vulnerabilities of a specific product and return vul_report like below:
@@ -79,7 +77,8 @@ class ModelAnalyzer():
         nodes = self.gs.sendQuery(query)
         vul_products = []
         # vuls = {}
-        vul_report = pd.DataFrame(columns=['Product', 'CVE-ID', 'CVE-Description', 'CVE-Impact', 'Access'])
+        vul_report = pd.DataFrame(columns=['Product', 'CVE-ID', 'CVE-Description', 'CVE-Impact', 
+                                           'Access', 'PrivilegesRequired', 'ImpactScore', 'ExploitabilityScore'])
         for node in nodes:
             node = node[0]
             version_start = node['versionStart']
@@ -96,8 +95,14 @@ class ModelAnalyzer():
                 node = node[0]
                 # if node['id'] not in vuls:
                 #     vuls[node['id']] = node
-                cvss = json.loads(node['baseMetricV2'])
-                vul_report.loc[len(vul_report.index)] = [product, node['id'], node['description'], node['impact'], cvss['cvssV2']['accessVector']]
+                cvss2 = json.loads(node['baseMetricV2'])
+                if 'baseMetricV3' in node:
+                    privilegesRequired = json.loads(node['baseMetricV3'])['cvssV3']['privilegesRequired']
+                else:
+                    privilegesRequired = "None"
+                vul_report.loc[len(vul_report.index)] = [product, node['id'], node['description'], 
+                                                    node['impact'], cvss2['cvssV2']['accessVector'], 
+                                                    privilegesRequired, cvss2['impactScore'], cvss2['exploitabilityScore']]
         # self.vul_analyze(vul_report)
         # for product in vul_product:
         #     query = "MATCH (n:Vulnerability)-[]-(a:Platform) WHERE a.uri='%s' RETURN n"%product
@@ -205,43 +210,7 @@ class ModelAnalyzer():
                 # if vuls:
                 #     vul_nodes.append(key)
                 #     neighbors = [n for n in self.G.neighbors(key)]
-                #     vul_nodes.extend(neighbors)
-    
-    def redraw(self, result):
-        """Redraw the original graph, change the node color and etc.
-
-        Args:
-            result (dict): _description_
-        """        
-        vul_node_attrs = {}
-        for vul_node in result['root']:
-            vul_node_attrs[vul_node] = {'color': "#ff0000"}
-        for vul_node in result['user']:
-            vul_node_attrs[vul_node] = {'color': "#ffff00"}
-        for vul_node in result['other']:
-            vul_node_attrs[vul_node] = {'color': "#ff9966"}
-        nx.set_node_attributes(self.G, vul_node_attrs)
-        
-    def new_graph(self, result):
-        DG = nx.DiGraph()
-        nodes = []
-        edges = []
-        for node in result['root']:
-            nodes.append((node, self.node_dict[node]))
-            edge = [(n, node) for n in self.G.neighbors(node)]
-            edges.extend(edge)
-        for node in result['user']:
-            nodes.append((node, self.node_dict[node]))
-            edge = [(n, node) for n in self.G.neighbors(node)]
-            edges.extend(edge)
-        for node in result['other']:
-            nodes.append((node, self.node_dict[node]))
-            edge = [(n, node) for n in self.G.neighbors(node)]
-            edges.extend(edge)
-        DG.add_nodes_from(nodes)
-        DG.add_edges_from(edges)
-        return DG
-        
+                #     vul_nodes.extend(neighbors)    
     
     def analyze(self):
         node_type = self.graph['node_type']

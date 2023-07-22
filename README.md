@@ -91,10 +91,15 @@ https://success.trendmicro.com/dcx/s/solution/1117391-preventing-wannacry-wcry-r
 ### Stuxnet
 CVE-2010-2568 System arbitrary code execution
 CVE-2008-4250 System arbitrary code execution
-CVE-2010-2729 System arbitrary code execution
+CVE-2010-2729 System arbitrary code execution Print spooler
 
 CVE-2010-2743 Privilege escalation
 
 ### Ukraine power grid
 CVE-2014-4114 System arbitrary code execution 
 https://www.boozallen.com/content/dam/boozallen/documents/2016/09/ukraine-report-when-the-lights-went-out.pdf
+
+## CVE CLASSIFICATION
+CVE-2020-10814 N/N/P Code exec/Application crash https://sourceforge.net/p/codeblocks/tickets/934/
+CVE-2020-10374 P/P/P Code exec/Chromium engine to create the screenshot https://kb.paessler.com/en/topic/87668-how-can-i-mitigate-cve-2020-10374-until-i-can-update
+CVE-2020-10214 C/C/C Code exec/Any code https://github.com/kuc001/IoTFirmware/blob/master/D-Link/vulnerability4.md

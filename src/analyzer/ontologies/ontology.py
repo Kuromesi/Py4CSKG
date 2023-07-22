@@ -3,32 +3,53 @@
 # if the attack prerequisites are satisfied, the attack can happen. 
 # A information system can be divided into assets, bridge, protection.
 
+class Product:
+    def __init__(self) -> None:
+        self.name = "N/A"
+        self.des = "N/A"
+        self.product = "N/A"
+        self.version = "N/A"
+        self.privilege = ""
+        self.exposed = "" # Network, Adjacent, Local, Physical
+
 class Node:
     """Logical nodes that composed of single or multiple components.
        Depending on the complexity of the system. 
     """    
     def __init__(self) -> None:
-        self.name = "" # Function of the node to the whole system
-        self.des = ""
+        self.name = "N/A"
+        self.des = "N/A"
         self.group = []
         self.entry_point = []
-        self.exposed = "" # Network, Adjacent, Local, Physical
         self.software = []
         self.hardware = []
         self.os = []
-        
-class Software:
-    def __init__(self) -> None:
-        self.product = ""
-        self.version = ""
-        self.privilege = ""
+        self.firmware = []
 
-class Hardware:
+class Software(Product):
     def __init__(self) -> None:
-        self.product = ""
-        self.version = ""
+        super().__init__()
 
-class OS:
+class Hardware(Product):
     def __init__(self) -> None:
-        self.product = ""
-        self.version = ""
+        super().__init__()
+
+class OS(Product):
+    def __init__(self) -> None:
+        super().__init__()
+
+class Firmware(Product):
+    def __init__(self) -> None:
+        super().__init__()
+
+class Link:
+    def __init__(self) -> None:
+        self.name = "N/A"
+        self.description = "N/A"
+        self.src = "N/A"
+        self.dst = "N/A"
+        self.protocol = []
+
+if __name__ == "__main__":
+    t = Node()
+    print(1)
