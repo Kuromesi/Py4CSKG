@@ -22,7 +22,7 @@ def logging(source):
     return decorator
 
 
-class Updater():
+class CVEDetailsUpdater():
     url_prefix = "https://www.cvedetails.com"
     def __init__(self) -> None:
         self.pattern = re.compile('\[.*\]' )
@@ -127,7 +127,7 @@ class Updater():
         
             
 
-    def run(self, path):
+    def update(self):
         """Multiprocessing
 
         Args:
@@ -135,6 +135,7 @@ class Updater():
             type (str, optional): enterprise, mobile or ICS. Defaults to "enterprise".
         """        
         # init process pool
+        path = "./data/base/cve_details"
         headers, type_page_urls = self.find_index_type_pages_urls()
         urls = []
         for url in type_page_urls:
@@ -176,14 +177,14 @@ class Saver():
                 content.update(res)
                 if cur == size:
                     with open(os.path.join(path, 'cve_type_%d.json'%fidx), 'w') as f:
-                        json.dump(content, f)
+                        json.dump(content, f, sort_keys=True, indent=4)
                     fidx += 1
                     content = {}
                     cur = 0
             except:
                 if cur != 0:
                     with open(os.path.join(path, 'cve_type_%d.json'%fidx), 'w') as f:
-                        json.dump(content, f)
+                        json.dump(content, f, sort_keys=True, indent=4)
                 break
             
             
@@ -191,7 +192,7 @@ class Saver():
 if __name__ == '__main__':
     # pattern = re.compile('\[.*\]' )   
     # url_finder_mobile()
-    cve = Updater()
+    cve = CVEDetailsUpdater()
     # cve.url_finder("")
     path = "src\DataUpdate\data"
     cve.run("src\DataUpdate\data")

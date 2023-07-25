@@ -5,7 +5,7 @@ import re
 import multiprocessing
 from tqdm import tqdm
 
-class Updater():
+class ATTACKUpdater():
     def __init__(self) -> None:
         self.pattern = re.compile('\[.*\]' )  
         
@@ -175,7 +175,7 @@ class Updater():
             print("deprecated")
             return 0
         
-    def url_finder(self, path, type="enterprise"):
+    def update(self, path, type="enterprise"):
         """Multiprocessing
 
         Args:
@@ -230,5 +230,5 @@ if __name__ == '__main__':
     # soup = bs(features='xml')
     # soup.append(soup.new_tag("Techniques"))
     # content_finder("https://attack.mitre.org/techniques/T1134/004/", soup)
-    updater = Updater()
+    updater = ATTACKUpdater()
     updater.url_finder("./data/attack/enterpriseN.xml", "enterprise")

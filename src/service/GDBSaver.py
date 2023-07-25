@@ -67,8 +67,14 @@ class GDBSaver:
             session.write_transaction(self._exec, query)
 
     def sendQuery(self, query):
-        with self.driver.session() as session:
-            res = session.write_transaction(self._result, query)
+        if isinstance(query, list):
+            res = []
+            with self.driver.session() as session:
+                for q in query:
+                    res.append(session.write_transaction(self._result, q))
+        else:
+            with self.driver.session() as session:
+                res = session.write_transaction(self._result, query)
         return res
 
 if __name__=="__main__":

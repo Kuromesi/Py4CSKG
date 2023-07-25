@@ -141,9 +141,9 @@ class CAPECTraverser(XmlTraverser):
                     self.misc_df.loc[len(self.misc_df.index)] = [id, "IOC", des]
                     self.rel_df.loc[len(self.rel_df.index)] = [src, id, "Has_IOC"]
                     count += 1    
-        self.pt_df.to_csv('data/neo4j/capec_pt.csv', index=False)
-        self.misc_df.to_csv('data/neo4j/capec_misc.csv', index=False)
-        self.rel_df.to_csv('data/neo4j/capec_rel.csv', index=False)
+        self.pt_df.to_csv('data/neo4j/nodes/capec_pt.csv', index=False)
+        self.misc_df.to_csv('data/neo4j/nodes/capec_misc.csv', index=False)
+        self.rel_df.to_csv('data/neo4j/relations/capec_rel.csv', index=False)
 
 class CWETraverser(XmlTraverser):
     def __init__(self, path: str):
@@ -236,11 +236,11 @@ class CWETraverser(XmlTraverser):
                     des = str(mitigation)
                     self.misc_df.loc[len(self.misc_df.index)] = [id, "Mitigation", des]
                     self.rel_df.loc[len(self.rel_df.index)] = [src, id, "Has_Mitigation"]
-        self.wk_df.to_csv('data/neo4j/cwe_wk.csv', index=False)
-        self.misc_df.to_csv('data/neo4j/cwe_misc.csv', index=False)
-        self.rel_df.to_csv('data/neo4j/cwe_rel.csv', index=False) 
+        self.wk_df.to_csv('data/neo4j/nodes/cwe_wk.csv', index=False)
+        self.misc_df.to_csv('data/neo4j/nodes/cwe_misc.csv', index=False)
+        self.rel_df.to_csv('data/neo4j/relations/cwe_rel.csv', index=False) 
+        
 class ATTACKTraverser(XmlTraverser):
-
     def __init__(self, path: str, tactic_url: str):
         self.TYPE = "Technique"
         self.tactic_url = tactic_url
@@ -329,18 +329,9 @@ class ATTACKTraverser(XmlTraverser):
                     self.misc_df.loc[len(self.misc_df.index)] = [id, "IOC", name, des]
                     self.rel_df.loc[len(self.rel_df.index)] = [attrs['id'], id, "Has_IOC"]
                         
-        self.tech_df.to_csv('data/neo4j/attack_tech.csv', index=False)
-        self.misc_df.to_csv('data/neo4j/attack_misc.csv', index=False)
-        self.rel_df.to_csv('data/neo4j/attack_rel.csv', index=False) 
-
-            # full_card = str(tech)
-            # card_attrs = {}
-            # card_attrs['id'] = attrs['id'] + "-FullCard"
-            # card_attrs['des'] = full_card
-            # card_attrs['prop'] = "FullCard"
-            # destID = self.ds.addNode(card_attrs)
-            # self.rs.saveNodeId(card_attrs['id'], destID)
-            # self.rs.saveRDF(attrs['id'], card_attrs['id'], 'Has_FullCard')
+        self.tech_df.to_csv('data/neo4j/nodes/attack_tech.csv', index=False)
+        self.misc_df.to_csv('data/neo4j/nodes/attack_misc.csv', index=False)
+        self.rel_df.to_csv('data/neo4j/relations/attack_rel.csv', index=False) 
 
     def tactic_traverse(self, json_url):
         with open(json_url, 'r', encoding='utf-8') as f:

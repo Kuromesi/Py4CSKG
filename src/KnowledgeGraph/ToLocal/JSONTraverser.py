@@ -1,7 +1,13 @@
+import sys, os
+BASE_DIR=os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.join(BASE_DIR))
+
 import json
 import pandas as pd
 from tqdm import tqdm 
-from version_compare import *
+from utils.version_compare import *
+
+
 
 type_dict = {
     'a': "Software",
@@ -15,7 +21,7 @@ class CVETraverser():
         self.cve_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'type', 'description', 'baseMetricV2', 'baseMetricV3', 'complete'])
         self.cpe_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'type', 'product', 'versionStart', 'versionEnd', 'vulnerable'])
         self.rel_df = pd.DataFrame(columns=[':START_ID', ':END_ID', ':TYPE'])
-        self.impact = pd.read_csv('./data/CVEImpact.csv', index_col=0)
+        # self.impact = pd.read_csv('./data/base/cve/CVEImpact.csv', index_col=0)
 
     def find_kv(self):
         pass
@@ -78,9 +84,7 @@ class CVETraverser():
                     cpe.append(self.cpe_version(platform))
                 cpe = self.cpe_summary(cpe)
                 result.append((cpe, []))
-        return result
-                
-                
+        return result        
 
     def get_cpe(self, nodes, results):
         cpe23uri = ""
@@ -160,28 +164,6 @@ class CVETraverser():
         result["vulnerable"] = True if words[15] == "T" else False
         return result
 
-    def cpe_processor(self, cpe):
-        result = {}
-        words = cpe.split(":")
-        result["cpe_version"] = words[0] + "-" + words[1]
-        result["part"] = words[2]
-        result["vendor"] = words[3]
-        result["id"] = words[4]
-        result["version"] = words[5]
-        result["update"] = words[6]
-        result["edition"] = words[7]
-        result["language"] = words[8]
-        result["sw_edition"] = words[9]
-        result["target_sw"] = words[10]
-        result["target_hw"] = words[11]
-        result["other"] = words[12]
-        result["versionStart"] = words[13]
-        result["versionEnd"] = words[14]
-        result["type"] = "CPE"
-        result["prop"] = "Platform"
-        result["url"] = cpe
-        return result
-
     def traverse(self, cves):
         # KURO
         # df = pd.DataFrame(columns=['id', 'des'])
@@ -190,9 +172,9 @@ class CVETraverser():
         count = 0
         for path in cves:
             count += 1
-            self.cve_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'type', 'description', 'baseMetricV2', 'baseMetricV3', 'impact', 'complete'])
-            self.cpe_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'type', 'product', 'versionStart', 'versionEnd', 'vulnerable'])
-            self.rel_df = pd.DataFrame(columns=[':START_ID', ':END_ID', ':TYPE'])
+            cve_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'type', 'description', 'baseMetricV2', 'baseMetricV3', 'complete'])
+            cpe_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'type', 'product', 'versionStart', 'versionEnd', 'vulnerable'])
+            rel_df = pd.DataFrame(columns=[':START_ID', ':END_ID', ':TYPE'])
             with open(path, 'r', encoding='utf-8') as f:
                 items = json.load(f)
             items = items['CVE_Items']
@@ -215,14 +197,7 @@ class CVETraverser():
                     # baseMetricV3
                     if ('baseMetricV3' in cvss):
                         cvss3 = json.dumps(cvss['baseMetricV3'])
-                    node = {'id': src,
-                            'type': "CVE",
-                            'prop': self.type,
-                            'des': des,
-                            'baseMetricV2': cvss2,
-                            'baseMetricV3': cvss3,
-                            'complete': json.dumps(cve)}
-                    # self.cve_df.loc[len(self.cve_df.index)] = [src, self.type, "CVE", des, cvss2, cvss3, self.impact.at[src, 'Impact'], json.dumps(cve)]
+                    cve_df.loc[len(self.cve_df.index)] = [src, self.type, "CVE", des, cvss2, cvss3, json.dumps(cve)]
                     
 
                     # Find related CWE
@@ -230,7 +205,7 @@ class CVETraverser():
                     for cwe in cwes:
                         cwe = cwe['value']
                         if cwe != "NVD-CWE-noinfo" and cwe != "NVD-CWE-Other":
-                            self.rel_df.loc[len(self.rel_df.index)] = [cwe, src, "Observed_Example"]
+                            rel_df.loc[len(rel_df.index)] = [cwe, src, "Observed_Example"]
 
                     # Find CPE
                     if 'configurations' in cur and 'nodes' in cur['configurations']:
@@ -238,47 +213,46 @@ class CVETraverser():
                         summary = self._get_cpe(cpe, src)
                         for sum in summary:
                             for product in sum[0]:
-                                # self.cpe_df.loc[len(self.cpe_df.index)] = [
-                                #     sum[0][product]['uri'], "Platform", sum[0][product]['type'], sum[0][product]['product'], 
-                                #     sum[0][product]['versionStart'], sum[0][product]['versionEnd'], sum[0][product]['vulnerable']
-                                #     ]
-                                self.rel_df.loc[len(self.rel_df.index)] = [src, sum[0][product]['uri'], "Has_Platform"]
+                                cpe_df.loc[len(cpe_df.index)] = [
+                                    sum[0][product]['uri'], "Platform", sum[0][product]['type'], sum[0][product]['product'], 
+                                    sum[0][product]['versionStart'], sum[0][product]['versionEnd'], sum[0][product]['vulnerable']
+                                    ]
+                                rel_df.loc[len(rel_df.index)] = [src, sum[0][product]['uri'], "Has_Platform"]
                                 if sum[1]:
                                     for platform in sum[1]:
-                                        # self.cpe_df.loc[len(self.cpe_df.index)] = [
-                                        #     sum[1][platform]['uri'], "Platform", sum[1][platform]['type'], sum[1][platform]['product'], 
-                                        #     sum[1][platform]['versionStart'], sum[1][platform]['versionEnd'], sum[1][platform]['vulnerable']
-                                        #     ]
-                                        self.rel_df.loc[len(self.rel_df.index)] = [src, sum[1][platform]['uri'], "Has_Platform"]
-                                        self.rel_df.loc[len(self.rel_df.index)] = [sum[0][product]['uri'], sum[1][platform]['uri'], "And"]
-                                        self.rel_df.loc[len(self.rel_df.index)] = [sum[1][platform]['uri'], sum[0][product]['uri'], "And"]
+                                        cpe_df.loc[len(cpe_df.index)] = [
+                                            sum[1][platform]['uri'], "Platform", sum[1][platform]['type'], sum[1][platform]['product'], 
+                                            sum[1][platform]['versionStart'], sum[1][platform]['versionEnd'], sum[1][platform]['vulnerable']
+                                            ]
+                                        rel_df.loc[len(rel_df.index)] = [src, sum[1][platform]['uri'], "Has_Platform"]
+                                        rel_df.loc[len(rel_df.index)] = [sum[0][product]['uri'], sum[1][platform]['uri'], "And"]
+                                        rel_df.loc[len(rel_df.index)] = [sum[1][platform]['uri'], sum[0][product]['uri'], "And"]
         
-            # self.cve_df.to_csv('data/neo4j/nodes/cve_cve%d.csv'%count, index=False)
-            # self.cpe_df.to_csv('data/neo4j/nodes/cve_cpe%d.csv'%count, index=False)
-            self.rel_df.to_csv('data/neo4j/relations/cve_rel%d.csv'%count, index=False) 
-                        # summary = self.cpe_summary(cpe_uri)
-                        # for product in summary:
-                        #     if not self.rs.checkNode(summary[product]['uri']):
-                        #         cpe_id = self.ds.addNode(summary[product])
-                        #         self.rs.saveNodeId(summary[product]['uri'], cpe_id)
-                                
-                        #     self.rs.saveRDF(src, summary[product]['uri'], "has_platform")
-                        
-                        
-                        # for uri in cpe_uri:
-                        #     res = self._cpe_processor(uri)
-                        #     # product.add(res['product'])
-                        #     if not self.rs.checkNode(uri):
-                        #         cpe_id = self.ds.addNode(res)
-                        #         self.rs.saveNodeId(uri, cpe_id)
-                                
-                        #     self.rs.saveRDF(src, uri, "has_platform")
-        # df['product'] = list(product)
-        # df.to_csv('data/CVE/product.csv', index=False)
-        # df.to_csv('myData/learning/CVE2CAPEC/cve.csv', index=False)
+            cve_df.to_csv('data/neo4j/nodes/cve_cve%d.csv'%count, index=False)
+            cpe_df.to_csv('data/neo4j/nodes/cve_cpe%d.csv'%count, index=False)
+            rel_df.to_csv('data/neo4j/relations/cve_rel%d.csv'%count, index=False) 
+    
+    def get_cves(self):
+        """get paths of cve in json format
+
+        Returns:
+            _type_: _description_
+        """        
+        path = "./data/base/cve"
+        cves = os.listdir(path)
+        not_included = ["CVE-Modified.json", "CVE-Recent.json", "cve.json"]
+        ret = []
+        for cve in cves:
+            if cve in not_included:
+                continue
+            if os.path.splitext(cve)[1] == '.json':
+                ret.append(os.path.join(path, cve))
+        return ret
+
+
 if __name__ == '__main__':
     cves = [
-        'data/CVE/CVE-2002.json', 'data/CVE/CVE-2003.json', 'data/CVE/CVE-2004.json',
+        'data/base/cve/CVE-2002.json', 'data/CVE/CVE-2003.json', 'data/CVE/CVE-2004.json',
         'data/CVE/CVE-2005.json', 'data/CVE/CVE-2006.json', 'data/CVE/CVE-2007.json',
         'data/CVE/CVE-2008.json', 'data/CVE/CVE-2009.json', 'data/CVE/CVE-2010.json',
         'data/CVE/CVE-2011.json', 'data/CVE/CVE-2012.json', 'data/CVE/CVE-2013.json',
@@ -286,6 +260,7 @@ if __name__ == '__main__':
         'data/CVE/CVE-2017.json', 'data/CVE/CVE-2018.json', 'data/CVE/CVE-2019.json',
         'data/CVE/CVE-2020.json', 'data/CVE/CVE-2021.json', ]
     cvet = CVETraverser()
+    cves = cvet.get_cves()
     cvet.traverse(cves)
 
 
