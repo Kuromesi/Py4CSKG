@@ -27,11 +27,16 @@ class KGBuilder():
     def to_csv_neo4j(self):
         """convert knowledge bases to csv format which could be directly loaded by neo4j
         """        
+        logger.info("Starting to convert raw data into neo4j csv format")
+        if not os.path.exists("./data/neo4j/nodes"):
+            os.makedirs("./data/neo4j/nodes")
+        if not os.path.exists("./data/neo4j/relations"):
+            os.makedirs("./data/neo4j/relations")
         cvet = TraverserBuilder.new_cve_traverser()
         cwet = TraverserBuilder.new_cwe_traverser()
         capect = TraverserBuilder.new_capec_traverser()
         attackt = TraverserBuilder.new_attack_traverser()
+        attackt.traverse()
         cvet.traverse()
         capect.traverse()
-        attackt.traverse()
         cwet.traverse()

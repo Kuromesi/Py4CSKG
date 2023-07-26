@@ -6,10 +6,13 @@ import requests
 import os, re
 from lxml import etree
 from tqdm import tqdm
+from DataUpdater.updaters.utils import *
+from Logging.Logger import logger
 
 class CVEUpdater():
-    def __init__(self) -> None:
+    def __init__(self, logger) -> None:
         self.pattern = re.compile(r"/feeds/json/cve/1.1/(.*).zip")
+    
     def get_cve_links(self):
         """get cve download links
 
@@ -46,6 +49,7 @@ class CVEUpdater():
         return z.extractall()
 
     def update(self):
+        logger.info("Starting to update CVE")
         cve_loc = "./data/base/cve"
         index = 'https://nvd.nist.gov'
         cve_links = self.get_cve_links()
@@ -55,22 +59,9 @@ class CVEUpdater():
             name = self.pattern.match(cve_link).group(1)
             cve_links.set_postfix(downloading=name)
             link =  index + cve_link
-            self.download_and_unzip(link)
+            download_and_unzip(link)
             cf = os.path.join(cve_loc, cve_name + ".json")
             shutil.move(name, cf)
-
-    def download_and_unzip(self, url):
-        """Downloads and unzips a file.
-
-        Keyword Args:
-            link to zipped xml file.
-
-        Returns:
-            unzipped data file in the current directory.
-        """
-        r = requests.get(url)
-        z = zipfile.ZipFile(io.BytesIO(r.content))
-        return z.extractall()
     
 if __name__ == '__main__':
     cveu = CVEUpdater()

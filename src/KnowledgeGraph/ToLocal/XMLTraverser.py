@@ -3,6 +3,8 @@ import pandas as pd
 import re
 import json
 from tqdm import tqdm
+from Logging.Logger import logger
+from DataUpdater.updaters.utils import *
 
 CVE = re.compile(r'CVE-\d*-\d*')
 
@@ -21,11 +23,6 @@ class XmlTraverser:
             value = tag.get_text().strip()
         return value
 
-    def string_proc(self, string):
-        string = string.replace("\n", "")
-        string = string.strip()
-        return string
-
     def traverse(self):
         pass
 
@@ -42,6 +39,7 @@ class CAPECTraverser(XmlTraverser):
     def traverse(self):
         # df = pd.DataFrame(columns=['id', 'name', 'description', 'cve'])
         # Find views
+        logger.info("Starting to traverse CAPEC")
         views = self.soup.find_all("View")
         views = tqdm(views)
         views.set_description("TRAVERSING VIEWS")
@@ -155,6 +153,7 @@ class CWETraverser(XmlTraverser):
         self.misc_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'description'])
     
     def traverse(self):
+        logger.info("Starting to traverse CWE")
         srcID, destID = None, None
         
         # Find views
@@ -241,7 +240,7 @@ class CWETraverser(XmlTraverser):
         self.rel_df.to_csv('data/neo4j/relations/cwe_rel.csv', index=False) 
         
 class ATTACKTraverser(XmlTraverser):
-    def __init__(self, path: str, tactic_url: str):
+    def __init__(self, path="data/base/attack/enterprise.xml", tactic_url='data/attack/enterprise_tactic.json'):
         self.TYPE = "Technique"
         self.tactic_url = tactic_url
         with open(path, "r", encoding='utf-8') as file:
@@ -251,22 +250,23 @@ class ATTACKTraverser(XmlTraverser):
         self.misc_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'name', 'description'])
 
     def traverse(self):
+        logger.info("Starting to traverse ATT&CK")
         self.tactic_traverse(self.tactic_url)
         technique = tqdm(self.soup.find_all('Technique'))
         technique.set_description("TRAVERSING ATT&CK TECHNIQUES")
         for tech in technique:
             technique.set_postfix(id=tech['id'])
             attrs = {}
-            attrs['id'] = self.string_proc(tech['id'])
-            attrs['name'] = self.string_proc(tech['name'])
-            attrs['des'] = self.string_proc(tech.next)
+            attrs['id'] = text_proc(tech['id'])
+            attrs['name'] = text_proc(tech['name'])
+            attrs['des'] = text_proc(tech.next)
             attrs['type'] = 'SubTechnique' if "." in attrs['id'] else "Technique"
             attrs['prop'] = self.TYPE
             attrs['complete'] = str(tech)
-            attrs['platforms'] = self.string_proc(tech.find('Platforms').text) if tech.find('Platforms') else ""
-            attrs['permissions_required'] = self.string_proc(tech.find('Permissions_Required').text) if tech.find('Permissions_Required') else ""   
-            attrs['effective_permissions'] = self.string_proc(tech.find('Effective_Permissions').text) if tech.find('Effective_Permissions') else ""
-            attrs['impact_type'] = self.string_proc(tech.find('Impact_Type').text) if tech.find('Impact_Type') else ""
+            attrs['platforms'] = text_proc(tech.find('Platforms').text) if tech.find('Platforms') else ""
+            attrs['permissions_required'] = text_proc(tech.find('Permissions_Required').text) if tech.find('Permissions_Required') else ""   
+            attrs['effective_permissions'] = text_proc(tech.find('Effective_Permissions').text) if tech.find('Effective_Permissions') else ""
+            attrs['impact_type'] = text_proc(tech.find('Impact_Type').text) if tech.find('Impact_Type') else ""
                 
             self.tech_df.loc[len(self.tech_df.index)] = [
                 attrs['id'], "Technique", attrs['name'], attrs['des'], attrs['type'], attrs['platforms'], 
@@ -304,7 +304,7 @@ class ATTACKTraverser(XmlTraverser):
                     # group_type = "Software" if id[0] == "S" else "Group"
                     self.misc_df.loc[len(self.misc_df.index)] = [id, "Threats", name, ""]
                     uri = id + ":" +attrs['id']
-                    des = self.string_proc(example.next)
+                    des = text_proc(example.next)
                     self.misc_df.loc[len(self.misc_df.index)] = [uri, "Procedure", "", des]
                     self.rel_df.loc[len(self.rel_df.index)] = [id, uri, "Has_Procedure"]
                     self.rel_df.loc[len(self.rel_df.index)] = [uri, attrs['id'], "Utilize"]
@@ -315,7 +315,7 @@ class ATTACKTraverser(XmlTraverser):
                 for mitigation in mitigations:
                     id = mitigation['id']
                     name = mitigation['name']
-                    des = self.string_proc(mitigation.text)
+                    des = text_proc(mitigation.text)
                     self.misc_df.loc[len(self.misc_df.index)] = [id, "Mitigation", name, des]
                     self.rel_df.loc[len(self.rel_df.index)] = [attrs['id'], id, "Has_Mitigation"]
                     
@@ -325,7 +325,7 @@ class ATTACKTraverser(XmlTraverser):
                 for detection in detections:
                     id = detection['id']
                     name = detection['name']
-                    des = self.string_proc(detection.text)
+                    des = text_proc(detection.text)
                     self.misc_df.loc[len(self.misc_df.index)] = [id, "IOC", name, des]
                     self.rel_df.loc[len(self.rel_df.index)] = [attrs['id'], id, "Has_IOC"]
                         
@@ -341,9 +341,8 @@ class ATTACKTraverser(XmlTraverser):
             # if True:
             cur = self.root_node[name]
             id = cur['id']
-            contents = cur["contents"]
-            attrs = {"id": id, "type": "Tactic", "contents": contents, "name": name, "url": id, "prop": "Tactic"}
-            self.misc_df.loc[len(self.misc_df.index)] = [id, "Tactic", name, contents]
+            description = cur["description"]
+            self.misc_df.loc[len(self.misc_df.index)] = [id, "Tactic", name, description]
 
 if __name__ == "__main__":
     # capect = CAPECTraverser('data/CAPEC/CAPEC.xml')

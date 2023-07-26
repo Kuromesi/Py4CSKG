@@ -8,6 +8,8 @@ from tqdm import tqdm
 from lxml import etree
 from functools import wraps
 import time, json
+from Logging.Logger import logger
+from DataUpdater.updaters.utils import *
 
 LOGGING_PATH = ""
 
@@ -45,10 +47,6 @@ class CVEDetailsUpdater():
             "Opera/9.80 (Macintosh; Intel Mac OS X 10.6.8; U; fr) Presto/2.9.168 Version/11.52",
         ]
     
-    def text_proc(self, text):
-        text = text.strip()
-        return text
-    
     def find_index_type_pages_urls(self):
         """find cve type urls in index
 
@@ -59,18 +57,18 @@ class CVEDetailsUpdater():
         try:
             res = requests.get(url)
         except:
-            print("Connection Failed!")
+            logger.error("Failed to update CVE details: %s"%e)
             exit()
         idx = etree.HTML(res.content) 
         headers_tab = idx.xpath('//*[@id="contentdiv"]/table[1]/tr[1]/th')
-        headers = [self.text_proc(header.text) for header in headers_tab]
+        headers = [text_proc(header.text) for header in headers_tab]
         headers = headers[2: -1]
         urls_tab = idx.xpath('//*[@id="contentdiv"]/table[1]/tr[27]/td/a')
         urls = [self.url_prefix + url.attrib['href'] for url in urls_tab]
         urls = urls[: -1]
         return headers, urls
     
-    @logging('www.cvedetails.com')
+    # @logging('www.cvedetails.com')
     def find_type_page_urls(self, url):
         """find type page urls in type pages
 
@@ -91,7 +89,7 @@ class CVEDetailsUpdater():
         urls = [self.url_prefix + url.attrib['href'] for url in urls_tab]
         return urls        
     
-    @logging('www.cvedetails.com')
+    # @logging('www.cvedetails.com')
     def type_page_proc(self, url, q, max_retries=0):
         """process a single page of type of vulnerabilities, get types
 
@@ -113,21 +111,19 @@ class CVEDetailsUpdater():
             cves = {}
             for i in range(len(ids)):
                 t = etree.tostring(ids[i])
-                id = self.text_proc(ids[i].text)
-                vul_type = self.text_proc(vul_types[i].text)
+                id = text_proc(ids[i].text)
+                vul_type = text_proc(vul_types[i].text)
                 cves[id] = vul_type
             q.put(cves)
         except Exception as e:
             if max_retries > 10:
-                print(e)
+                logger.error("Failed to update CVE details: %s"%e)
             else:
                 time.sleep(10)
-                print("retrying connect to %s"%url)
                 self.type_page_proc(url, q, max_retries + 1)
         
-            
-
     def update(self):
+        logger.info("Starting to update CVE details")
         """Multiprocessing
 
         Args:
@@ -164,7 +160,7 @@ class Saver():
         self.size = 500
 
     def save(self, queue):
-        path = "src\DataUpdate\data"
+        path = "./data/base/cve_details"
         content = {}
         cur = self.cur
         fidx = self.fidx
@@ -185,9 +181,7 @@ class Saver():
                 if cur != 0:
                     with open(os.path.join(path, 'cve_type_%d.json'%fidx), 'w') as f:
                         json.dump(content, f, sort_keys=True, indent=4)
-                break
-            
-            
+                break    
 
 if __name__ == '__main__':
     # pattern = re.compile('\[.*\]' )   

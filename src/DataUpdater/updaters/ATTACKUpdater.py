@@ -1,16 +1,19 @@
 from bs4 import BeautifulSoup as bs
-import os
+import os, sys, time
 import requests
-import re
+import re, json
 import multiprocessing
 from tqdm import tqdm
+from Logging.Logger import logger
+from DataUpdater.updaters.utils import *
+from lxml import etree
 
 class ATTACKUpdater():
     def __init__(self) -> None:
-        self.pattern = re.compile('\[.*\]' )  
+        self.pattern = re.compile('\[.*\]' )
         
 
-    def extract_content(self, url:str) -> str:
+    def extract_content(self, url:str, retries=0, max_retries=5) -> str:
         """extract content from web pages
 
         Args:
@@ -21,10 +24,9 @@ class ATTACKUpdater():
         """        
         soup = bs(features='xml')
         try:
-            res = requests.get(url)
+            res = do_request(url)
         except:
-            print("Connection Failed!")
-            exit()
+            logger.error("Failed to update ATT&CK techniques: %s"%url)
         s = bs(res.content, "lxml")
         
         # find id
@@ -42,7 +44,7 @@ class ATTACKUpdater():
                 technique["name"] = names.get_text() + " " + name.contents[2].strip()
             else:
                 technique["name"] = name.get_text().replace("\n", "").strip()
-            print(technique["name"])
+            # print(technique["name"])
 
             # find description
             description = s.find("div", attrs={"class": "description-body"})
@@ -172,10 +174,78 @@ class ATTACKUpdater():
             # self.res.put(technique)
             return str(technique)
         else:
-            print("deprecated")
             return 0
+    
+    def update_technique(self, path="data/base/attack"):
+        urls = []
+        result = []
+        pool = multiprocessing.Pool(64)
+        target_urls = {
+            "enterprise": "https://attack.mitre.org/techniques/enterprise/",
+            "mobile": "https://attack.mitre.org/techniques/mobile/",
+            "ics": "https://attack.mitre.org/techniques/ics/"
+        }
+        url_main = "https://attack.mitre.org"
+        for kind, url in target_urls.items():
+            logger.info("Updating ATT&CK %s techniques"%kind)
+            soup = bs(features='xml')
+            soup.append(soup.new_tag("Techniques"))
+            try:
+                res = do_request(url)
+            except:
+                print("Failed to update ATT&CK techniques: %s"%url)
+                continue
+            s = bs(res.content, "lxml")
+            s.find("table", attrs={"class": "table-techniques"})
+            s = s.find("tbody")
+            s = s.find_all("tr")
+            for tr in s:
+                links = tr.find_all("a")
+                sub_url = url_main + links[0]["href"]
+                urls.append(sub_url)
+            for temp in urls:
+                temp = pool.apply_async(self.extract_content, (temp, ))    
+                result.append(temp)
+            for temp in result:
+                temp = temp.get()
+                if temp:
+                    tag = bs(temp, "xml")
+                    soup.Techniques.append(tag.Technique)
+            soup = soup.prettify()
+            with open(os.path.join(path, kind + ".xml"), "w", encoding="utf-8") as f:
+                f.write(soup)
+                f.close()
+        pool.close()
+        pool.join()
+
+    def update_tactic(self):
+        logger.info("Updating ATT&CK tactics")
+        urls = {
+            "enterprise": "https://attack.mitre.org/tactics/enterprise/",
+            "mobile": "https://attack.mitre.org/tactics/mobile/",
+            "ics": "https://attack.mitre.org/tactics/ics/",
+        }
+        for n, url in urls.items():
+            try:
+                res = do_request(url)
+            except:
+                logger.error("Failed to update ATT&CK tactic: %s"%url)
+                continue
+            res = etree.HTML(res)
+            rows = res.xpath('//*[@id="v-attckmatrix"]/div[2]/div/div/div/div/div[2]/div/table/tbody/tr')
+            tactics = {}
+            for row in rows:
+                id = text_proc(row.xpath('td[1]/a')[0].text)
+                name = text_proc(row.xpath('td[2]/a')[0].text)
+                des = text_proc(row.xpath('td[3]')[0].text)
+                tactics[name] = {}
+                tactics[name]['id'] = id
+                tactics[name]['description'] = des
+            with open(os.path.join("./data/base/attack", n + "_tactic.json"), 'w') as f:
+                json.dump(tactics, f)
+
         
-    def update(self, path, type="enterprise"):
+    def update(self, path="data/base/attack"):
         """Multiprocessing
 
         Args:
@@ -183,44 +253,10 @@ class ATTACKUpdater():
             type (str, optional): enterprise, mobile or ICS. Defaults to "enterprise".
         """        
         # init process pool
-        urls = []
-        result = []
-        pool = multiprocessing.Pool(64)
-        
-        if type == "enterprise":
-            url = "https://attack.mitre.org/techniques/enterprise/"
-        elif type == "mobile":
-            url = "https://attack.mitre.org/techniques/mobile/"
-        url_main = "https://attack.mitre.org"
-        soup = bs(features='xml')
-        soup.append(soup.new_tag("Techniques"))
-        try:
-            res = requests.get(url)
-        except:
-            print("Connection Failed!")
-            exit()
-        s = bs(res.content, "lxml")
-        s.find("table", attrs={"class": "table-techniques"})
-        s = s.find("tbody")
-        s = s.find_all("tr")
-        for tr in s:
-            links = tr.find_all("a")
-            sub_url = url_main + links[0]["href"]
-            urls.append(sub_url)
-        for temp in urls:
-            temp = pool.apply_async(self.extract_content, (temp, ))    
-            result.append(temp)
-        pool.close()
-        pool.join()
-        for temp in result:
-            temp = temp.get()
-            if temp:
-                tag = bs(temp, "xml")
-                soup.Techniques.append(tag.Technique)
-        soup = soup.prettify()
-        f = open(path, "w", encoding="utf-8")
-        f.write(soup)
-        f.close()
+        logger.info("Starting to update ATT&CK")
+        self.update_tactic()
+        self.update_technique()
+
         
 
 if __name__ == '__main__':
