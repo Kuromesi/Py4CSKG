@@ -3,7 +3,7 @@ import pandas as pd
 import re
 import json
 from tqdm import tqdm
-from Logging.Logger import logger
+from utils.Logger import logger
 from DataUpdater.updaters.utils import *
 
 CVE = re.compile(r'CVE-\d*-\d*')
@@ -243,15 +243,24 @@ class ATTACKTraverser(XmlTraverser):
     def __init__(self, path="data/base/attack/enterprise.xml", tactic_url='data/attack/enterprise_tactic.json'):
         self.TYPE = "Technique"
         self.tactic_url = tactic_url
-        with open(path, "r", encoding='utf-8') as file:
-            self.soup = BeautifulSoup(file, "xml")
+        
         self.tech_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'name', 'description', 'type', 'platforms', 'permissions_required', 'effective_permissions', 'impact_type','complete'])
         self.rel_df = pd.DataFrame(columns=[':START_ID', ':END_ID', ':TYPE'])
         self.misc_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'name', 'description'])
 
     def traverse(self):
-        logger.info("Starting to traverse ATT&CK")
-        self.tactic_traverse(self.tactic_url)
+        names = ["enterprise", "mobile", "ics"]
+        for name in names:
+            logger.info("Starting to traverse %s ATT&CK"%name)
+            self.tactic_traverse("data/base/attack/%s_tactic.json"%name)
+            self.traverse_single("data/base/attack/%s.xml"%name)
+        self.tech_df.to_csv('data/neo4j/nodes/attack_tech.csv', index=False)
+        self.misc_df.to_csv('data/neo4j/nodes/attack_misc.csv', index=False)
+        self.rel_df.to_csv('data/neo4j/relations/attack_rel.csv', index=False) 
+
+    def traverse_single(self, path):
+        with open(path, "r", encoding='utf-8') as file:
+            self.soup = BeautifulSoup(file, "xml")
         technique = tqdm(self.soup.find_all('Technique'))
         technique.set_description("TRAVERSING ATT&CK TECHNIQUES")
         for tech in technique:
@@ -328,16 +337,11 @@ class ATTACKTraverser(XmlTraverser):
                     des = text_proc(detection.text)
                     self.misc_df.loc[len(self.misc_df.index)] = [id, "IOC", name, des]
                     self.rel_df.loc[len(self.rel_df.index)] = [attrs['id'], id, "Has_IOC"]
-                        
-        self.tech_df.to_csv('data/neo4j/nodes/attack_tech.csv', index=False)
-        self.misc_df.to_csv('data/neo4j/nodes/attack_misc.csv', index=False)
-        self.rel_df.to_csv('data/neo4j/relations/attack_rel.csv', index=False) 
 
     def tactic_traverse(self, json_url):
         with open(json_url, 'r', encoding='utf-8') as f:
             self.root_node = json.load(f)
         for name in self.root_node:
-            print(name)
             # if True:
             cur = self.root_node[name]
             id = cur['id']

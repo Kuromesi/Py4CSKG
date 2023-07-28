@@ -1,6 +1,8 @@
 from DataUpdater.updater import *
 from KnowledgeGraph.KGBuilder import *
-from Logging.Logger import Logger
+from utils.Logger import Logger
+import os
+os.environ['NUMEXPR_MAX_THREADS'] = '16'
 DATA_PATH = "./data"
 if __name__ == "__main__":
     # logger = Logger(logger_level="DEBUG")

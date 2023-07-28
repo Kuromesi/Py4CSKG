@@ -1,5 +1,5 @@
 import requests, zipfile, io
-from Logging.Logger import logger
+from utils.Logger import logger
 
 def download_and_unzip(url, path="", retries=0, max_retries=5):
         """Downloads and unzips a file.
@@ -34,7 +34,7 @@ def do_request(url, retries=0, max_retries=5):
         else:
             logger.error("Failed to request %s: %s"%(url, e))
             raise
-    return res.content
+    return res
 
 def text_proc(text):
     text = text.strip()

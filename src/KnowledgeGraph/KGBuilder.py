@@ -36,7 +36,7 @@ class KGBuilder():
         cwet = TraverserBuilder.new_cwe_traverser()
         capect = TraverserBuilder.new_capec_traverser()
         attackt = TraverserBuilder.new_attack_traverser()
-        attackt.traverse()
+        # attackt.traverse()
         cvet.traverse()
         capect.traverse()
         cwet.traverse()

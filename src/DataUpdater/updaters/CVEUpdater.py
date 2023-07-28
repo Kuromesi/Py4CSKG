@@ -7,7 +7,7 @@ import os, re
 from lxml import etree
 from tqdm import tqdm
 from DataUpdater.updaters.utils import *
-from Logging.Logger import logger
+from utils.Logger import logger
 
 class CVEUpdater():
     def __init__(self, logger) -> None:

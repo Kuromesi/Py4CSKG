@@ -8,7 +8,7 @@ from tqdm import tqdm
 from lxml import etree
 from functools import wraps
 import time, json
-from Logging.Logger import logger
+from utils.Logger import logger
 from DataUpdater.updaters.utils import *
 
 LOGGING_PATH = ""

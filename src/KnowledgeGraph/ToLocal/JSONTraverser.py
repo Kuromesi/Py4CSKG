@@ -1,4 +1,6 @@
 import sys, os
+
+from utils.MultiTask import MultiTask
 BASE_DIR=os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(os.path.join(BASE_DIR))
 
@@ -6,7 +8,7 @@ import json
 import pandas as pd
 from tqdm import tqdm 
 from utils.version_compare import *
-
+from utils.Logger import logger
 
 
 type_dict = {
@@ -163,74 +165,80 @@ class CVETraverser():
         result["uri"] = cpe
         result["vulnerable"] = True if words[15] == "T" else False
         return result
+    
+    def traverse_single(self, path, count):
+        logger.info("Starting to traverse cve: %s"%path)
+        cve_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'type', 'description', 'baseMetricV2', 'baseMetricV3', 'complete'])
+        cpe_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'type', 'product', 'versionStart', 'versionEnd', 'vulnerable'])
+        rel_df = pd.DataFrame(columns=[':START_ID', ':END_ID', ':TYPE'])
+        with open(path, 'r', encoding='utf-8') as f:
+            items = json.load(f)
+        items = items['CVE_Items']
+        # items = tqdm(items)
+        for cur in items:
+            cve = cur['cve']
+            src = cve['CVE_data_meta']['ID']
+            # items.set_postfix(CVE=src)
+            # print(src)
+            des = cve['description']['description_data'][0]['value']
+            if ("** REJECT **" not in des):
+                # df.loc[len(df.index)] = [src, des]
+                # CVSS
+                cvss = cur['impact']
+                cvss2 = ""
+                cvss3 = ""
+                # baseMetricV2
+                if ('baseMetricV2' in cvss):
+                    cvss2 = json.dumps(cvss['baseMetricV2'])
+                # baseMetricV3
+                if ('baseMetricV3' in cvss):
+                    cvss3 = json.dumps(cvss['baseMetricV3'])
+                cve_df.loc[len(self.cve_df.index)] = [src, self.type, "CVE", des, cvss2, cvss3, json.dumps(cve)]
+                
 
-    def traverse(self, cves):
+                # Find related CWE
+                cwes = cve['problemtype']['problemtype_data'][0]['description']
+                for cwe in cwes:
+                    cwe = cwe['value']
+                    if cwe != "NVD-CWE-noinfo" and cwe != "NVD-CWE-Other":
+                        rel_df.loc[len(rel_df.index)] = [cwe, src, "Observed_Example"]
+
+                # Find CPE
+                if 'configurations' in cur and 'nodes' in cur['configurations']:
+                    cpe = cur['configurations']['nodes']
+                    summary = self._get_cpe(cpe, src)
+                    for sum in summary:
+                        for product in sum[0]:
+                            cpe_df.loc[len(cpe_df.index)] = [
+                                sum[0][product]['uri'], "Platform", sum[0][product]['type'], sum[0][product]['product'], 
+                                sum[0][product]['versionStart'], sum[0][product]['versionEnd'], sum[0][product]['vulnerable']
+                                ]
+                            rel_df.loc[len(rel_df.index)] = [src, sum[0][product]['uri'], "Has_Platform"]
+                            if sum[1]:
+                                for platform in sum[1]:
+                                    cpe_df.loc[len(cpe_df.index)] = [
+                                        sum[1][platform]['uri'], "Platform", sum[1][platform]['type'], sum[1][platform]['product'], 
+                                        sum[1][platform]['versionStart'], sum[1][platform]['versionEnd'], sum[1][platform]['vulnerable']
+                                        ]
+                                    rel_df.loc[len(rel_df.index)] = [src, sum[1][platform]['uri'], "Has_Platform"]
+                                    rel_df.loc[len(rel_df.index)] = [sum[0][product]['uri'], sum[1][platform]['uri'], "And"]
+                                    rel_df.loc[len(rel_df.index)] = [sum[1][platform]['uri'], sum[0][product]['uri'], "And"]
+        cve_df.to_csv('data/neo4j/nodes/cve_cve%d.csv'%count, index=False)
+        cpe_df.to_csv('data/neo4j/nodes/cve_cpe%d.csv'%count, index=False)
+        rel_df.to_csv('data/neo4j/relations/cve_rel%d.csv'%count, index=False)
+    
+    def traverse(self):
         # KURO
         # df = pd.DataFrame(columns=['id', 'des'])
         # product = set()
         # df = pd.DataFrame(columns=['product'])
         count = 0
-        for path in cves:
-            count += 1
-            cve_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'type', 'description', 'baseMetricV2', 'baseMetricV3', 'complete'])
-            cpe_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'type', 'product', 'versionStart', 'versionEnd', 'vulnerable'])
-            rel_df = pd.DataFrame(columns=[':START_ID', ':END_ID', ':TYPE'])
-            with open(path, 'r', encoding='utf-8') as f:
-                items = json.load(f)
-            items = items['CVE_Items']
-            items = tqdm(items)
-            for cur in items:
-                cve = cur['cve']
-                src = cve['CVE_data_meta']['ID']
-                items.set_postfix(CVE=src)
-                # print(src)
-                des = cve['description']['description_data'][0]['value']
-                if ("** REJECT **" not in des):
-                    # df.loc[len(df.index)] = [src, des]
-                    # CVSS
-                    cvss = cur['impact']
-                    cvss2 = ""
-                    cvss3 = ""
-                    # baseMetricV2
-                    if ('baseMetricV2' in cvss):
-                        cvss2 = json.dumps(cvss['baseMetricV2'])
-                    # baseMetricV3
-                    if ('baseMetricV3' in cvss):
-                        cvss3 = json.dumps(cvss['baseMetricV3'])
-                    cve_df.loc[len(self.cve_df.index)] = [src, self.type, "CVE", des, cvss2, cvss3, json.dumps(cve)]
-                    
-
-                    # Find related CWE
-                    cwes = cve['problemtype']['problemtype_data'][0]['description']
-                    for cwe in cwes:
-                        cwe = cwe['value']
-                        if cwe != "NVD-CWE-noinfo" and cwe != "NVD-CWE-Other":
-                            rel_df.loc[len(rel_df.index)] = [cwe, src, "Observed_Example"]
-
-                    # Find CPE
-                    if 'configurations' in cur and 'nodes' in cur['configurations']:
-                        cpe = cur['configurations']['nodes']
-                        summary = self._get_cpe(cpe, src)
-                        for sum in summary:
-                            for product in sum[0]:
-                                cpe_df.loc[len(cpe_df.index)] = [
-                                    sum[0][product]['uri'], "Platform", sum[0][product]['type'], sum[0][product]['product'], 
-                                    sum[0][product]['versionStart'], sum[0][product]['versionEnd'], sum[0][product]['vulnerable']
-                                    ]
-                                rel_df.loc[len(rel_df.index)] = [src, sum[0][product]['uri'], "Has_Platform"]
-                                if sum[1]:
-                                    for platform in sum[1]:
-                                        cpe_df.loc[len(cpe_df.index)] = [
-                                            sum[1][platform]['uri'], "Platform", sum[1][platform]['type'], sum[1][platform]['product'], 
-                                            sum[1][platform]['versionStart'], sum[1][platform]['versionEnd'], sum[1][platform]['vulnerable']
-                                            ]
-                                        rel_df.loc[len(rel_df.index)] = [src, sum[1][platform]['uri'], "Has_Platform"]
-                                        rel_df.loc[len(rel_df.index)] = [sum[0][product]['uri'], sum[1][platform]['uri'], "And"]
-                                        rel_df.loc[len(rel_df.index)] = [sum[1][platform]['uri'], sum[0][product]['uri'], "And"]
-        
-            cve_df.to_csv('data/neo4j/nodes/cve_cve%d.csv'%count, index=False)
-            cpe_df.to_csv('data/neo4j/nodes/cve_cpe%d.csv'%count, index=False)
-            rel_df.to_csv('data/neo4j/relations/cve_rel%d.csv'%count, index=False) 
+        mt = MultiTask()
+        cves = self.get_cves()
+        mt.create_pool()
+        tasks = [(task, id) for id, task in enumerate(cves)]
+        mt.apply_task(self.traverse_single, tasks)
+        mt.delete_pool() 
     
     def get_cves(self):
         """get paths of cve in json format

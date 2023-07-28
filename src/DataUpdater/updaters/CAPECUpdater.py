@@ -1,6 +1,6 @@
 from DataUpdater.updaters.utils import *
 import shutil, os
-from Logging.Logger import logger
+from utils.Logger import logger
 
 
 class CAPECUpdater():

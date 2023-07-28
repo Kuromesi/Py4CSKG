@@ -3,7 +3,7 @@ from DataUpdater.updaters.ATTACKUpdater import *
 from DataUpdater.updaters.CVEUpdater import *
 from DataUpdater.updaters.CWEUpdater import *
 from DataUpdater.updaters.CAPECUpdater import *
-from Logging.Logger import logger
+from utils.Logger import logger
 import os
 
 class Updater():

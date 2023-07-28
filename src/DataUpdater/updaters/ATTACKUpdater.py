@@ -4,7 +4,7 @@ import requests
 import re, json
 import multiprocessing
 from tqdm import tqdm
-from Logging.Logger import logger
+from utils.Logger import logger
 from DataUpdater.updaters.utils import *
 from lxml import etree
 
@@ -177,17 +177,17 @@ class ATTACKUpdater():
             return 0
     
     def update_technique(self, path="data/base/attack"):
-        urls = []
-        result = []
-        pool = multiprocessing.Pool(64)
         target_urls = {
-            "enterprise": "https://attack.mitre.org/techniques/enterprise/",
             "mobile": "https://attack.mitre.org/techniques/mobile/",
+            "enterprise": "https://attack.mitre.org/techniques/enterprise/",
             "ics": "https://attack.mitre.org/techniques/ics/"
         }
         url_main = "https://attack.mitre.org"
         for kind, url in target_urls.items():
             logger.info("Updating ATT&CK %s techniques"%kind)
+            urls = []
+            result = []
+            pool = multiprocessing.Pool(64)
             soup = bs(features='xml')
             soup.append(soup.new_tag("Techniques"))
             try:
@@ -231,7 +231,7 @@ class ATTACKUpdater():
             except:
                 logger.error("Failed to update ATT&CK tactic: %s"%url)
                 continue
-            res = etree.HTML(res)
+            res = etree.HTML(res.content)
             rows = res.xpath('//*[@id="v-attckmatrix"]/div[2]/div/div/div/div/div[2]/div/table/tbody/tr')
             tactics = {}
             for row in rows:
