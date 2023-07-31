@@ -16,7 +16,7 @@ class MultiTask:
         ret = []
         for res in result:
             ret.append(res.get())
-        return res
+        return ret
         
     def delete_pool(self):
         self.pool.close()

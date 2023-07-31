@@ -8,9 +8,10 @@ from lxml import etree
 from tqdm import tqdm
 from DataUpdater.updaters.utils import *
 from utils.Logger import logger
+from utils.Config import config
 
 class CVEUpdater():
-    def __init__(self, logger) -> None:
+    def __init__(self) -> None:
         self.pattern = re.compile(r"/feeds/json/cve/1.1/(.*).zip")
     
     def get_cve_links(self):
@@ -21,10 +22,10 @@ class CVEUpdater():
         """        
         index = 'https://nvd.nist.gov/vuln/data-feeds'
         try:
-            res = requests.get(index)
+            res = do_request(index)
         except:
-            print("Connection to %s Failed!"%index)
-            exit()
+            logger.error("Failed to update cve: %s"%index)
+            raise
         res = etree.HTML(res.content)
         links_tab = res.xpath('//*[@id="vuln-feed-table"]/div/table/tbody/tr[@class="xml-feed-data-row"]/td/a')
         names_tab = res.xpath('//*[@id="vuln-feed-table"]/div/table/tbody/tr[@class="xml-feed-desc-row"]/td[1]')
@@ -50,9 +51,13 @@ class CVEUpdater():
 
     def update(self):
         logger.info("Starting to update CVE")
-        cve_loc = "./data/base/cve"
+        base = config.get("DataUpdater", "base_path")
+        cve_loc = os.path.join(base, "base/cve")
         index = 'https://nvd.nist.gov'
-        cve_links = self.get_cve_links()
+        try:
+            cve_links = self.get_cve_links()
+        except:
+            return
         cve_links = tqdm(cve_links.items())
         cve_links.set_description("Updating CVE data")
         for cve_name, cve_link in cve_links:

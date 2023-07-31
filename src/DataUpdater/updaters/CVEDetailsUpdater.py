@@ -10,6 +10,7 @@ from functools import wraps
 import time, json
 from utils.Logger import logger
 from DataUpdater.updaters.utils import *
+from utils.Config import config
 
 LOGGING_PATH = ""
 
@@ -131,7 +132,6 @@ class CVEDetailsUpdater():
             type (str, optional): enterprise, mobile or ICS. Defaults to "enterprise".
         """        
         # init process pool
-        path = "./data/base/cve_details"
         headers, type_page_urls = self.find_index_type_pages_urls()
         urls = []
         for url in type_page_urls:
@@ -160,7 +160,8 @@ class Saver():
         self.size = 500
 
     def save(self, queue):
-        path = "./data/base/cve_details"
+        base = config.get("DataUpdater", "base_path")
+        path = os.path.join(base, "base/cve_details")
         content = {}
         cur = self.cur
         fidx = self.fidx

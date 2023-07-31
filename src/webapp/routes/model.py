@@ -4,7 +4,7 @@ import json
 from webapp.utils.project import *
 from webapp.utils.draw import *
 from webapp.utils.search import *
-from analyzer.analyze import *
+from analyzer.bk.analyze import *
 
 model = Blueprint('model', __name__)
 

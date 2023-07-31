@@ -7,6 +7,8 @@ from tqdm import tqdm
 from utils.Logger import logger
 from DataUpdater.updaters.utils import *
 from lxml import etree
+from utils.MultiTask import *
+from utils.Config import config
 
 class ATTACKUpdater():
     def __init__(self) -> None:
@@ -27,6 +29,7 @@ class ATTACKUpdater():
             res = do_request(url)
         except:
             logger.error("Failed to update ATT&CK techniques: %s"%url)
+            return ""
         s = bs(res.content, "lxml")
         
         # find id
@@ -81,10 +84,10 @@ class ATTACKUpdater():
                         for cont in contents:
                             link = cont["href"]
                             try:
-                                res = requests.get(link)
+                                res = do_request(link)
                             except:
-                                print("Connection Failed!")
-                                exit()
+                                logger.error("Failed to update ATT&CK techniques: %s"%link)
+                                return ""
                             sub = bs(res.content, "lxml")
                             temp_res = sub.find_all("a", attrs={"target": "_blank"})
                             if temp_res:
@@ -174,20 +177,22 @@ class ATTACKUpdater():
             # self.res.put(technique)
             return str(technique)
         else:
-            return 0
+            return ""
     
-    def update_technique(self, path="data/base/attack"):
+    def update_technique(self, base):
         target_urls = {
             "mobile": "https://attack.mitre.org/techniques/mobile/",
             "enterprise": "https://attack.mitre.org/techniques/enterprise/",
             "ics": "https://attack.mitre.org/techniques/ics/"
         }
         url_main = "https://attack.mitre.org"
+        mt = MultiTask()
+        mt.create_pool()
+        base = os.path.join(base, "base/attack")
         for kind, url in target_urls.items():
             logger.info("Updating ATT&CK %s techniques"%kind)
             urls = []
             result = []
-            pool = multiprocessing.Pool(64)
             soup = bs(features='xml')
             soup.append(soup.new_tag("Techniques"))
             try:
@@ -202,23 +207,19 @@ class ATTACKUpdater():
             for tr in s:
                 links = tr.find_all("a")
                 sub_url = url_main + links[0]["href"]
-                urls.append(sub_url)
-            for temp in urls:
-                temp = pool.apply_async(self.extract_content, (temp, ))    
-                result.append(temp)
+                urls.append((sub_url, ))
+            result = mt.apply_task(self.extract_content, urls)
             for temp in result:
-                temp = temp.get()
                 if temp:
                     tag = bs(temp, "xml")
                     soup.Techniques.append(tag.Technique)
             soup = soup.prettify()
-            with open(os.path.join(path, kind + ".xml"), "w", encoding="utf-8") as f:
+            with open(os.path.join(base, kind + ".xml"), "w", encoding="utf-8") as f:
                 f.write(soup)
                 f.close()
-        pool.close()
-        pool.join()
+        mt.delete_pool()
 
-    def update_tactic(self):
+    def update_tactic(self, base):
         logger.info("Updating ATT&CK tactics")
         urls = {
             "enterprise": "https://attack.mitre.org/tactics/enterprise/",
@@ -241,11 +242,12 @@ class ATTACKUpdater():
                 tactics[name] = {}
                 tactics[name]['id'] = id
                 tactics[name]['description'] = des
-            with open(os.path.join("./data/base/attack", n + "_tactic.json"), 'w') as f:
+            base = os.path.join(base, "base/attack")
+            with open(os.path.join(base, n + "_tactic.json"), 'w') as f:
                 json.dump(tactics, f)
 
         
-    def update(self, path="data/base/attack"):
+    def update(self):
         """Multiprocessing
 
         Args:
@@ -254,8 +256,9 @@ class ATTACKUpdater():
         """        
         # init process pool
         logger.info("Starting to update ATT&CK")
-        self.update_tactic()
-        self.update_technique()
+        base = config.get("DataUpdater", "base_path")
+        self.update_tactic(base)
+        self.update_technique(base)
 
         
 

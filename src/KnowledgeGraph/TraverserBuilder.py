@@ -7,7 +7,7 @@ class TraverserBuilder():
         return cvet
 
     def new_capec_traverser() -> CAPECTraverser:
-        capect = CAPECTraverser('data/base/capec/CAPEC.xml')
+        capect = CAPECTraverser()
         return capect
     
     def new_attack_traverser() -> ATTACKTraverser:
@@ -15,5 +15,5 @@ class TraverserBuilder():
         return attackt
     
     def new_cwe_traverser() -> CWETraverser:
-        cwet = CWETraverser('data/base/cwe/CWE.xml')
+        cwet = CWETraverser()
         return cwet

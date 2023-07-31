@@ -4,7 +4,7 @@ sys.path.append(os.path.join(BASE_DIR))
 
 from TextSimilarity.TextSimilarity import *
 from TextClassification.cve2cwe import *
-from analyzer.analyze import *
+from analyzer.bk.analyze import *
 
 def cve2capecFactory():
     df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')

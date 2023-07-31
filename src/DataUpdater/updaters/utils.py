@@ -11,13 +11,13 @@ def download_and_unzip(url, path="", retries=0, max_retries=5):
             unzipped data file in the current directory.
         """
         try:
-            r = requests.get(url)
+            res = do_request(url)
         except Exception as e:
             if retries < max_retries:
                 download_and_unzip(path, retries=retries + 1)
             else:
                 raise
-        z = zipfile.ZipFile(io.BytesIO(r.content))
+        z = zipfile.ZipFile(io.BytesIO(res.content))
         return z.extractall(path)
 
 def do_request(url, retries=0, max_retries=5):

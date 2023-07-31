@@ -20,9 +20,6 @@ type_dict = {
 class CVETraverser():
     def __init__(self) -> None:
         self.type = "Vulnerability"
-        self.cve_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'type', 'description', 'baseMetricV2', 'baseMetricV3', 'complete'])
-        self.cpe_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'type', 'product', 'versionStart', 'versionEnd', 'vulnerable'])
-        self.rel_df = pd.DataFrame(columns=[':START_ID', ':END_ID', ':TYPE'])
         # self.impact = pd.read_csv('./data/base/cve/CVEImpact.csv', index_col=0)
 
     def find_kv(self):
@@ -193,7 +190,7 @@ class CVETraverser():
                 # baseMetricV3
                 if ('baseMetricV3' in cvss):
                     cvss3 = json.dumps(cvss['baseMetricV3'])
-                cve_df.loc[len(self.cve_df.index)] = [src, self.type, "CVE", des, cvss2, cvss3, json.dumps(cve)]
+                cve_df.loc[len(cve_df.index)] = [src, self.type, "CVE", des, cvss2, cvss3, json.dumps(cve)]
                 
 
                 # Find related CWE
@@ -223,8 +220,11 @@ class CVETraverser():
                                     rel_df.loc[len(rel_df.index)] = [src, sum[1][platform]['uri'], "Has_Platform"]
                                     rel_df.loc[len(rel_df.index)] = [sum[0][product]['uri'], sum[1][platform]['uri'], "And"]
                                     rel_df.loc[len(rel_df.index)] = [sum[1][platform]['uri'], sum[0][product]['uri'], "And"]
+        cve_df.drop_duplicates()
         cve_df.to_csv('data/neo4j/nodes/cve_cve%d.csv'%count, index=False)
+        cpe_df.drop_duplicates()
         cpe_df.to_csv('data/neo4j/nodes/cve_cpe%d.csv'%count, index=False)
+        rel_df.drop_duplicates()
         rel_df.to_csv('data/neo4j/relations/cve_rel%d.csv'%count, index=False)
     
     def traverse(self):
@@ -235,7 +235,7 @@ class CVETraverser():
         count = 0
         mt = MultiTask()
         cves = self.get_cves()
-        mt.create_pool()
+        mt.create_pool(32)
         tasks = [(task, id) for id, task in enumerate(cves)]
         mt.apply_task(self.traverse_single, tasks)
         mt.delete_pool() 

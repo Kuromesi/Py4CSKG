@@ -1,12 +1,14 @@
 from DataUpdater.updaters.utils import *
 import shutil, os
 from utils.Logger import logger
+from utils.Config import config
 
 
 class CAPECUpdater():
     def update(self):
         logger.info("Starting to update CAPEC")
-        path = "./data/base/capec"
+        base = config.get("DataUpdater", "base_path")
+        path = os.path.join(base, "base/capec")
         capec_url = "https://capec.mitre.org/data/xml/views/1000.xml.zip"
         try:
             download_and_unzip(capec_url, path=path)
