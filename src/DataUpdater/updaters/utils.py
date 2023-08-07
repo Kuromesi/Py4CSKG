@@ -20,19 +20,19 @@ def download_and_unzip(url, path="", retries=0, max_retries=5):
         z = zipfile.ZipFile(io.BytesIO(res.content))
         return z.extractall(path)
 
-def do_request(url, retries=0, max_retries=5):
+def do_request(url, retries=0, max_retries=5, headers=None):
     try:
-        res = requests.get(url)
+        res = requests.get(url, headers=headers)
         if res.status_code != 200:
             raise Exception("status code of request is %d"%res.status_code)
     except Exception as e:
         if retries < max_retries:
             try:
-                res = do_request(url, retries=retries + 1, max_retries=max_retries)
+                res = do_request(url, retries=retries + 1, max_retries=max_retries, headers=headers)
             except:
                 raise
         else:
-            logger.error("Failed to request %s: %s"%(url, e))
+            logger.error("failed to request %s: %s"%(url, e))
             raise
     return res
 

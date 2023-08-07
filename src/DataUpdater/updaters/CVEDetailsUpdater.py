@@ -11,8 +11,8 @@ import time, json
 from utils.Logger import logger
 from DataUpdater.updaters.utils import *
 from utils.Config import config
-
-LOGGING_PATH = ""
+from DataUpdater.updaters.utils import do_request
+from utils.MultiTask import MultiTask
 
 def logging(source):
     def decorator(func):
@@ -56,17 +56,32 @@ class CVEDetailsUpdater():
         """        
         url = "https://www.cvedetails.com/vulnerabilities-by-types.php"
         try:
-            res = requests.get(url)
-        except:
+            cookie = {
+                "cvedconsent": "1--94912313670ceed2c3095fca18f17fff9cde5b81",
+                "_ga": "GA1.1.1535701902.1691412836",
+                "_ga_3404JT2267": "GS1.1.1691412835.1.1.1691413260.0.0.0"
+            }
+            headers = {
+                'User-Agent': self.user_agents[randint(0, len(self.user_agents) - 1)],
+            }
+            res = do_request(url, headers=headers)
+        except Exception as e:
             logger.error("Failed to update CVE details: %s"%e)
             exit()
+            
+        
         idx = etree.HTML(res.content) 
-        headers_tab = idx.xpath('//*[@id="contentdiv"]/table[1]/tr[1]/th')
-        headers = [text_proc(header.text) for header in headers_tab]
-        headers = headers[2: -1]
-        urls_tab = idx.xpath('//*[@id="contentdiv"]/table[1]/tr[27]/td/a')
-        urls = [self.url_prefix + url.attrib['href'] for url in urls_tab]
-        urls = urls[: -1]
+        headers_tab1 = idx.xpath('//*[@id="contentdiv"]/div/main/div[2]/table/thead/tr/th')
+        headers_tab2 = idx.xpath('//*[@id="contentdiv"]/div/main/div[3]/table/thead/tr/th')
+        headers = []
+        headers.extend([text_proc(header.text) for header in headers_tab1][2: ])
+        headers.extend([text_proc(header.text) for header in headers_tab2][2: ])
+               
+        urls_tab1 = idx.xpath('//*[@id="contentdiv"]/div/main/div[2]/table/tbody/tr[12]/td/a')
+        urls_tab2 = idx.xpath('//*[@id="contentdiv"]/div/main/div[3]/table/tbody/tr[12]/td/a')
+        urls = []
+        urls.extend([self.url_prefix + url.attrib['href'] for url in urls_tab1])
+        urls.extend([self.url_prefix + url.attrib['href'] for url in urls_tab2])
         return headers, urls
     
     # @logging('www.cvedetails.com')
@@ -80,18 +95,21 @@ class CVEDetailsUpdater():
             _type_: _description_
         """             
         urls = []
+        headers = {
+                'User-Agent': self.user_agents[randint(0, len(self.user_agents) - 1)],
+            }
         try:
-            res = requests.get(url)
+            res = do_request(url, headers=headers)
         except:
             print("Connection to %s Failed!"%url)
             exit()
         idx = etree.HTML(res.content)
         urls_tab = idx.xpath('//*[@id="pagingb"]/a[@href]')
-        urls = [self.url_prefix + url.attrib['href'] for url in urls_tab]
+        urls = [url + u.attrib['href'] for u in urls_tab[1: ]]
         return urls        
     
     # @logging('www.cvedetails.com')
-    def type_page_proc(self, url, q, max_retries=0):
+    def type_page_proc(self, url, q, impact, max_retries=0):
         """process a single page of type of vulnerabilities, get types
 
         Args:
@@ -100,28 +118,20 @@ class CVEDetailsUpdater():
         Returns:
             _type_: _description_
         """     
-        random_agent = self.user_agents[randint(0, len(self.user_agents) - 1)]
         headers = {
-            'User-Agent':random_agent,
+            'User-Agent': self.user_agents[randint(0, len(self.user_agents) - 1)],
         }
         try:
-            res = requests.get(url, headers=headers)
+            res = do_request(url, headers=headers)
             idx = etree.HTML(res.content)
-            ids = idx.xpath('//*[@id="vulnslisttable"]/tr[@class="srrowns"]/td[2]/a')
-            vul_types = idx.xpath('//*[@id="vulnslisttable"]/tr[@class="srrowns"]/td[5]')
+            ids = idx.xpath('//*[@id="searchresults"]/div/div[1]/div[1]/h3/a')
             cves = {}
-            for i in range(len(ids)):
-                t = etree.tostring(ids[i])
-                id = text_proc(ids[i].text)
-                vul_type = text_proc(vul_types[i].text)
-                cves[id] = vul_type
+            for id in ids:
+                id = text_proc(id.text)
+                cves[id] = [impact]
             q.put(cves)
         except Exception as e:
-            if max_retries > 10:
-                logger.error("Failed to update CVE details: %s"%e)
-            else:
-                time.sleep(10)
-                self.type_page_proc(url, q, max_retries + 1)
+            logger.error("Failed to update CVE details: %s"%e)
         
     def update(self):
         logger.info("Starting to update CVE details")
@@ -133,23 +143,25 @@ class CVEDetailsUpdater():
         """        
         # init process pool
         headers, type_page_urls = self.find_index_type_pages_urls()
-        urls = []
-        for url in type_page_urls:
-            urls.extend(self.find_type_page_urls(url))
+        imapct_urls = {}
+        for header, url in zip(headers, type_page_urls):
+            imapct_urls[header] = self.find_type_page_urls(url)
         # urls.extend(self.find_type_page_urls(type_page_urls[0]))
         
+        mt = MultiTask()
+        mt.create_pool()
         saver = Saver()
         manager = multiprocessing.Manager()
         q = manager.Queue()
         p = multiprocessing.Process(target=saver.save, args=(q, ))
         p.start()
 
-        pool = multiprocessing.Pool(32)
-        result = []
-        for url in urls:
-            result.append(pool.apply_async(self.type_page_proc, (url, q)))
-        pool.close()
-        pool.join()
+        tasks = []
+        for impact, urls in imapct_urls.items():
+            for url in urls:
+                tasks.append((url, q, impact))
+        mt.apply_task(self.type_page_proc, tasks)
+        mt.delete_pool()
         p.join()
             
 class Saver():
@@ -163,26 +175,18 @@ class Saver():
         base = config.get("DataUpdater", "base_path")
         path = os.path.join(base, "base/cve_details")
         content = {}
-        cur = self.cur
-        fidx = self.fidx
-        size = self.size
         while True:
             try:
-                s = queue.qsize()
                 res = queue.get(True, 60)
-                cur += 1
-                content.update(res)
-                if cur == size:
-                    with open(os.path.join(path, 'cve_type_%d.json'%fidx), 'w') as f:
-                        json.dump(content, f, sort_keys=True, indent=4)
-                    fidx += 1
-                    content = {}
-                    cur = 0
+                for id, impact in res.items():
+                    if id in content:
+                        content[id].extend(impact)
+                    else:
+                        content[id] = impact
             except:
-                if cur != 0:
-                    with open(os.path.join(path, 'cve_type_%d.json'%fidx), 'w') as f:
-                        json.dump(content, f, sort_keys=True, indent=4)
-                break    
+                with open(os.path.join(path, 'impact.json'), 'w') as f:
+                    json.dump(content, f, sort_keys=True, indent=4)
+                break 
 
 if __name__ == '__main__':
     # pattern = re.compile('\[.*\]' )   

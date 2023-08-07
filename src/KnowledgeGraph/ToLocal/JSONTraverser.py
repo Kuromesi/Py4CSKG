@@ -9,7 +9,7 @@ import pandas as pd
 from tqdm import tqdm 
 from utils.version_compare import *
 from utils.Logger import logger
-
+from utils.Config import config
 
 type_dict = {
     'a': "Software",
@@ -163,9 +163,9 @@ class CVETraverser():
         result["vulnerable"] = True if words[15] == "T" else False
         return result
     
-    def traverse_single(self, path, count):
+    def traverse_single(self, path, count, cve_details):
         logger.info("Starting to traverse cve: %s"%path)
-        cve_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'type', 'description', 'baseMetricV2', 'baseMetricV3', 'complete'])
+        cve_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'type', 'description', 'impact', 'baseMetricV2', 'baseMetricV3', 'complete'])
         cpe_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'type', 'product', 'versionStart', 'versionEnd', 'vulnerable'])
         rel_df = pd.DataFrame(columns=[':START_ID', ':END_ID', ':TYPE'])
         with open(path, 'r', encoding='utf-8') as f:
@@ -190,7 +190,7 @@ class CVETraverser():
                 # baseMetricV3
                 if ('baseMetricV3' in cvss):
                     cvss3 = json.dumps(cvss['baseMetricV3'])
-                cve_df.loc[len(cve_df.index)] = [src, self.type, "CVE", des, cvss2, cvss3, json.dumps(cve)]
+                cve_df.loc[len(cve_df.index)] = [src, self.type, "CVE", des, cve_details[src], cvss2, cvss3, json.dumps(cve)]
                 
 
                 # Find related CWE
@@ -236,7 +236,11 @@ class CVETraverser():
         mt = MultiTask()
         cves = self.get_cves()
         mt.create_pool(32)
-        tasks = [(task, id) for id, task in enumerate(cves)]
+        base = config.get("DataUpdater", "base_path")
+        path = os.path.join(base, "cve_details/impact.json")
+        with open(path, 'r') as f:
+            cve_details = json.load(f)
+        tasks = [(task, id, cve_details) for id, task in enumerate(cves)]
         mt.apply_task(self.traverse_single, tasks)
         mt.delete_pool() 
     
@@ -246,7 +250,8 @@ class CVETraverser():
         Returns:
             _type_: _description_
         """        
-        path = "./data/base/cve"
+        base = config.get("DataUpdater", "base_path")
+        path = os.path.join(base, "cve")
         cves = os.listdir(path)
         not_included = ["CVE-Modified.json", "CVE-Recent.json", "cve.json"]
         ret = []
