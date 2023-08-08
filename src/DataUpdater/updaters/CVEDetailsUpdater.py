@@ -56,11 +56,6 @@ class CVEDetailsUpdater():
         """        
         url = "https://www.cvedetails.com/vulnerabilities-by-types.php"
         try:
-            cookie = {
-                "cvedconsent": "1--94912313670ceed2c3095fca18f17fff9cde5b81",
-                "_ga": "GA1.1.1535701902.1691412836",
-                "_ga_3404JT2267": "GS1.1.1691412835.1.1.1691413260.0.0.0"
-            }
             headers = {
                 'User-Agent': self.user_agents[randint(0, len(self.user_agents) - 1)],
             }
@@ -69,19 +64,23 @@ class CVEDetailsUpdater():
             logger.error("Failed to update CVE details: %s"%e)
             exit()
             
-        
         idx = etree.HTML(res.content) 
         headers_tab1 = idx.xpath('//*[@id="contentdiv"]/div/main/div[2]/table/thead/tr/th')
         headers_tab2 = idx.xpath('//*[@id="contentdiv"]/div/main/div[3]/table/thead/tr/th')
         headers = []
-        headers.extend([text_proc(header.text) for header in headers_tab1][2: ])
-        headers.extend([text_proc(header.text) for header in headers_tab2][2: ])
+        headers.extend([text_proc(header.text) for header in headers_tab1][1: ])
+        headers.extend([text_proc(header.text) for header in headers_tab2][1: ])
                
         urls_tab1 = idx.xpath('//*[@id="contentdiv"]/div/main/div[2]/table/tbody/tr[12]/td/a')
         urls_tab2 = idx.xpath('//*[@id="contentdiv"]/div/main/div[3]/table/tbody/tr[12]/td/a')
         urls = []
         urls.extend([self.url_prefix + url.attrib['href'] for url in urls_tab1])
         urls.extend([self.url_prefix + url.attrib['href'] for url in urls_tab2])
+        # website bug
+        for url in urls:
+            if url == "https://www.cvedetails.com/vulnerability-list/opinpval-1/vulnerabilities.html":
+                urls[urls.index(url)] = "https://www.cvedetails.com/vulnerability-list/opinpv-1/vulnerabilities.html"
+                break
         return headers, urls
     
     # @logging('www.cvedetails.com')
@@ -173,13 +172,14 @@ class Saver():
 
     def save(self, queue):
         base = config.get("DataUpdater", "base_path")
-        path = os.path.join(base, "base/cve_details")
+        path = os.path.join(base, "cve_details")
         content = {}
         while True:
             try:
                 res = queue.get(True, 60)
                 for id, impact in res.items():
                     if id in content:
+                        # list(set(content[id].extend(impact)))
                         content[id].extend(impact)
                     else:
                         content[id] = impact

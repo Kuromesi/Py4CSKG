@@ -1,6 +1,10 @@
 from bs4 import BeautifulSoup
 import pandas as pd
 import re, os, json
+import sys
+BASE_DIR=os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.join(BASE_DIR))
+
 from tqdm import tqdm
 from utils.Logger import logger
 from DataUpdater.updaters.utils import *
@@ -36,13 +40,14 @@ class CAPECTraverser(XmlTraverser):
         # Find views
         logger.info("Starting to traverse CAPEC")
         base = config.get("DataUpdater", "base_path")
-        path = os.path.join(base, "base/capec/CAPEC.xml")
+        path = os.path.join(base, "capec/CAPEC.xml")
         with open(path, 'r', encoding='utf-8') as f:
             soup = BeautifulSoup(f, 'xml')
         vc_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'name', 'description', 'type', 'complete'])
         pt_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'name', 'description', 'extended_description', 'type', 'complete'])
         misc_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'description'])
         rel_df = pd.DataFrame(columns=[':START_ID', ':END_ID', ':TYPE'])
+        capec_cve_df = pd.DataFrame(columns=['id', 'name', 'description', 'cve'])
         views = soup.find_all("View")
         views = tqdm(views)
         views.set_description("TRAVERSING VIEWS")
@@ -63,7 +68,17 @@ class CAPECTraverser(XmlTraverser):
                         if member != "\n":
                             dest = "CAPEC-" + member["CAPEC_ID"]
                             relation = member.name
-                            rel_df.loc[len(rel_df.index)] = [src, dest, relation]
+                            rel_df.loc[len(rel_df.index)] = [src, dest, relation]   
+                
+                # For textsimlarity
+                examples = view.find_all("Example")
+                cves = []
+                if examples:
+                    examples = str(examples)
+                    cves = CVE.findall(examples)
+                    for cve in cves:
+                        rel_df.loc[len(rel_df.index)] = [src, cve, "Has_Example"]
+                capec_cve_df.loc[len(capec_cve_df.index)] = [src, name, objective, cves]            
         
         # Find categories
         categories = soup.find_all("Category")
@@ -87,6 +102,16 @@ class CAPECTraverser(XmlTraverser):
                             dest = "CAPEC-" + member["CAPEC_ID"]
                             relation = member.name
                             rel_df.loc[len(rel_df.index)] = [src, dest, relation]
+                
+                # For textsimlarity
+                examples = category.find_all("Example")
+                cves = []
+                if examples:
+                    examples = str(examples)
+                    cves = CVE.findall(examples)
+                    for cve in cves:
+                        rel_df.loc[len(rel_df.index)] = [src, cve, "Has_Example"]
+                capec_cve_df.loc[len(capec_cve_df.index)] = [src, name, objective, cves]
 
         # Find attack patterns
         atkpts = soup.find_all("Attack_Pattern")
@@ -142,6 +167,18 @@ class CAPECTraverser(XmlTraverser):
                     misc_df.loc[len(misc_df.index)] = [id, "IOC", des]
                     rel_df.loc[len(rel_df.index)] = [src, id, "Has_IOC"]
                     count += 1    
+
+                # For texsimilarity
+                examples = atkpt.find_all("Example")
+                cves = []
+                if examples:
+                    examples = str(examples)
+                    cves = CVE.findall(examples)
+                    for cve in cves:
+                        rel_df.loc[len(rel_df.index)] = [src, cve, "Has_Example"]
+                capec_cve_df.loc[len(capec_cve_df.index)] = [src, name, description, cves]
+                
+
         base = config.get("KnowledgeGraph", "neo4j_path")
         pt_df.drop_duplicates()
         pt_df.to_csv(os.path.join(base, 'neo4j/nodes/capec_pt.csv'), index=False)
@@ -149,6 +186,9 @@ class CAPECTraverser(XmlTraverser):
         misc_df.to_csv(os.path.join(base, 'neo4j/nodes/capec_misc.csv'), index=False)
         rel_df.drop_duplicates()
         rel_df.to_csv(os.path.join(base, 'neo4j/relations/capec_rel.csv'), index=False)
+        base = config.get("DeepLearning", "base_path")
+        capec_cve_df.to_csv(os.path.join(base, "capec/capec.csv"), index=False)
+
 
 class CWETraverser(XmlTraverser):
     def __init__(self):
@@ -156,7 +196,7 @@ class CWETraverser(XmlTraverser):
     
     def traverse(self):
         base = config.get("DataUpdater", "base_path")
-        path = os.path.join(base, "base/cwe/CWE.xml")
+        path = os.path.join(base, "cwe/CWE.xml")
         with open(path, "r", encoding='utf-8') as file:
             soup = BeautifulSoup(file, "xml")
         wk_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'name', 'description', 'type', 'complete'])
@@ -260,7 +300,7 @@ class ATTACKTraverser(XmlTraverser):
         base = config.get("DataUpdater", "base_path")
         mt = MultiTask()
         mt.create_pool(8)
-        base = os.path.join(base, "base/attack")
+        base = os.path.join(base, "attack")
         tasks = [(os.path.join(base, "%s_tactic.json"%name), os.path.join(base, "%s.xml"%name), name) for name in names]
         mt.apply_task(self.traverse_single, tasks)
         mt.delete_pool()
@@ -360,17 +400,17 @@ class ATTACKTraverser(XmlTraverser):
                     misc_df.loc[len(misc_df.index)] = [id, "IOC", name, des]
                     rel_df.loc[len(rel_df.index)] = [attrs['id'], id, "Has_IOC"]
         base = config.get("KnowledgeGraph", "neo4j_path")
-        tech_df.drop_duplicates()
+        tech_df = tech_df.drop_duplicates()
         tech_df.to_csv(os.path.join(base, 'neo4j/nodes/attack_tech_%s.csv'%kind), index=False)
-        misc_df.drop_duplicates()
+        misc_df = misc_df.drop_duplicates()
         misc_df.to_csv(os.path.join(base, 'neo4j/nodes/attack_misc_%s.csv'%kind), index=False)
-        rel_df.drop_duplicates()
+        rel_df = rel_df.drop_duplicates()
         rel_df.to_csv(os.path.join(base, 'neo4j/relations/attack_rel_%s.csv'%kind), index=False) 
 
 if __name__ == "__main__":
-    # capect = CAPECTraverser('data/CAPEC/CAPEC.xml')
-    # capect.traverse()
-    attackt = ATTACKTraverser('data/attack/enterpriseN.xml', 'data/attack/tactic.json')
+    capect = CAPECTraverser()
+    capect.traverse()
+    attackt = ATTACKTraverser()
     attackt.traverse()
-    # cwet = CWETraverser('data/CWE/CWE.xml')
-    # cwet.traverse()
+    cwet = CWETraverser('data/CWE/CWE.xml')
+    cwet.traverse()

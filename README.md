@@ -53,6 +53,15 @@ neo4j-admin database import full --overwrite-destination \
 --nodes=/data/import/nodes/cve_cve.*.csv --nodes=/data/import/nodes/cve_cpe.*.csv \
 --multiline-fields=true --ignore-empty-strings=true --skip-duplicate-nodes=true --skip-bad-relationships=true --auto-skip-subsequent-headers=true
 
+docker run -it --rm -v /Users/kuromesi/MyCOde/share/neo4j/data:/data neo4j:latest \
+neo4j-admin database import full --overwrite-destination \
+--nodes="/data/import/nodes/attack_misc.*.csv" --nodes="/data/import/nodes/attack_tech.*.csv" \
+--nodes="/data/import/nodes/capec_misc.csv" --nodes="/data/import/nodes/capec_pt.csv" \
+--nodes="/data/import/nodes/cve_cpe1.csv" --nodes="/data/import/nodes/cve_cve1.csv" \
+--relationships="/data/import/relations/.*.csv" \
+--multiline-fields=true --ignore-empty-strings=true --skip-duplicate-nodes=true --skip-bad-relationships=true \
+--auto-skip-subsequent-headers=true neo4j
+
 ### FULL-TEXT INDEX
 CREATE FULLTEXT INDEX vulDes FOR (n:Vulnerability) ON EACH [n.description]
 

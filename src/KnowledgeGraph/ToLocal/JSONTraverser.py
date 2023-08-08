@@ -190,7 +190,9 @@ class CVETraverser():
                 # baseMetricV3
                 if ('baseMetricV3' in cvss):
                     cvss3 = json.dumps(cvss['baseMetricV3'])
-                cve_df.loc[len(cve_df.index)] = [src, self.type, "CVE", des, cve_details[src], cvss2, cvss3, json.dumps(cve)]
+                impact = ", ".join(cve_details[src]) if src in cve_details else "unknown"
+                impact = impact.strip()
+                cve_df.loc[len(cve_df.index)] = [src, self.type, "CVE", des, impact, cvss2, cvss3, json.dumps(cve)]
                 
 
                 # Find related CWE

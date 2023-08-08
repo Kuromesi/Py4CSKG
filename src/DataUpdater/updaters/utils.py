@@ -1,4 +1,4 @@
-import requests, zipfile, io
+import requests, zipfile, io, re
 from utils.Logger import logger
 
 def download_and_unzip(url, path="", retries=0, max_retries=5):
@@ -38,4 +38,5 @@ def do_request(url, retries=0, max_retries=5, headers=None):
 
 def text_proc(text):
     text = text.strip()
+    re.sub(" +", " ", text)
     return text
