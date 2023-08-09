@@ -384,7 +384,7 @@ class ATTACKTraverser(XmlTraverser):
             mitigations = tech.find_all('Mitigation')
             if mitigations:
                 for mitigation in mitigations:
-                    id = mitigation['id']
+                    id = mitigation['id'] + ":%s"%attrs['id']
                     name = mitigation['name']
                     des = text_proc(mitigation.text)
                     misc_df.loc[len(misc_df.index)] = [id, "Mitigation", name, des]
@@ -394,7 +394,7 @@ class ATTACKTraverser(XmlTraverser):
             detections = tech.find_all('Detection')
             if detections:
                 for detection in detections:
-                    id = detection['id']
+                    id = detection['id'] + ":%s"%attrs['id']
                     name = detection['name']
                     des = text_proc(detection.text)
                     misc_df.loc[len(misc_df.index)] = [id, "IOC", name, des]

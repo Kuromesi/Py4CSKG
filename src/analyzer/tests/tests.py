@@ -5,7 +5,7 @@ def gen_test_graph():
     G = nx.DiGraph()
     node_1 = ("web server", 
               {
-                  "os": [("Windows 7", )],
+                  "os": [],
                   "firmware": [],
                   "software": [("yxcms_yxcms", "1.4.7", "network", "user"), ("phpmyadmin_phpmyadmin", "4.8.3", "network", "user")],
                   "entry": []
@@ -39,5 +39,6 @@ def gen_test_graph():
     # 添加边
     G.add_edge("web server", "domain controller")
     G.add_edge("domain member", "domain controller")
+    G.add_edge("domain controller", "domain member")
     G.add_edge("domain member", "database server")
     return G

@@ -2,9 +2,12 @@ import sys, os
 BASE_DIR=os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(os.path.join(BASE_DIR))
 
-from TextSimilarity.TextSimilarity import *
-from TextClassification.cve2cwe import *
-from analyzer.bk.analyze import *
+# from TextSimilarity.TextSimilarity import *
+# from TextClassification.cve2cwe import *
+# from analyzer.bk.analyze import *
+from analyzer.tests.tests import gen_test_graph
+from analyzer.analyze import ModelAnalyzer
+from service.GDBSaver import GDBSaver
 
 def cve2capecFactory():
     df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
@@ -27,6 +30,13 @@ def analyze_test():
     ma.convert_pyvis(graph)
     ma.analyze()
 
+def analyzer_test():
+    graph = gen_test_graph()
+    gs = GDBSaver()
+    ma = ModelAnalyzer(gs, graph)
+    ma.find_attack_path("web server", "database server", graph, ma.vul_graph)
+
+
 
 if __name__ == '__main__':
-    analyze_test()
+    analyzer_test()

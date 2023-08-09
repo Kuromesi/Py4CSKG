@@ -12,8 +12,10 @@ class ModelAnalyzer():
     def __init__(self, gs, graph) -> None:
         logger.info("Initializing ModelAnalyzer")
         self.kg = KGQuery(gs)
-        self.vul_graph = gen_test_graph(graph)
+        vul_graph = self.gen_vul_graph(graph)
         self.graph = graph
+        self.vul_graph = vul_graph
+        self.attack_graph = None
 
     def gen_vul_graph(self, graph):
         """return data like
@@ -57,16 +59,20 @@ class ModelAnalyzer():
                 vul_map[node[0]] = temp
         return vul_map
 
-    def find_attack_path(self, src, dst, graph):
+    def find_attack_path(self, src, dst, graph, vul_graph):
         # first check if the dst can be compromised remotely
         # if not, return the dst can not be compromised by moving laterally
-        if dst not in self.vul_graph:
+        if dst not in vul_graph:
             logger.info("%s is not vulnerable and can not be compromised")
             return
         is_dst_vulnerable = False
-        for entry in self.vul_graph[dst]:
-            if entry.access in (ACCESS_ADJACENT, ACCESS_NETWORK) and entry.impact != CIA_LOSS:
-                is_dst_vulnerable = True
+        vul_map = vul_graph[dst]
+        for component_type, vul_products in vul_map.items():
+            for product, entries in vul_products.items():
+                for entry in entries:
+                    if entry.access in (ACCESS_ADJACENT, ACCESS_NETWORK) and entry.impact != CIA_LOSS:
+                        is_dst_vulnerable = True
+                        break
         if not is_dst_vulnerable:
             logger.info("%s contains vulnerable components but can not be compromised remotely")
             return
@@ -75,18 +81,22 @@ class ModelAnalyzer():
             AG = nx.DiGraph()
             nodes = []
             edges = []
-            for node in G.nodes(data=True):
-                if node[0] in self.vul_graph:
+            for node in graph.nodes(data=True):
+                if node[0] in vul_graph:
                     max_pos_entry = None
-                    for entry in self.vul_graph[node[0]]:
-                        if entry.access in (ACCESS_ADJACENT, ACCESS_NETWORK) and entry.impact not in (CIA_LOSS, APP_PRIV):
-                            if max_pos_entry:
-                                max_pos_entry = entry if entry.score > max_pos_entry.score else max_pos_entry
-                            else:
-                                max_pos_entry = entry
-                        if max_pos_entry:
-                            nodes.append((node, {"entry": entry}))
-                            for neighbor in G.neighbors(node[0]):
+                    vul_map = vul_graph[node[0]]
+                    for component_type, vul_products in vul_map.items():
+                        for product, entries in vul_products.items():
+                            for entry in entries:
+                                if entry.access in (ACCESS_ADJACENT, ACCESS_NETWORK) and entry.effect not in (CIA_LOSS, APP_PRIV):
+                                    if max_pos_entry:
+                                        max_pos_entry = entry if entry.score > max_pos_entry.score else max_pos_entry
+                                    else:
+                                        max_pos_entry = entry
+                    if max_pos_entry:
+                        nodes.append((node[0], {"entry": entry}))
+                        for neighbor in graph.neighbors(node[0]):
+                            if nx.has_path(self.graph, neighbor, node[0]):
                                 edges.append((neighbor, node[0], {'weight': max_pos_entry.score}))
             AG.add_nodes_from(nodes)
             AG.add_edges_from(edges)
@@ -99,7 +109,7 @@ class KGQuery():
         self.gs = gs
     
     def find_vuls(self, product, version):
-        query = "MATCH (n:Platform) WHERE n.product='%s' AND n.vulnerable='True' RETURN n"%product
+        query = "MATCH (n:Platform) WHERE n.product='%s' AND n.vulnerable='True' RETURN n"%product.replace("_", " ")
         nodes = self.gs.sendQuery(query)
         vul_products = []
         for node in nodes:
@@ -109,13 +119,14 @@ class KGQuery():
             if cmp_version(version, version_start) != -1 and cmp_version(version, version_end) != 1:
                 vul_products.append(node['id'])
         query = []
+        cves = []
         if vul_products:
             query = "MATCH (n:Vulnerability)-[]-(a:Platform) WHERE"
             for vul_product in vul_products:
                 query += " a.id='%s' OR"%vul_product
             query = query.strip("OR") + "RETURN n"
             results = self.gs.sendQuery(query)
-        cves = [CVEEntry(res[0]) for res in results]
+            cves = [CVEEntry(res[0]) for res in results]
         return cves
 
         

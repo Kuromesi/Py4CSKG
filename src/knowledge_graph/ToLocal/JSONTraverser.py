@@ -222,11 +222,11 @@ class CVETraverser():
                                     rel_df.loc[len(rel_df.index)] = [src, sum[1][platform]['uri'], "Has_Platform"]
                                     rel_df.loc[len(rel_df.index)] = [sum[0][product]['uri'], sum[1][platform]['uri'], "And"]
                                     rel_df.loc[len(rel_df.index)] = [sum[1][platform]['uri'], sum[0][product]['uri'], "And"]
-        cve_df.drop_duplicates()
+        cve_df = cve_df.drop_duplicates()
         cve_df.to_csv('data/neo4j/nodes/cve_cve%d.csv'%count, index=False)
-        cpe_df.drop_duplicates()
+        cpe_df = cpe_df.drop_duplicates()
         cpe_df.to_csv('data/neo4j/nodes/cve_cpe%d.csv'%count, index=False)
-        rel_df.drop_duplicates()
+        rel_df = rel_df.drop_duplicates()
         rel_df.to_csv('data/neo4j/relations/cve_rel%d.csv'%count, index=False)
     
     def traverse(self):

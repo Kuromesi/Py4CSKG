@@ -57,10 +57,23 @@ docker run -it --rm -v /Users/kuromesi/MyCOde/share/neo4j/data:/data neo4j:lates
 neo4j-admin database import full --overwrite-destination \
 --nodes="/data/import/nodes/attack_misc.*.csv" --nodes="/data/import/nodes/attack_tech.*.csv" \
 --nodes="/data/import/nodes/capec_misc.csv" --nodes="/data/import/nodes/capec_pt.csv" \
---nodes="/data/import/nodes/cve_cpe1.csv" --nodes="/data/import/nodes/cve_cve1.csv" \
+--nodes="/data/import/nodes/cve_cpe.csv" --nodes="/data/import/nodes/cve_cve.*.csv" \
+--nodes="/data/import/nodes/cwe_misc.csv"  --nodes="/data/import/nodes/cwe_wk.csv" \
 --relationships="/data/import/relations/.*.csv" \
---multiline-fields=true --ignore-empty-strings=true --skip-duplicate-nodes=true --skip-bad-relationships=true \
+--multiline-fields=true --ignore-empty-strings=true --skip-duplicate-nodes=true \
+--skip-bad-relationships=true --bad-tolerance=10000 \
 --auto-skip-subsequent-headers=true neo4j
+
+docker run \
+    --name testneo4j \
+    -p7474:7474 -p7687:7687 \
+    -itd \
+    -v /Users/kuromesi/MyCOde/share/neo4j/data:/data \
+    -v /Users/kuromesi/MyCOde/share/neo4j/logs:/logs \
+    -v /Users/kuromesi/MyCOde/share/neo4j/import:/var/lib/neo4j/import \
+    -v /Users/kuromesi/MyCOde/share/neo4j/plugins:/plugins \
+    --env NEO4J_AUTH=neo4j/password \
+    neo4j:latest
 
 ### FULL-TEXT INDEX
 CREATE FULLTEXT INDEX vulDes FOR (n:Vulnerability) ON EACH [n.description]
