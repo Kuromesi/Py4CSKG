@@ -5,9 +5,9 @@
 import torch
 import torch.nn as nn
 from tqdm import trange, tqdm
-from NER.models import *
-from NER.bert_crf import *
-from NER.predict import *
+from ner.models import *
+from ner.bert_crf import *
+from ner.predict import *
 from torchcrf import CRF
 from transformers import AutoTokenizer
 

@@ -1,8 +1,8 @@
-from DataUpdater.updaters.CVEDetailsUpdater import *
-from DataUpdater.updaters.ATTACKUpdater import *
-from DataUpdater.updaters.CVEUpdater import *
-from DataUpdater.updaters.CWEUpdater import *
-from DataUpdater.updaters.CAPECUpdater import *
+from data_updater.updaters.CVEDetailsUpdater import *
+from data_updater.updaters.ATTACKUpdater import *
+from data_updater.updaters.CVEUpdater import *
+from data_updater.updaters.CWEUpdater import *
+from data_updater.updaters.CAPECUpdater import *
 from utils.Logger import logger
 import os
 

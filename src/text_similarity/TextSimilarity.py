@@ -5,13 +5,15 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 from tqdm import tqdm, trange
-from TextSimilarity.predict import NERFactory
+from text_similarity.predict import NERFactory
 import os
+from utils.Config import config
+from utils.Logger import logger
 
-class TextSimilarity():
+class RealTextSimilarity():
     """def __init__(self, docs), docs are dataframe type object, can be CAPEC, ATT&CK etc.
     """    
-    def __init__(self, docs, weight_path=None) -> None:
+    def __init__(self, docs) -> None:
         model_name = "sentence-transformers/all-MiniLM-L6-v2" # jackaduma/SecBERT bert-base-uncased roberta-large-nli-stsb-mean-tokens all-MiniLM-L6-v2 bert-large-nli-stsb-mean-tokens
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         # bert_config = BertConfig.from_pretrained(model_name)
@@ -20,15 +22,13 @@ class TextSimilarity():
         self.device = "cpu" if torch.cuda.is_available() else "cpu"
         self.bert.to(self.device)
         self.docs = docs
-        self.init_ner()
-        self.init_weight(weight_path)
     
-    def init_weight(self, weight_path=None):
-        if weight_path:
+    def init_weight(self, weight_path):
+        try:
             self.docs_embedding = np.load(weight_path)
-        else:
-            self.docs_weight = self.transform_tfidf(self.docs['processed'].tolist())
-            self.docs_embedding = self.batch_embedding(self.docs['processed'].tolist(), self.docs_weight, weighted=True).detach().numpy()
+        except Exception as e:
+            logger.info("Embeddings not exists in %s, creating embeddings"%weight_path)
+            self.docs_embedding = self.create_embedding(self.docs, weight_path)
                
     def init_ner(self):
         self.ner = NERFactory()
@@ -37,13 +37,9 @@ class TextSimilarity():
         tokens = self.tokenizer(text, padding=True, return_tensors="pt", truncation=True, max_length=512).to(self.device)
         attention_mask = tokens['attention_mask'].to(self.device)
         tokens_ids = tokens['input_ids'].to(self.device)
-        # FOR TEST ONLY
-        decoded_text = self.tokenizer.decode(tokens_ids[0])
-        decoded_text = decoded_text.split()
         
         embedding = self.bert(tokens_ids)[0]
         mask = attention_mask.unsqueeze(-1).expand(embedding.size()).float()
-
         if weighted:
             feature = weight['feature']
             tfidf = weight['tfidf']
@@ -107,20 +103,6 @@ class TextSimilarity():
         embedding = torch.cat((embedding, self.embedding(batch, weight, weighted=weighted)['embedding'].to('cpu')), 0)
         return embedding
     
-    def batch_weighted_embedding(self, text, weighted):
-        step = len(text) // self.batch_size
-        embedding = None
-        for i in range(step):
-            batch = text[i * self.batch_size: (i + 1) * self.batch_size]
-            if embedding is not None:
-                embedding = torch.cat((embedding, self.weighted_embedding(batch, weighted=weighted)['embedding'].to('cpu')), 0)
-            else:
-                embedding = self.weighted_embedding(batch, weighted=weighted)['embedding'].to('cpu')
-
-        batch = text[step * self.batch_size: len(text)]
-        embedding = torch.cat((embedding, self.weighted_embedding(batch, weighted=weighted)['embedding'].to('cpu')), 0)
-        return embedding
-    
     def transform_tfidf(self, corpus):
         tv=TfidfVectorizer()#初始化一个空的tv。
         corpus_vec = []
@@ -153,9 +135,24 @@ class TextSimilarity():
         df.drop_duplicates(subset=['id'], keep='first', inplace=True)
         return df
 
-    def create_embedding(self, docs, name, weighted=False):
+    def create_embedding(self, docs, path, weighted=True):
         docs_weight = []
         if weighted:
             docs_weight = self.transform_tfidf(docs)
         docs_embedding = self.batch_embedding(docs, docs_weight, weighted=weighted).detach().numpy()
-        np.save(os.path.join('data/embeddings', name + ".npy"), docs_embedding)
+        np.save(os.path.join(path), docs_embedding)
+        return docs_embedding
+
+class TextSimilarity():
+    def __init__(self) -> None:
+        logger.info("Initializing TextSimilarity")
+        self.rts = RealTextSimilarity()
+        doc_weight = config.get("TextSimilarity", "doc_weight")
+        self.rts.init_weight(doc_weight)
+        self.rts.init_ner()
+
+    def calculate_similarity(self, query):
+        res = self.rts.calculate_similarity(query)
+        return res
+
+    

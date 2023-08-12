@@ -9,9 +9,9 @@ from lxml import etree
 from functools import wraps
 import time, json
 from utils.Logger import logger
-from DataUpdater.updaters.utils import *
+from data_updater.updaters.utils import *
 from utils.Config import config
-from DataUpdater.updaters.utils import do_request
+from data_updater.updaters.utils import do_request
 from utils.MultiTask import MultiTask
 
 def logging(source):

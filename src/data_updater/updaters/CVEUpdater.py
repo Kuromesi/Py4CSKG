@@ -6,7 +6,7 @@ import requests
 import os, re
 from lxml import etree
 from tqdm import tqdm
-from DataUpdater.updaters.utils import *
+from data_updater.updaters.utils import *
 from utils.Logger import logger
 from utils.Config import config
 

@@ -1,4 +1,4 @@
-from DataUpdater.updaters.utils import *
+from data_updater.updaters.utils import *
 import shutil, os
 from utils.Logger import logger
 from utils.Config import config

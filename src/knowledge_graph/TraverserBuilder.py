@@ -1,5 +1,5 @@
-from KnowledgeGraph.ToLocal.JSONTraverser import *
-from KnowledgeGraph.ToLocal.XMLTraverser import *
+from knowledge_graph.ToLocal.JSONTraverser import *
+from knowledge_graph.ToLocal.XMLTraverser import *
 
 class TraverserBuilder():
     def new_cve_traverser() -> CVETraverser:

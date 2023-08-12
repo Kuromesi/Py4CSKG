@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import numpy as np
-from TextClassification.utils.utils import *
+from text_classification.utils.utils import *
 import abc
 
 class Model(nn.Module):

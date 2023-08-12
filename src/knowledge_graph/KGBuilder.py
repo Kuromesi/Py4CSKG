@@ -1,8 +1,8 @@
 from service.GDBSaver import GDBSaver
 import os, sys, json
-from KnowledgeGraph.ToLocal.JSONTraverser import *
-from KnowledgeGraph.ToLocal.XMLTraverser import *
-from KnowledgeGraph.TraverserBuilder import *
+from knowledge_graph.ToLocal.JSONTraverser import *
+from knowledge_graph.ToLocal.XMLTraverser import *
+from knowledge_graph.TraverserBuilder import *
 
 class KGBuilder():
     def __init__(self) -> None:

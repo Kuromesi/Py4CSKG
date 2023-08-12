@@ -7,7 +7,7 @@ sys.path.append(os.path.join(BASE_DIR))
 
 from tqdm import tqdm
 from utils.Logger import logger
-from DataUpdater.updaters.utils import *
+from data_updater.updaters.utils import *
 from utils.MultiTask import MultiTask
 from utils.Config import config
 

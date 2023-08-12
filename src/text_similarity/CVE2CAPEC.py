@@ -15,7 +15,7 @@ import spacy, re
 from tqdm import tqdm, trange
 from gensim import corpora
 from gensim.models import TfidfModel
-from TextSimilarity.predict import *
+from text_similarity.predict import *
 import os, math
 import json
 

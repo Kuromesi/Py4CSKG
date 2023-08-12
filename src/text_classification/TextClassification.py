@@ -1,11 +1,14 @@
-from TextClassification.BERT import *
-from TextClassification.utils.Dataset import *
-from TextClassification.config.BERTConfig import *
+from text_classification.BERT import *
+from text_classification.utils.Dataset import *
+from text_classification.config.BERTConfig import *
+from utils.Config import config
 
 class CVE2CWE():
     def init_bert(self):
-        self.bert = BERT.from_pretrained('trained_models/BERTBiLSTMCRF')
-        self.bert.to('cuda')
+        self.bert = BERT.from_pretrained(config.get("TextClassification", "cve2cwe_path"))
+        device = config.get("TextClassification", "device")
+        if device == "gpu":
+            self.bert.to('cuda')
         config = BERTConfig()
         self.bert_dataset = BERTDataset(config)
         self.bert_labels = loadLabels(config.label_path)
@@ -17,7 +20,6 @@ class CVE2CWE():
         pred = pred.cpu().data
         pred = torch.max(pred, 1)[1]
         return self.bert_labels[pred[0]]
-        # print(self.bert_labels[pred[0]])
 
 if __name__ == "__main__":
     BERT_classification_predict()

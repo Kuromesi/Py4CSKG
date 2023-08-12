@@ -5,7 +5,7 @@ import re, json
 import multiprocessing
 from tqdm import tqdm
 from utils.Logger import logger
-from DataUpdater.updaters.utils import *
+from data_updater.updaters.utils import *
 from lxml import etree
 from utils.MultiTask import *
 from utils.Config import config

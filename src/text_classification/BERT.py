@@ -34,7 +34,5 @@ class BERT(BertPreTrainedModel):
             y_pred = logits
             y = y.type(torch.cuda.LongTensor)
             loss = self.loss_func(y_pred, y)
-            outputs = (loss, ) + outputs
-
-        
+            outputs = (loss, ) + outputs 
         return outputs  # (loss), scores
