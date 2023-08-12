@@ -4,7 +4,7 @@ import pandas as pd
 from utils.version_compare import cmp_version
 import json
 from service.GDBSaver import GDBSaver
-from KnowledgeGraph.Ontology.CVE import *
+from knowledge_graph.Ontology.CVE import *
 from analyzer.tests.tests import gen_test_graph
 from utils.Logger import logger
 
@@ -94,15 +94,26 @@ class ModelAnalyzer():
                                     else:
                                         max_pos_entry = entry
                     if max_pos_entry:
-                        nodes.append((node[0], {"entry": entry}))
+                        nodes.append((node[0], {"entry": max_pos_entry}))
                         for neighbor in graph.neighbors(node[0]):
                             if nx.has_path(self.graph, neighbor, node[0]):
                                 edges.append((neighbor, node[0], {'weight': max_pos_entry.score}))
             AG.add_nodes_from(nodes)
             AG.add_edges_from(edges)
             self.attack_graph = AG
-        shortest_path = nx.shortest_path(self.attack_graph, src, dst, weight="weight")
+        try:
+            shortest_path = nx.shortest_path(self.attack_graph, src, dst, weight="weight")
+            logger.info("Shortest attack path generated")
+            self.print_path([shortest_path])
+        except Exception as e:
+            logger.error(e)
         paths = nx.all_simple_paths(self.attack_graph, src, dst)
+        logger.info("All attack paths generated")
+        self.print_path(paths)
+
+    def print_path(self, paths):
+        for path in paths:
+            logger.info("Attack path: " + " --> ".join(path)) 
 
 class KGQuery():
     def __init__(self, gs: GDBSaver) -> None:

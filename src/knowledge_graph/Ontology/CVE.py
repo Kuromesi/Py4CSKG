@@ -48,55 +48,56 @@ def get_max_pos_entries(entries):
         return res
 
 def get_vul_type(cvss2, cvss3, impact):
-    impact = []
+    impact = [i.lower() for i in impact]
     effect = ""
     if cvss2 and cvss3:
-        if cvss2["confidentialityImpact"] == "Low" and cvss2["integrityImpact"] == "Low" and cvss2["availabilityImpact"] == "Low":
+        cvss2_full = cvss2
+        cvss2 = cvss2['cvssV2']
+        cvss3_full = cvss3
+        cvss3 = cvss3['cvssV3']
+        if cvss2["confidentialityImpact"] == "PARTIAL" and cvss2["integrityImpact"] == "PARTIAL" and cvss2["availabilityImpact"] == "PARTIAL":
             if GAIN_PRIV_CVED in impact:
-                effect = USER_PRIV if cvss2["obtainUserPrivilege"] else APP_PRIV
+                effect = USER_PRIV if cvss2_full["obtainUserPrivilege"] else APP_PRIV
             elif CODE_EXEC_CVED in impact:
                 effect = APP_EXEC
-        elif cvss2["confidentialityImpact"] == "High" and cvss2["integrityImpact"] == "High" and cvss2["availabilityImpact"] == "High":
+        elif cvss2["confidentialityImpact"] == "COMPLETE" and cvss2["integrityImpact"] == "COMPLETE" and cvss2["availabilityImpact"] == "COMPLETE":
             if GAIN_PRIV_CVED in impact:
-                effect = ROOT_PRIV if cvss3['cvssV3']['privilegesRequired'] == "None" else PRIV_ESC
+                effect = ROOT_PRIV if cvss3['privilegesRequired'] == "NONE" else PRIV_ESC
             elif CODE_EXEC_CVED in impact:
                 effect = SYS_EXEC
-            else:
-                effect = CIA_LOSS
         else:
             effect = CIA_LOSS
 
     elif cvss2:
-        if cvss2["confidentialityImpact"] == "Low" and cvss2["integrityImpact"] == "Low" and cvss2["availabilityImpact"] == "Low":
+        cvss2_full = cvss2
+        cvss2 = cvss2['cvssV2']
+        if cvss2["confidentialityImpact"] == "PARTIAL" and cvss2["integrityImpact"] == "PARTIAL" and cvss2["availabilityImpact"] == "PARTIAL":
             if GAIN_PRIV_CVED in impact:
-                effect = USER_PRIV if cvss2["obtainUserPrivilege"] else APP_PRIV
+                effect = USER_PRIV if cvss2_full["obtainUserPrivilege"] else APP_PRIV
             elif CODE_EXEC_CVED in impact:
                 effect = APP_EXEC
-            else:
-                effect = CIA_LOSS
-        elif cvss2["confidentialityImpact"] == "High" and cvss2["integrityImpact"] == "High" and cvss2["availabilityImpact"] == "High":
+        elif cvss2["confidentialityImpact"] == "COMPLETE" and cvss2["integrityImpact"] == "COMPLETE" and cvss2["availabilityImpact"] == "COMPLETE":
             if GAIN_PRIV_CVED in impact:
-                effect = ROOT_PRIV if cvss3['cvssV2']['authentication'] == "None" else PRIV_ESC # differ from both cvss2 and cvss3 exists state
+                effect = ROOT_PRIV if cvss2['authentication'] == "NONE" else PRIV_ESC # differ from both cvss2 and cvss3 exists state
             elif CODE_EXEC_CVED in impact:
                 effect = SYS_EXEC
-            else:
-                effect = CIA_LOSS
         else:
             effect = CIA_LOSS
     
     elif cvss3:
-        if cvss3["confidentialityImpact"] == "High" and cvss3["integrityImpact"] == "High" and cvss3["availabilityImpact"] == "High":
+        cvss3_full = cvss3
+        cvss3 = cvss3['cvssV3']
+        if cvss3["confidentialityImpact"] == "HIGH" and cvss3["integrityImpact"] == "HIGH" and cvss3["availabilityImpact"] == "HIGH":
             if GAIN_PRIV_CVED in impact:
-                effect = PRIV_UND if cvss3['cvssV3']['privilegesRequired'] == "None" else PRIV_ESC
+                effect = PRIV_UND if cvss3['privilegesRequired'] == "NONE" else PRIV_ESC
             elif CODE_EXEC_CVED in impact:
                 effect = EXEC_UND
-            else:
-                effect = CIA_LOSS
         else:
             effect = CIA_LOSS
-
     else:
         raise ValueError("neither CVSSv2 nor CVSSv3 exists")
+    if not effect:
+        effect = CIA_LOSS
     return effect
 
 class CVEEntry():
@@ -111,7 +112,7 @@ class CVEEntry():
             self.score = cvss2['cvssV2']['baseScore']
             cvss3 = json.loads(record['baseMetricV3'])
             self.privileges_required = cvss3['cvssV3']['privilegesRequired']
-            self.effect = get_vul_type(cvss2['cvssV2'], cvss3['cvssV3'], self.impact.split(", "))
+            self.effect = get_vul_type(cvss2, cvss3, self.impact.split(", "))
         elif 'baseMetricV2' in record:
             cvss2 = json.loads(record['baseMetricV2'])
             self.access = cvss2['cvssV2']['accessVector']
@@ -120,12 +121,12 @@ class CVEEntry():
                 self.privileges_required = "Low"
             else:
                 self.privileges_required = "None"
-            self.effect = get_vul_type(cvss2['cvssV2'], None, self.impact.split(", "))
+            self.effect = get_vul_type(cvss2, None, self.impact.split(", "))
         elif 'baseMetricV3' in record:
             cvss3 = json.loads(record['baseMetricV3'])
             self.access = cvss3['cvssV3']['attackVector']
             self.score = cvss3['cvssV3']['baseScore']
             self.privileges_required = cvss3['cvssV3']['privilegesRequired']
-            self.effect = get_vul_type(None, cvss3['cvssV3'], self.impact.split(", "))
+            self.effect = get_vul_type(None, cvss3, self.impact.split(", "))
         else:
             raise ValueError("neither CVSSv2 nor CVSSv3 exists")

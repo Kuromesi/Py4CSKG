@@ -186,6 +186,8 @@ class CAPECTraverser(XmlTraverser):
         misc_df.to_csv(os.path.join(base, 'neo4j/nodes/capec_misc.csv'), index=False)
         rel_df.drop_duplicates()
         rel_df.to_csv(os.path.join(base, 'neo4j/relations/capec_rel.csv'), index=False)
+        if not os.path.exists:
+            os.mkdir(os.path.join(base, "capec"))
         base = config.get("DeepLearning", "base_path")
         capec_cve_df.to_csv(os.path.join(base, "capec/capec.csv"), index=False)
 

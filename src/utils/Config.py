@@ -7,4 +7,4 @@ class ConfigBuilder():
         cp.read(path)
         return cp
     
-config = ConfigBuilder.new_config_parser("./data/config.cfg")
+config = ConfigBuilder.new_config_parser("./config.cfg")
