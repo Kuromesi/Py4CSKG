@@ -7,7 +7,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 from ast import literal_eval
 from sklearn.metrics import f1_score
 from sklearn.feature_extraction.text import TfidfVectorizer
-import spacy, re
 from tqdm import tqdm, trange
 from gensim import corpora
 from gensim.models import TfidfModel

@@ -3,7 +3,7 @@ from pyvis.network import Network
 import networkx as nx
 import matplotlib.pyplot as plt
 from service.GDBSaver import GDBSaver
-from service.RDBSaver import RDBSaver
+# from service.RDBSaver import RDBSaver
 from webapp.utils.version_compare import *
 import pandas as pd
 from webapp.utils.prediction import *

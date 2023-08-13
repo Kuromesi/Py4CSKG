@@ -3,11 +3,11 @@ from pyvis.network import Network
 import networkx as nx
 import matplotlib.pyplot as plt
 from service.GDBSaver import GDBSaver
-from service.RDBSaver import RDBSaver
+# from service.RDBSaver import RDBSaver
 from webapp.utils.version_compare import *
 import pandas as pd
-from TextSimilarity.TextSimilarity import *
-from TextClassification.cve2cwe import *
+from text_similarity.TextSimilarity import *
+from text_classification.TextClassification import *
 from graph.GraphProcessor import GraphProcessor
 
 PRIVS = ['None', 'Low', 'High']

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Kuromesi - Py4CSKG</title>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css'>
+    <link rel='stylesheet'
+        href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.min.css'>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.4.1/css/mdb.min.css'>
+</head>
+
+<body>
+    <!--/.Navbar -->
+<!--Navbar-->
+<nav class="mb-4 navbar navbar-expand-lg navbar-light pink lighten-4">
+    <!-- Navbar brand -->
+    <a class="navbar-brand font-bold" href="#">Py4CSKG</a>
+    <!-- Collapse button -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span
+            class="navbar-toggler-icon"></span></button>
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <!-- Links -->
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link font-bold" href="#">Shop <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link font-bold" href="#">Dolls</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link font-bold" href="#">Toys</a>
+            </li>
+        </ul>
+        <!-- Links -->
+        <!-- Search form -->
+        <form class="form-inline md-form mb-0">
+            <i class="fa fa-search" aria-hidden="true"></i>
+            <input class="form-control font-bold w-75 ml-3" type="text" placeholder="Search" aria-label="Search">
+        </form>
+    </div>
+</nav>
+{% block content %}{% endblock %}
+</body>
