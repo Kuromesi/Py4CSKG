@@ -22,29 +22,12 @@
         </ul>
   
         <div class="col-md-3 text-end">
-          <button type="button" class="btn btn-outline-primary me-2">Login</button>
+          <a href="/signin" class="btn btn-outline-primary me-2" role="button">Login</a>
           <button type="button" class="btn btn-primary">Sign-up</button>
         </div>
       </header>
     </div>
-    <div class="container mt-3">
-		<form action="/signin" method="post">
-			<div class="mb-3 mt-3 pl-3 mr-3">
-			  <label for="email" class="form-label">Email:</label>
-			  <input type="email" class="form-control" id="email" placeholder="Enter email" name="email">
-			</div>
-			<div class="mb-3 ml-3 mr-3">
-			  <label for="pwd" class="form-label">Password:</label>
-			  <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="pswd">
-			</div>
-			<div class="form-check mb-3">
-			  <label class="form-check-label">
-				<input class="form-check-input" type="checkbox" name="remember"> Remember me
-			  </label>
-			</div>
-			<button type="submit" class="btn btn-primary">Submit</button>
-		</form>
-	</div>
+    {% block content %}{% endblock %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
   </body>
 </html>

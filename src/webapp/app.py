@@ -42,9 +42,9 @@ app.register_blueprint(sign)
 app.register_blueprint(model)
 app.register_blueprint(predict)
 
-@app.context_processor
-def inject_user():
-    return {'user': current_user.name}
+# @app.context_processor
+# def inject_user():
+#     return {'user': current_user.name}
 
 @app.route('/', methods=['GET', 'POST'])
 def home():

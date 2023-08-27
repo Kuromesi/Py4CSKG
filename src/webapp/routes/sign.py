@@ -8,11 +8,7 @@ sign = Blueprint('sign', __name__)
 
 @sign.route('/signin', methods=['GET'])
 def signin_form():
-    return '''<form action="/signin" method="post">
-              <p><input name="username"></p>
-              <p><input name="password" type="password"></p>
-              <p><button type="submit">Sign In</button></p>
-              </form>'''
+    return render_template("base_test.html")
 
 @sign.route('/signin', methods=['POST'])
 def signin():
