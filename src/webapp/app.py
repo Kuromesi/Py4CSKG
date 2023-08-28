@@ -42,14 +42,16 @@ app.register_blueprint(sign)
 app.register_blueprint(model)
 app.register_blueprint(predict)
 
-# @app.context_processor
-# def inject_user():
-#     return {'user': current_user.name}
+@app.context_processor
+def inject_user():
+    if current_user.is_anonymous:
+        return {'user': "anonymous"}
+    return {'user': current_user.name}
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if current_user.is_authenticated:
-        return render_template("base_test.html")
+        return render_template("home.html")
     return redirect(url_for("sign.signin_form"))
 
 @app.route('/test', methods=['GET'])

@@ -6,11 +6,11 @@ from flask_login import login_user, logout_user, login_required
 
 sign = Blueprint('sign', __name__)
 
-@sign.route('/signin', methods=['GET'])
+@sign.route('/login', methods=['GET'])
 def signin_form():
-    return render_template("base_test.html")
+    return render_template("login.html")
 
-@sign.route('/signin', methods=['POST'])
+@sign.route('/login', methods=['POST'])
 def signin():
     # 需要从request对象读取表单内容：
     username = request.form['username']
@@ -20,7 +20,7 @@ def signin():
         if user.validate_password(password):
             login_user(user)
             flash("Login success.")
-            return '<h3>Hello, %s!</h3>'%user.name
+            return render_template("home.html")
     flash("Invalid username or password.")
     return '''<form action="/signin" method="post">
               <p><input name="username"></p>
