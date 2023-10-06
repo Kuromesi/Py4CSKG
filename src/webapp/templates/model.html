@@ -1,60 +1,260 @@
 {% extends 'base.html' %}
 
 {% block script %}
-    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
-    <script src="https://cdn.staticfile.org/vue/2.7.0/vue.min.js"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    </script>
-    <script src="{{ url_for('static',filename='js/utils.js') }}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js"
-        integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/model.css') }}">
+<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.7.0/vue.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="{{ url_for('static',filename='js/utils.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js"
+    integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/model.css') }}">
+<style>
+    .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none
+    }
+
+    @media (min-width:768px) {
+        .bd-placeholder-img-lg {
+            font-size: 3.5rem
+        }
+    }
+
+    .b-example-divider {
+        height: 3rem;
+        background-color: rgba(0, 0, 0, .1);
+        border: solid rgba(0, 0, 0, .15);
+        border-width: 0;
+        box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15)
+    }
+
+    .bi {
+        vertical-align: -.125em;
+        fill: currentColor
+    }
+
+    .opacity-50 {
+        opacity: .5
+    }
+
+    .opacity-75 {
+        opacity: .75
+    }
+
+    .list-group {
+        width: auto;
+        max-width: 460px;
+        margin: 0 auto
+    }
+
+    .form-check-input:checked+.form-checked-content {
+        opacity: .5
+    }
+
+    .form-check-input-placeholder {
+        pointer-events: none;
+        border-style: dashed
+    }
+
+    [contenteditable]:focus {
+        outline: 0
+    }
+
+    .list-group-checkable {
+        display: grid;
+        gap: .5rem;
+        border: 0
+    }
+
+    .list-group-checkable .list-group-item {
+        cursor: pointer;
+        border-radius: .5rem
+    }
+
+    .list-group-item-check {
+        position: absolute;
+        clip: rect(0, 0, 0, 0);
+        pointer-events: none
+    }
+
+    .list-group-item-check:hover+.list-group-item {
+        background-color: var(--bs-light)
+    }
+
+    .list-group-item-check:checked+.list-group-item {
+        color: #fff;
+        background-color: var(--bs-blue)
+    }
+
+    .list-group-item-check[disabled]+.list-group-item,
+    .list-group-item-check:disabled+.list-group-item {
+        pointer-events: none;
+        filter: none;
+        opacity: .5
+    }
+</style>
 {% endblock %}
 {% block content %}
-    
-    <div class="container">
-        <div class="row" style="height: 400px;">
-            <div class="col-sm-9" id="mynetwork" @click="click"></div>
-            <div class="col-sm-3" id="network_info">
-                <h1>Information</h1>
-                <div>
-                    <div v-for="(v, k) in content">
-                        <h2>{[ k ]}</h2>
-                        <p>{[ v ]}</p>
-                    </div>
+
+<div class="container" id="network-container">
+    <div class="row" style="height: 400px;">
+        <div class="col-sm-9" id="mynetwork" @click="click"></div>
+        <div class="col-sm-3" id="network_info">
+            <h1>Information</h1>
+            <div>
+                <div v-for="(v, k) in content">
+                    <h2>{[ k ]}</h2>
+                    <p>{[ v ]}</p>
                 </div>
             </div>
         </div>
     </div>
-    <div class="container mt-3" id="modeling">
-        <div class="row">
-            <div class="col-sm-9">
-                <div>
-                </div>
-                <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling" @click="list_files">List</button>
+</div>
+<div class="container mt-3" id="control-panel-container">
+    <div class="row" id="node-control">
+        <div class="col-md-4">
+            <div>
+                <label>Name</label>
+                <input class="form-control" type="text" name="name" v-model="cur_node['name']">
             </div>
-            
+            <div>
+                <label>Group</label>
+                <input class="form-control" type="text" name="group" v-model="cur_node['group']">
+            </div>
+            <div>
+                <label>Description</label>
+                <textarea class="form-control" type="text" name="description"
+                    v-model="cur_node['description']"></textarea>
+            </div>
+            <div class="dropdown mt-3">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                    Components
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" @click="select_component('os')">OS</a></li>
+                    <li><a class="dropdown-item" @click="select_component('software')">Software</a></li>
+                    <li><a class="dropdown-item" @click="select_component('firmware')">Firmware</a></li>
+                    <li><a class="dropdown-item" @click="select_component('hardware')">Hardware</a></li>
+                </ul>
+            </div>
+            <div class="mt-3" id="buttons">
+                <button @click="add_node" class="btn btn-outline-primary">Add Node</button>
+                <button @click="delete_node" class="btn btn-outline-primary">Delete Node</button>
+                <button @click="modify_node" class="btn btn-outline-primary">Modify Node</button>
+            </div>
         </div>
-        <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
-            <div class="offcanvas-header">
-              <h5 class="offcanvas-title" id="offcanvasScrollingLabel">PROJECT PANEL</h5>
-              <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-            </div>
-            <div class="offcanvas-body">
-                <h3>Local Projects</h3>
-                <div v-for="v in files">
-                    <div :id="v">
-                        <p id="file_link" @click="load_project(v)">{[ v ]}</p>
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <input type="text" class="form-control" placeholder="PROJECT NAME" v-model="cur_project">
-                    <button type="button" class="btn btn-outline-primary" @click="save_graph">Save Graph</button>
+        <div class="col-md-4 pre-scrollable" id="product-list">
+            <label>Products</label>
+            <div class="list-group list-group-checkable" style="overflow-y: auto; max-height: 280px;">
+                <div v-for="(v, k) in cur_node['component'][component_type]">
+                    <input class="list-group-item-check" type="radio" name="listGroupCheckableRadios"
+                        :id="k" value="" checked @click="select_product(k)">
+                    <label class="list-group-item py-3" :for="k">
+                        {[ v["product"] ]}
+                        <span class="d-block small opacity-50">{[ v["product"] ]}-{[ v["version"] ]}-{[ v["access"] ]}-{[ v["privilege"] ]}</span>
+                    </label>
                 </div>
             </div>
-          </div>
+        </div>
+        <div class="col-md-4" id="product-details">
+            <div>
+                <label>Product</label>
+                <input class="form-control" type="text" name="product" v-model="selected_product['product']">
+            </div>
+            <!-- <div style="overflow: auto;" v-if="if_recommend">
+                    <p id="file_link" v-for="recom in recommendations"  @click="fill_product(recom)">{[ recom ]}</p>
+                </div> -->
+            <div>
+                <label>Version</label>
+                <input class="form-control" type="text" name="version" v-model="selected_product['version']">
+            </div>
+            <div class="row">
+                <label>Access</label>
+                <div class="col-md-8">
+                    <input class="form-control" type="text" name="access" readonly
+                        v-model="selected_product['access']">
+                </div>
+
+                <div class="dropdown col-md-4">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                        Access
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'network')">network</a></li>
+                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'adjacent')">adjacent</a></li>
+                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'local')">local</a></li>
+                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'physical')">physical</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="row">
+                <label>Privilege</label>
+                <div class="col-md-8">
+                    <input class="form-control" type="text" name="privilege" required readonly
+                        v-model="selected_product['privilege']">
+                </div>
+
+                <div class="dropdown col-md-4">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                        Privilege
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" @click="set_product_attributes('privilege', 'user')">user</a></li>
+                        <li><a class="dropdown-item" @click="set_product_attributes('privilege', 'root')">root</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-outline-primary" @click="add_product">Add product</button>
+                <button class="btn btn-outline-primary" @click="delete_product">Delete product</button>
+                <button class="btn btn-outline-primary">Save changes</button>
+            </div>
+        </div>
     </div>
-    <script src="{{ url_for('static',filename='js/graph.js') }}"></script>
-    <script src="{{ url_for('static',filename='js/modeling.js') }}"></script>
+    <div class="row mt-3" id="edge-control">
+        <button class="btn btn-outline-primary col-md-1">Source</button>
+        <input class="form-control col" type="text" name="privilege" required readonly>
+        <button class="btn btn-outline-primary col-md-1">Destination</button>
+        <input class="form-control col" type="text" name="privilege" required readonly>
+        <button class="btn btn-outline-primary col-md-1">Add</button>
+        <button class="btn btn-outline-primary col-md-1">Delete</button>
+    </div>
+</div>
+<div class="container mt-3" id="modeling">
+    <div class="row">
+        <div class="col-sm-9">
+            <div>
+            </div>
+            <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas"
+                data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling"
+                @click="list_files">List</button>
+        </div>
+
+    </div>
+    <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1"
+        id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasScrollingLabel">PROJECT PANEL</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <h3>Local Projects</h3>
+            <div class="pre-scrollable" style="max-height: 60%;" v-for="v in files">
+                <div :id="v">
+                    <p id="file_link" @click="load_project(v)">{[ v ]}</p>
+                </div>
+            </div>
+            <input type="text" class="form-control mt-3" placeholder="PROJECT NAME" v-model="cur_project">
+            <button type="button" class="btn btn-outline-primary mt-3" @click="save_graph">Save Graph</button>
+            <button type="button" class="btn btn-outline-primary mt-3" @click="save_graph">New Graph</button>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static',filename='js/graph.js') }}"></script>
+<script src="{{ url_for('static',filename='js/modeling.js') }}"></script>
 {% endblock %}

@@ -1,5 +1,3 @@
-
-
 modeling = new Vue({
     el: "#modeling",
     delimiters: ['{[', ']}'],
@@ -231,7 +229,7 @@ modeling = new Vue({
     },
     watch: {
         product: {
-            handler (newVal, oldVal) {
+            handler(newVal, oldVal) {
                 if (!this.if_recommend) {
                     this.if_recommend = true;
                 } else if (this.product) {
@@ -240,12 +238,14 @@ modeling = new Vue({
                     axios({
                         method: 'post',
                         url: url,
-                        data: { query: newVal }
+                        data: {
+                            query: newVal
+                        }
                     }).then(function (res) {
                         modeling.recommendations = res.data;
                     })
                 }
-                
+
             }
         }
     }
@@ -297,3 +297,91 @@ function network_click(params) {
         modeling.cur_edge.protocol = clickedEdge.protocol;
     }
 }
+
+node_control = new Vue({
+    el: "#node-control",
+    delimiters: ['{[', ']}'],
+    data: {
+        cur_node: {
+            name: "",
+            group: "",
+            component: {
+                os: {},
+                software: {},
+                firmware: {},
+                hardware: {}
+            },
+            description: ""
+        },
+        selected_component: {},
+        component_type: "os",
+        selected_product: {
+            product: "",
+            version: "",
+            access: "network",
+            privilege: "user"
+        }
+    },
+    methods: {
+        add_node() {
+            node = {}
+            for (k in this.cur_node) {
+                if (k == "component") {
+                    node[k] = JSON.parse(JSON.stringify(this.cur_node[k]))
+                } else {
+                    node[k] = this.cur_node[k]
+                }
+            }
+            node.title = this.cur_node.name;
+            node.label = this.cur_node.name;
+            if (network) {
+                addNode(node);
+            } else {
+                network = drawGraph([node], [{}])
+                network.on('click', network_click)
+            }
+        },
+        delete_node() {
+            network.deleteSelected()
+        },
+        modify_node() {
+
+        },
+        select_component(component) {
+            switch (component) {
+                case 'os':
+                    console.log("os selected")
+                    this.$set(this.selected_component, this.cur_node["component"]["os"])
+                    this.component_type = "os"
+                    break
+                case 'software':
+                    console.log("software selected")
+                    this.$set(this.selected_component, this.cur_node["component"]["software"])
+                    this.component_type = "software"
+                    break
+                case 'firmware':
+                    console.log("firmware selected")
+                    this.$set(this.selected_component, this.cur_node["component"]["firmware"])
+                    this.component_type = "firmware"
+                    break
+                case 'hardware':
+                    console.log("hardware selected")
+                    this.$set(this.selected_component, this.cur_node["component"]["hardware"])
+                    this.component_type = "hardware"
+                    break
+            }
+        },
+        add_product() {
+            this.$set(this.cur_node["component"][this.component_type], this.selected_product["product"], JSON.parse(JSON.stringify(this.selected_product)))
+        },
+        delete_product() {
+            Vue.delete(this.cur_node["component"][this.component_type], this.selected_product["product"])
+        },
+        set_product_attributes(key, val) {
+            this.$set(this.selected_product, key, val)
+        },
+        select_product(product) {
+            this.selected_product = JSON.parse(JSON.stringify(this.cur_node["component"][this.component_type][product]))
+        }
+    }
+})
