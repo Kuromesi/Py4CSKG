@@ -7,6 +7,7 @@ sys.path.append(os.path.join(BASE_DIR))
 # from analyzer.bk.analyze import *
 from analyzer.tests.tests import gen_test_graph
 from analyzer.analyze import ModelAnalyzer
+from analyzer.graph.GraphProcessor import GraphProcessor
 from service.GDBSaver import GDBSaver
 
 def cve2capecFactory():
@@ -32,9 +33,11 @@ def analyze_test():
 
 def analyzer_test():
     graph = gen_test_graph()
+    gp = GraphProcessor()
+    graph = gp.convert_pyvis("src/webapp/data/stuxnet_cve/graph.json")['graph']
     gs = GDBSaver()
     ma = ModelAnalyzer(gs, graph)
-    ma.find_attack_path("web server", "database server", graph, ma.vul_graph)
+    ma.find_attack_path("employee workstation", "engineering workstation", graph, ma.vul_graph)
 
 
 

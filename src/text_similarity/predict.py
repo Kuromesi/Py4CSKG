@@ -13,8 +13,9 @@ from transformers import AutoTokenizer
 
 def NERFactory():
     config = BERTBiLSTMCRFConfig()
-    model_dir = "./trained_models/BERTBiLSTMCRF79"
-    labels = ['O', 'B-cons', 'I-cons']
+    model_dir = "./data/deep/trained_models/BERTBiLSTMCRF79"
+    labels = ['O', 'B-cons', 'I-cons', 'B-weak', 'I-weak']
+    # labels = ['O', 'B-cons', 'I-cons']
     return NERPredict(config, model_dir, labels)
 
 if __name__ == "__main__":

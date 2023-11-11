@@ -1,42 +1,56 @@
 import networkx as nx
+import json
+
+def gen_tuple(product):
+    name = product['product']
+    name = name.replace(" ", "_")
+    return (name, product['version'], product['access'], product['privilege'])
 
 class GraphProcessor:
-    def convert_pyvis(self, graph:dict):
+    def convert_pyvis(self, path:str):
         """Receive pyvis json format graph from frontend and convert it into networkx graph.
 
         Args:
-            graph (dict): pyvis graph
+            path (str): pyvis graph path
         """        
         # Nodes
-        color_map = []
+        # color_map = []
+        with open(path, "r") as f:
+            graph = json.load(f)
+        group = {}
         nodes = []
-        node_type = {
-            'software': {},
-            'hardware': {},
-            'os': {},
-            'firmware': {},
-            'component': {},
-            'defender': {},
-            'entry': {}
-        }
         node_dict = {}
         for node in graph['nodes']:
             # color_map.append(node.pop('color'))
             # id = node.pop('id')
-            color_map.append(node['color'])
             id = node['id']
-            nodes.append((id, node))
-            if node['type'] not in node_type:
-                node_type[node['type']] = {}
-            node_type[node['type']].update({id: node}) # Classified with corresponding ontologies
+            if node['group']:
+                if node['group'] not in group:
+                    group[node['group']] = []
+                group[node['group']].append(id)
+            
+            tmp = {"os": [], "software": [], "hardware": [], "firmware": [], "cve": []}
+            for component, products in node['component'].items():
+                if component == "cve":
+                    for cve in products:
+                        tmp[component].append(cve)
+                    continue
+                for _, product in products.items():
+                    tmp[component].append(gen_tuple(product))
+            node.update(tmp)
+            del(node['component'])
+            del(node['id'])
+            nodes.append((node['name'], node))
             node_dict.update({id: node})
         # Edges
         edges = []
         for edge in graph['edges']:
             if 'from' in edge and 'to' in edge:
-                src = edge.pop('from')
-                dest = edge.pop('to')
+                src = edge.pop('src')
+                dest = edge.pop('dst')
                 edges.append((src, dest, edge))
+                if edge['edge_type'] == "undirected":
+                    edges.append((src, dest, edge))
         
         G = nx.Graph()    
         G.add_nodes_from(nodes)
@@ -44,12 +58,8 @@ class GraphProcessor:
         
         graph = {
             'graph': G,
-            'node_type': node_type
             }
         return graph
-        # self.graph = graph
-        # self.G = G
-        # self.node_dict = node_dict
 
     def get_neighbors(self, node, filter={}):
         """get neighbors of a node and do some filtering work
@@ -104,3 +114,9 @@ class GraphProcessor:
         DG.add_nodes_from(nodes)
         DG.add_edges_from(edges)
         return DG
+
+if __name__ == "__main__":
+    gp = GraphProcessor()
+    with open("src/webapp/data/new_demo/graph.json", "r") as f:
+        graph = json.load(f)
+    gp.convert_pyvis(graph)

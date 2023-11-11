@@ -1,3 +1,7 @@
+import sys, os
+BASE_DIR=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASE_DIR)
+
 from text_classification.BERT import *
 from text_classification.utils.Dataset import *
 from text_classification.config.BERTConfig import *
@@ -9,9 +13,9 @@ class CVE2CWE():
         device = config.get("TextClassification", "device")
         if device == "gpu":
             self.bert.to('cuda')
-        config = BERTConfig()
-        self.bert_dataset = BERTDataset(config)
-        self.bert_labels = loadLabels(config.label_path)
+        bert_config = BERTConfig()
+        self.bert_dataset = BERTDataset(bert_config)
+        self.bert_labels = loadLabels(bert_config.label_path)
         
     def bert_predict(self, text):
         text_vec = self.bert_dataset.text2vec(text)
@@ -22,4 +26,7 @@ class CVE2CWE():
         return self.bert_labels[pred[0]]
 
 if __name__ == "__main__":
-    BERT_classification_predict()
+    cve2cwe = CVE2CWE()
+    cve2cwe.init_bert()
+    text = "An information exposure vulnerability in the Palo Alto Networks Cortex XDR agent on Windows devices allows a local system administrator to disclose the admin password for the agent in cleartext, which bad actors can then use to execute privileged cytool commands that disable or uninstall the agent."
+    print(cve2cwe.bert_predict(text))

@@ -96,6 +96,10 @@
         filter: none;
         opacity: .5
     }
+
+    #product-recommendation:hover {
+        background-color: var(--bs-light)
+    }
 </style>
 {% endblock %}
 {% block content %}
@@ -116,7 +120,7 @@
 </div>
 <div class="container mt-3" id="control-panel-container">
     <div class="row" id="node-control">
-        <div class="col-md-4">
+        <div class="col-md-4" id="node-details">
             <div>
                 <label>Name</label>
                 <input class="form-control" type="text" name="name" v-model="cur_node['name']">
@@ -132,13 +136,14 @@
             </div>
             <div class="dropdown mt-3">
                 <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
-                    Components
+                    {[ component_type ]}
                 </button>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" @click="select_component('os')">OS</a></li>
                     <li><a class="dropdown-item" @click="select_component('software')">Software</a></li>
                     <li><a class="dropdown-item" @click="select_component('firmware')">Firmware</a></li>
                     <li><a class="dropdown-item" @click="select_component('hardware')">Hardware</a></li>
+                    <li><a class="dropdown-item" @click="select_component('cve')">CVE</a></li>
                 </ul>
             </div>
             <div class="mt-3" id="buttons">
@@ -147,27 +152,43 @@
                 <button @click="modify_node" class="btn btn-outline-primary">Modify Node</button>
             </div>
         </div>
-        <div class="col-md-4 pre-scrollable" id="product-list">
+        <div class="col-md-4 pre-scrollable" id="product-list" v-if="component_type != 'cve'">
             <label>Products</label>
             <div class="list-group list-group-checkable" style="overflow-y: auto; max-height: 280px;">
                 <div v-for="(v, k) in cur_node['component'][component_type]">
-                    <input class="list-group-item-check" type="radio" name="listGroupCheckableRadios"
-                        :id="k" value="" checked @click="select_product(k)">
+                    <input class="list-group-item-check" type="radio" name="listGroupCheckableRadios" :id="k" value=""
+                        checked @click="select_product(k)">
                     <label class="list-group-item py-3" :for="k">
                         {[ v["product"] ]}
-                        <span class="d-block small opacity-50">{[ v["product"] ]}-{[ v["version"] ]}-{[ v["access"] ]}-{[ v["privilege"] ]}</span>
+                        <span class="d-block small opacity-50">{[ v["product"] ]}-{[ v["version"] ]}-{[ v["access"]
+                            ]}-{[ v["privilege"] ]}</span>
                     </label>
                 </div>
             </div>
         </div>
-        <div class="col-md-4" id="product-details">
+        <div class="col-md-4 pre-scrollable" id="cve-list" v-else>
+            <label>CVEs</label>
+            <div class="list-group list-group-checkable" style="overflow-y: auto; max-height: 280px;">
+                <div v-for="(v, k) in cur_node['component'][component_type]">
+                    <input class="list-group-item-check" type="radio" name="listGroupCheckableRadios" :id="k" value=""
+                        checked @click="select_cve(k)">
+                    <label class="list-group-item py-3" :for="k">
+                        {[ v["cve"] ]}
+                        <span class="d-block small opacity-50">{[ v["cve"] ]}</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4" id="product-details" v-if="component_type != 'cve'">
             <div>
                 <label>Product</label>
-                <input class="form-control" type="text" name="product" v-model="selected_product['product']">
+                <input class="form-control" type="text" name="product" v-model="selected_product['product']"
+                    @focus="product_on_focus" @blur="product_on_blur">
+                <ul class="list-group" style="position: absolute; z-index: 9999; overflow-y: auto; max-height: 250px; max-width: 480px;"
+                    v-if="if_recommend">
+                    <li class="list-group-item" id="product-recommendation" v-for="recom in recommended_products" @mousedown="fill_product(recom)">{[ recom ]}</li>
+                </ul>
             </div>
-            <!-- <div style="overflow: auto;" v-if="if_recommend">
-                    <p id="file_link" v-for="recom in recommendations"  @click="fill_product(recom)">{[ recom ]}</p>
-                </div> -->
             <div>
                 <label>Version</label>
                 <input class="form-control" type="text" name="version" v-model="selected_product['version']">
@@ -175,8 +196,7 @@
             <div class="row">
                 <label>Access</label>
                 <div class="col-md-8">
-                    <input class="form-control" type="text" name="access" readonly
-                        v-model="selected_product['access']">
+                    <input class="form-control" type="text" name="access" readonly v-model="selected_product['access']">
                 </div>
 
                 <div class="dropdown col-md-4">
@@ -184,10 +204,13 @@
                         Access
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'network')">network</a></li>
-                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'adjacent')">adjacent</a></li>
+                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'network')">network</a>
+                        </li>
+                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'adjacent')">adjacent</a>
+                        </li>
                         <li><a class="dropdown-item" @click="set_product_attributes('access', 'local')">local</a></li>
-                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'physical')">physical</a></li>
+                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'physical')">physical</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -215,17 +238,40 @@
                 <button class="btn btn-outline-primary">Save changes</button>
             </div>
         </div>
+        <div class="col-md-4" id="cve-details" v-else>
+            <div class="row mt-3">
+                <label>CVE</label>
+                <input class="form-control" type="text" name="cve" v-model="selected_cve['cve']">
+            </div>
+            <div class="row mt-3">
+                <label>Description</label>
+                <input class="form-control" type="text" name="description" v-model="selected_cve['description']">
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-outline-primary" @click="add_cve">Add</button>
+                <button class="btn btn-outline-primary" @click="delete_cve">Delete</button>
+            </div>
+        </div>
     </div>
     <div class="row mt-3" id="edge-control">
-        <button class="btn btn-outline-primary col-md-1">Source</button>
-        <input class="form-control col" type="text" name="privilege" required readonly>
-        <button class="btn btn-outline-primary col-md-1">Destination</button>
-        <input class="form-control col" type="text" name="privilege" required readonly>
-        <button class="btn btn-outline-primary col-md-1">Add</button>
-        <button class="btn btn-outline-primary col-md-1">Delete</button>
+        <button class="btn btn-outline-primary col-md-1" @click="select_node('src')">Source</button>
+        <input class="form-control col" type="text" name="privilege" required readonly :value="selected_edge.src.name">
+        <button class="btn btn-outline-primary col-md-1" @click="select_node('dst')">Destination</button>
+        <input class="form-control col" type="text" name="privilege" required readonly :value="selected_edge.dst.name">
+        <button class="btn btn-outline-primary col-md-1" @click="add_edge">Add</button>
+        <div class="dropdown col-md-2">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                {[ edge_type ]}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" @click="set_edge_type('directed')">directed</a></li>
+                <li><a class="dropdown-item" @click="set_edge_type('undirected')">undirected</a></li>
+            </ul>
+        </div>
+        <button class="btn btn-outline-primary col-md-1" @click="delete_edge">Delete</button>
     </div>
 </div>
-<div class="container mt-3" id="modeling">
+<div class="container mt-3" id="project-control">
     <div class="row">
         <div class="col-sm-9">
             <div>
@@ -251,7 +297,7 @@
             </div>
             <input type="text" class="form-control mt-3" placeholder="PROJECT NAME" v-model="cur_project">
             <button type="button" class="btn btn-outline-primary mt-3" @click="save_graph">Save Graph</button>
-            <button type="button" class="btn btn-outline-primary mt-3" @click="save_graph">New Graph</button>
+            <button type="button" class="btn btn-outline-primary mt-3" @click="new_graph">New Graph</button>
         </div>
     </div>
 </div>

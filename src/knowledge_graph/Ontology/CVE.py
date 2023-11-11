@@ -101,7 +101,10 @@ def get_vul_type(cvss2, cvss3, impact):
     return effect
 
 class CVEEntry():
-    def __init__(self, record) -> None:
+    def __init__(self, record=None) -> None:
+        if not record:
+            self.score = 1
+            return
         self.id = record['id']
         self.impact = record['impact']
         cvss2 = None

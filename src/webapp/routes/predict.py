@@ -1,15 +1,15 @@
 from flask import Blueprint
 from flask import request, render_template
 import json
-from text_similarity.TextSimilarity import *
+# from text_similarity.TextSimilarity import *
 from webapp.utils.draw import *
 from analyzer.analyze import *
 
 predict = Blueprint('predict', __name__)
 
-def cve2capecFactory():
-    df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-    return TextSimilarity()
+# def cve2capecFactory():
+#     df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+#     return TextSimilarity()
 
 @predict.route('/predict', methods=['GET'])
 def predict_page():

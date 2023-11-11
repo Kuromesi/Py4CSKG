@@ -1,15 +1,10 @@
-from sentence_transformers import SentenceTransformer
+# from sentence_transformers import SentenceTransformer
 from transformers import BertModel, BertConfig, AutoTokenizer, BertPreTrainedModel
 import pandas as pd
 import torch
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
-from ast import literal_eval
-from sklearn.metrics import f1_score
 from sklearn.feature_extraction.text import TfidfVectorizer
-from tqdm import tqdm, trange
-from gensim import corpora
-from gensim.models import TfidfModel
 from webapp.models.CVE2CAPEC import *
 from webapp.models.BERT import *
 from webapp.utils.Dataset import *

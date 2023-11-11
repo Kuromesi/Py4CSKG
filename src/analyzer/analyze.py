@@ -17,7 +17,7 @@ class ModelAnalyzer():
         self.vul_graph = vul_graph
         self.attack_graph = None
 
-    def gen_vul_graph(self, graph):
+    def gen_vul_graph(self, graph: dict):
         """return data like
         {
             node_name: {
@@ -55,11 +55,14 @@ class ModelAnalyzer():
                         temp["software"] = {}
                     temp["software"][software[0]] = cves
 
+            cves = self.kg.get_vuls(node[1]["cve"])
+            temp["other"] = {}
+            temp["other"]["cve"] = cves
             if temp:
                 vul_map[node[0]] = temp
         return vul_map
 
-    def find_attack_path(self, src, dst, graph, vul_graph):
+    def find_attack_path(self, src: str, dst: str, graph: nx.Graph, vul_graph: dict):
         # first check if the dst can be compromised remotely
         # if not, return the dst can not be compromised by moving laterally
         if dst not in vul_graph:
@@ -74,16 +77,18 @@ class ModelAnalyzer():
                         is_dst_vulnerable = True
                         break
         if not is_dst_vulnerable:
-            logger.info("%s contains vulnerable components but can not be compromised remotely")
-            return
+            logger.info(f"({dst}) contains vulnerable components but can not be compromised remotely")
+            # return
 
         if not self.attack_graph:
             AG = nx.DiGraph()
             nodes = []
             edges = []
             for node in graph.nodes(data=True):
+                max_pos_entry = None
+                if not node[1]['os'] and not node[1]['hardware'] and not node[1]['firmware'] and not node[1]['software']:
+                    max_pos_entry = CVEEntry()
                 if node[0] in vul_graph:
-                    max_pos_entry = None
                     vul_map = vul_graph[node[0]]
                     for component_type, vul_products in vul_map.items():
                         for product, entries in vul_products.items():
@@ -93,11 +98,11 @@ class ModelAnalyzer():
                                         max_pos_entry = entry if entry.score > max_pos_entry.score else max_pos_entry
                                     else:
                                         max_pos_entry = entry
-                    if max_pos_entry:
-                        nodes.append((node[0], {"entry": max_pos_entry}))
-                        for neighbor in graph.neighbors(node[0]):
-                            if nx.has_path(self.graph, neighbor, node[0]):
-                                edges.append((neighbor, node[0], {'weight': max_pos_entry.score}))
+                if max_pos_entry:
+                    nodes.append((node[0], {"entry": max_pos_entry}))
+                    for neighbor in graph.neighbors(node[0]):
+                        if nx.has_path(self.graph, neighbor, node[0]):
+                            edges.append((neighbor, node[0], {'weight': max_pos_entry.score}))
             AG.add_nodes_from(nodes)
             AG.add_edges_from(edges)
             self.attack_graph = AG
@@ -108,12 +113,16 @@ class ModelAnalyzer():
         except Exception as e:
             logger.error(e)
         paths = nx.all_simple_paths(self.attack_graph, src, dst)
-        logger.info("All attack paths generated")
-        self.print_path(paths)
+        if paths:
+            logger.info("All attack paths generated")
+            self.print_path(paths)
 
     def print_path(self, paths):
+        idx = 1
+        print("Attack path: ")
         for path in paths:
-            logger.info("Attack path: " + " --> ".join(path)) 
+            print(f"\t[{idx}] " + " --> ".join(path))
+            idx += 1
 
 class KGQuery():
     def __init__(self, gs: GDBSaver) -> None:
@@ -140,6 +149,13 @@ class KGQuery():
             cves = [CVEEntry(res[0]) for res in results]
         return cves
 
+    def get_vuls(self, cves):
+        ret = []
+        for cve in cves:
+            query = f"MATCH (n:Vulnerability) WHERE n.id='{cve}' RETURN n"
+            result = self.gs.sendQuery(query)
+            ret.append(CVEEntry(result[0][0]))
+        return ret
         
 if __name__ == "__main__":
     G = gen_test_graph()

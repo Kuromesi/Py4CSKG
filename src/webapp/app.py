@@ -5,11 +5,11 @@ sys.path.append(os.path.join(BASE_DIR))
 from flask import Flask
 from flask import request, render_template, redirect, url_for
 from flask_login import current_user
-from webapp.utils.project import *
-from webapp.utils.prediction import *
-from webapp.utils.draw import *
-from webapp.utils.search import *
-from webapp.utils.analyze import *
+# from webapp.utils.project import *
+# from webapp.utils.prediction import *
+# from webapp.utils.draw import *
+# from webapp.utils.search import *
+# from webapp.utils.analyze import *
 from webapp.routes import *
 from webapp.exts import db, login_manager
 from webapp.routes.sign import sign

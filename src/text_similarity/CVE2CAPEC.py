@@ -2,7 +2,7 @@ import sys, os
 BASE_DIR=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 
-from sentence_transformers import SentenceTransformer
+# from sentence_transformers import SentenceTransformer
 from transformers import BertModel, BertConfig, AutoTokenizer, AutoModel
 import pandas as pd
 import torch
@@ -13,8 +13,6 @@ from sklearn.metrics import f1_score
 from sklearn.feature_extraction.text import TfidfVectorizer
 import spacy, re
 from tqdm import tqdm, trange
-from gensim import corpora
-from gensim.models import TfidfModel
 from text_similarity.predict import *
 import os, math
 import json
@@ -549,12 +547,12 @@ if __name__ == '__main__':
 #     print("")
     # tfidf()
     # comparison_result_single()
-    # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-    df = pd.read_csv('./data/attack/attack_nlp.csv')
+    df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+    # df = pd.read_csv('./data/attack/attack_nlp.csv')
     ts = TextSimilarity(df)
-    text = "An issue was discovered in SageCRM 7.x before 7.3 SP3. The Component Manager functionality, provided by SageCRM, permits additional components to be added to the application to enhance provided functionality. This functionality allows a zip file to be uploaded, containing a valid .ecf component file, which will be extracted to the inf directory outside of the webroot. By creating a zip file containing an empty .ecf file, to pass file-validation checks, any other file provided in zip file will be extracted onto the filesystem. In this case, a web shell with the filename '..\WWWRoot\CustomPages\aspshell.asp' was included within the zip file that, when extracted, traversed back out of the inf directory and into the SageCRM webroot. This permitted remote interaction with the underlying filesystem with the highest privilege level, SYSTEM."
+    text = "The Windows Task Scheduler in Microsoft Windows Vista SP1 and SP2, Windows Server 2008 Gold, SP2, and R2, and Windows 7 does not properly determine the security context of scheduled tasks, which allows local users to gain privileges via a crafted application"
     # text = "shared folder"
-    ts.test_similarity("weakness", "vulnerability")
+    # ts.test_similarity("weakness", "vulnerability")
     ts.init_ner()
     ts.init_weight(df)
     ts.calculate_similarity(text)
