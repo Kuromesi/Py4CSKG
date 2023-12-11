@@ -34,6 +34,7 @@ class ModelAnalyzer():
         vul_map = {}
         for node in graph.nodes(data=True):
             temp = {}
+            cves = []
             for os in node[1]["os"]:
                 cves = self.kg.find_vuls(os[0], os[1])
                 if cves:
@@ -51,15 +52,20 @@ class ModelAnalyzer():
             for software in node[1]["software"]:
                 cves = self.kg.find_vuls(software[0], software[1])
                 if cves:
+                    for cve in cves:
+                        cve.access = software[2] if cmp_access(cve.access, software[2]) < 0 else cve.access
                     if "software" not in temp:
                         temp["software"] = {}
                     temp["software"][software[0]] = cves
 
-            cves = self.kg.get_vuls(node[1]["cve"])
+            if node[1]["cve"]:
+                cves.extend(self.kg.get_vuls(node[1]["cve"]))
             temp["other"] = {}
             temp["other"]["cve"] = cves
             if temp:
-                vul_map[node[0]] = temp
+                vul_map[node[0]] = {}
+                vul_map[node[0]]['vuls'] = temp
+                vul_map[node[0]]['entry'] = node[1]['entry']
         return vul_map
 
     def find_attack_path(self, src: str, dst: str, graph: nx.Graph, vul_graph: dict):
@@ -69,7 +75,7 @@ class ModelAnalyzer():
             logger.info("%s is not vulnerable and can not be compromised")
             return
         is_dst_vulnerable = False
-        vul_map = vul_graph[dst]
+        vul_map = vul_graph[dst]['vuls']
         for component_type, vul_products in vul_map.items():
             for product, entries in vul_products.items():
                 for entry in entries:
@@ -86,14 +92,15 @@ class ModelAnalyzer():
             edges = []
             for node in graph.nodes(data=True):
                 max_pos_entry = None
-                if not node[1]['os'] and not node[1]['hardware'] and not node[1]['firmware'] and not node[1]['software']:
+                if not node[1]['os'] and not node[1]['hardware'] and not node[1]['firmware'] and not node[1]['software'] and not node[1]['cve']:
                     max_pos_entry = CVEEntry()
                 if node[0] in vul_graph:
-                    vul_map = vul_graph[node[0]]
+                    vul_map = vul_graph[node[0]]['vuls']
                     for component_type, vul_products in vul_map.items():
                         for product, entries in vul_products.items():
                             for entry in entries:
-                                if entry.access in (ACCESS_ADJACENT, ACCESS_NETWORK) and entry.effect not in (CIA_LOSS, APP_PRIV):
+                                if self.is_node_access(entry.access, vul_graph[node[0]]['entry']) and entry.effect not in (CIA_LOSS, APP_PRIV):
+                                # if entry.access in (ACCESS_ADJACENT, ACCESS_NETWORK) :
                                     if max_pos_entry:
                                         max_pos_entry = entry if entry.score > max_pos_entry.score else max_pos_entry
                                     else:
@@ -106,6 +113,8 @@ class ModelAnalyzer():
             AG.add_nodes_from(nodes)
             AG.add_edges_from(edges)
             self.attack_graph = AG
+            nx.draw_networkx(AG)
+            plt.show()      
         try:
             shortest_path = nx.shortest_path(self.attack_graph, src, dst, weight="weight")
             logger.info("Shortest attack path generated")
@@ -124,11 +133,25 @@ class ModelAnalyzer():
             print(f"\t[{idx}] " + " --> ".join(path))
             idx += 1
 
+    def is_node_access(self, access, entry) -> bool:
+        is_access = cmp_access(access, ACCESS_ADJACENT) >= 0
+        is_access = is_access or entry and access != ACCESS_PHYSICAL
+        return is_access
+
 class KGQuery():
     def __init__(self, gs: GDBSaver) -> None:
         self.gs = gs
     
-    def find_vuls(self, product, version):
+    def find_vuls(self, product, version) -> list[CVEEntry]:
+        """_summary_
+
+        Args:
+            product (string): _description_
+            version (string): _description_
+
+        Returns:
+            _type_: _description_
+        """        
         query = "MATCH (n:Platform) WHERE n.product='%s' AND n.vulnerable='True' RETURN n"%product.replace("_", " ")
         nodes = self.gs.sendQuery(query)
         vul_products = []

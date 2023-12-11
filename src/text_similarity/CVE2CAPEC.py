@@ -24,7 +24,7 @@ class TextSimilarity():
         # bert_config = BertConfig.from_pretrained(model_name)
         self.bert = AutoModel.from_pretrained(model_name)
         self.batch_size = 16
-        self.device = "cpu" if torch.cuda.is_available() else "cpu"
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.bert.to(self.device)
         
         self.docs = docs
@@ -33,7 +33,7 @@ class TextSimilarity():
         self.docs_weight = self.transform_tfidf(docs['processed'].tolist())
         # query_weight = self.transform_tfidf(cves['des'].tolist())
 
-        self.docs_embedding = self.batch_embedding(docs['processed'].tolist(), self.docs_weight, weighted=True).detach().numpy()
+        self.docs_embedding = self.batch_embedding(docs['processed'].tolist(), self.docs_weight, weighted=True).cpu().detach().numpy()
                
 
     def init_ner(self):
@@ -168,11 +168,11 @@ class TextSimilarity():
         # corpus = [dictionary.doc2bow(doc.split()) for doc in docs['processed'].tolist()]
         # tv = TfidfModel(corpus)
         # tfidf = tv['employ']
-        cves = pd.read_csv('./myData/learning/CVE2CAPEC/cve_nlp.csv', index_col=0)
+        # cves = pd.read_csv('./myData/learning/CVE2CAPEC/cve_nlp.csv', index_col=0)
 
         
         # np.save('./data/capec_embedding.npy', docs_embedding)
-        query_embedding = self.weighted_embedding(query, weighted=True)['embedding'].detach().numpy()
+        query_embedding = self.weighted_embedding(query, weighted=True)['embedding'].cpu().detach().numpy()
         df = pd.DataFrame(columns=['id', 'name','similarity'])
         for i in range(len(self.docs_embedding)):
             doc_vec = self.docs_embedding[i]
@@ -548,9 +548,9 @@ if __name__ == '__main__':
     # tfidf()
     # comparison_result_single()
     df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-    # df = pd.read_csv('./data/attack/attack_nlp.csv')
+    # df = pd.read_csv('./data/attack_nlp.csv')
     ts = TextSimilarity(df)
-    text = "The Windows Task Scheduler in Microsoft Windows Vista SP1 and SP2, Windows Server 2008 Gold, SP2, and R2, and Windows 7 does not properly determine the security context of scheduled tasks, which allows local users to gain privileges via a crafted application"
+    text = "password"
     # text = "shared folder"
     # ts.test_similarity("weakness", "vulnerability")
     ts.init_ner()

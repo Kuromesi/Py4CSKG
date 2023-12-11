@@ -9,8 +9,8 @@ if __name__ == "__main__":
     # updater.update_attack()
     # updater.update_cve_details()
 
-    # kg_builder = KGBuilder()
-    # kg_builder.to_csv_neo4j()
-    cve2cwe = CVE2CWE()
-    cve2cwe.init_bert()
-    cve2cwe.bert_predict("test")
+    kg_builder = KGBuilder()
+    kg_builder.to_csv_neo4j()
+    # cve2cwe = CVE2CWE()
+    # cve2cwe.init_bert()
+    # cve2cwe.bert_predict("test")

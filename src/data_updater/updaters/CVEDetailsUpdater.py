@@ -108,8 +108,8 @@ class CVEDetailsUpdater():
         return urls        
     
     # @logging('www.cvedetails.com')
-    def type_page_proc(self, url, q, impact, max_retries=0):
-        """process a single page of type of vulnerabilities, get types
+    def _type_page_proc(self, url, q, impact, max_retries=0):
+        """process a single page of type of vulnerabilities, get types (for old version)
 
         Args:
             url (_type_): _description_
@@ -124,6 +124,30 @@ class CVEDetailsUpdater():
             res = do_request(url, headers=headers)
             idx = etree.HTML(res.content)
             ids = idx.xpath('//*[@id="searchresults"]/div/div[1]/div[1]/h3/a')
+            cves = {}
+            for id in ids:
+                id = text_proc(id.text)
+                cves[id] = [impact]
+            q.put(cves)
+        except Exception as e:
+            logger.error("Failed to update CVE details: %s"%e)
+
+    def type_page_proc(self, url, q, impact, max_retries=0):
+        """process a single page of type of vulnerabilities, get types (for new version)
+
+        Args:
+            url (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """     
+        headers = {
+            'User-Agent': self.user_agents[randint(0, len(self.user_agents) - 1)],
+        }
+        try:
+            res = do_request(url, headers=headers)
+            idx = etree.HTML(res.content)
+            ids = idx.xpath('//*[@id="searchresults"]/div/div/div[1]/div[1]/h3/a')
             cves = {}
             for id in ids:
                 id = text_proc(id.text)

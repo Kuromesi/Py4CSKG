@@ -48,9 +48,9 @@ class Updater():
         """update attack -> cve -> cwe -> capec -> cve_details
         """        
         logger.info("Starting to update knowledge bases")
-        self.update_attack()
-        self.update_cve()
-        self.update_cwe()
-        self.update_capec()
+        # self.update_attack()
+        # self.update_cve()
+        # self.update_cwe()
+        # self.update_capec()
         self.update_cve_details()
         logger.info("Updating knowledge bases finished")

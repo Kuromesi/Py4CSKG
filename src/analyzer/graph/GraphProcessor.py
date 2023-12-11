@@ -29,14 +29,18 @@ class GraphProcessor:
                     group[node['group']] = []
                 group[node['group']].append(id)
             
-            tmp = {"os": [], "software": [], "hardware": [], "firmware": [], "cve": []}
+            tmp = {"os": [], "software": [], "hardware": [], "firmware": [], "cve": [], "entry": []}
             for component, products in node['component'].items():
                 if component == "cve":
                     for cve in products:
                         tmp[component].append(cve)
-                    continue
-                for _, product in products.items():
-                    tmp[component].append(gen_tuple(product))
+                else:
+                    for _, product in products.items():
+                        tmp[component].append(gen_tuple(product))
+
+            if "entry" in node:
+                for entry in node['entry']:
+                    tmp['entry'].append(entry)
             node.update(tmp)
             del(node['component'])
             del(node['id'])

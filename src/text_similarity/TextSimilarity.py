@@ -1,3 +1,7 @@
+import sys, os
+BASE_DIR=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASE_DIR)
+
 from transformers import AutoTokenizer, AutoModel
 import pandas as pd
 import torch
@@ -19,7 +23,7 @@ class RealTextSimilarity():
         # bert_config = BertConfig.from_pretrained(model_name)
         self.bert = AutoModel.from_pretrained(model_name)
         self.batch_size = 16
-        self.device = "cpu" if torch.cuda.is_available() else "cpu"
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.bert.to(self.device)
         self.docs = docs
     
@@ -118,18 +122,27 @@ class RealTextSimilarity():
         tfidf = tv.idf_
         return {'feature': features, 'tfidf': tfidf}      
     
-    def calculate_similarity(self, query):
+    def calculate_similarity(self, query, filter=None):
         '''
         BERT
         '''
-        query_embedding = self.weighted_embedding(query, weighted=True)['embedding'].detach().numpy()
+        query_embedding = self.weighted_embedding(query, weighted=True)['embedding'].cpu().detach().numpy()
         df = pd.DataFrame(columns=['id', 'name', 'description', 'similarity'])
-        for i in range(len(self.docs_embedding)):
-            doc_vec = self.docs_embedding[i]
+        if filter:
+            result = self.docs[self.docs['id'].isin(filter)].index
+            docs_embedding = self.docs_embedding[result]
+        else:
+            docs_embedding =self.docs_embedding
+        for i in range(len(docs_embedding)):
+            doc_vec = docs_embedding[i]
             sim = cosine_similarity([doc_vec], [query_embedding[0]])[0][0]
-            doc_id = self.docs['id'].loc[i]
-            doc_name = self.docs['name'].loc[i]
-            doc_des = self.docs['description'].loc[i]
+            if filter:
+                idx = result[i]
+            else:
+                idx = i
+            doc_id = self.docs['id'].loc[idx]
+            doc_name = self.docs['name'].loc[idx]
+            doc_des = self.docs['description'].loc[idx]
             df.loc[len(df.index)] = [doc_id, doc_name, doc_des, sim]
         df = df.sort_values(by='similarity', ascending=False)
         df.drop_duplicates(subset=['id'], keep='first', inplace=True)
@@ -138,21 +151,25 @@ class RealTextSimilarity():
     def create_embedding(self, docs, path, weighted=True):
         docs_weight = []
         if weighted:
-            docs_weight = self.transform_tfidf(docs)
-        docs_embedding = self.batch_embedding(docs, docs_weight, weighted=weighted).detach().numpy()
+            docs_weight = self.transform_tfidf(docs['processed'].tolist())
+        docs_embedding = self.batch_embedding(docs['processed'].tolist(), docs_weight, weighted=weighted).cpu().detach().numpy()
         np.save(os.path.join(path), docs_embedding)
         return docs_embedding
 
 class TextSimilarity():
     def __init__(self) -> None:
         logger.info("Initializing TextSimilarity")
-        self.rts = RealTextSimilarity()
+        df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+        self.rts = RealTextSimilarity(df)
         doc_weight = config.get("TextSimilarity", "doc_weight")
         self.rts.init_weight(doc_weight)
         self.rts.init_ner()
 
-    def calculate_similarity(self, query):
-        res = self.rts.calculate_similarity(query)
+    def calculate_similarity(self, query, filter=None):
+        res = self.rts.calculate_similarity(query, filter)
         return res
 
-    
+if __name__ == "__main__":
+    ts = TextSimilarity()
+    txt = "test test"
+    ts.calculate_similarity(txt, ["CAPEC-1"])

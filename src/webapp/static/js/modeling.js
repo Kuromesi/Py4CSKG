@@ -308,6 +308,7 @@ node_control = new Vue({
         cur_node: {
             name: "",
             group: "",
+            entry: {},
             component: {
                 os: {},
                 software: {},
@@ -323,11 +324,15 @@ node_control = new Vue({
         selected_product: {
             product: "",
             version: "",
-            access: "network",
+            access: "NETWORK",
             privilege: "user"
         },
         selected_cve: {
             cve: "",
+            description: ""
+        },
+        selected_entry: {
+            entry: "",
             description: ""
         },
         recommended_products: [],
@@ -354,6 +359,7 @@ node_control = new Vue({
             this.cur_node = {
                 name: "",
                 group: "",
+                entry: {},
                 component: {
                     os: {},
                     software: {},
@@ -409,6 +415,54 @@ node_control = new Vue({
                     this.$set(this.selected_component, this.cur_node["component"]["cve"])
                     this.component_type = "cve"
                     break
+                case 'entry':
+                    console.log("entry selected")
+                    this.$set(this.selected_component, this.cur_node["entry"])
+                    this.component_type = "entry"
+                    break
+            }
+        },
+        add_component() {
+            if (this.component_type == "entry") {
+                this.$set(this.cur_node["entry"], this.selected_entry["entry"], JSON.parse(JSON.stringify(this.selected_entry)))
+            } else if (this.component_type == "cve") {
+                this.$set(this.cur_node["component"][this.component_type], this.selected_cve["cve"], JSON.parse(JSON.stringify(this.selected_cve)))
+                this.selected_cve = {
+                    cve: "",
+                    description: ""
+                }
+            } else {
+                this.$set(this.cur_node["component"][this.component_type], this.selected_product["product"], JSON.parse(JSON.stringify(this.selected_product)))
+                this.selected_product = {
+                    product: "",
+                    version: "",
+                    access: "NETWORK",
+                    privilege: "user"
+                }
+            }
+        },
+        delete_component() {
+            if (this.component_type == "entry") {
+                Vue.delete(this.cur_node["entry"], this.selected_entry["entry"])
+            } else if (this.component_type == "cve") {
+                Vue.delete(this.cur_node["component"][this.component_type], this.selected_cve["cve"])
+            } else {
+                this.$set(this.cur_node["component"][this.component_type], this.selected_product["product"], JSON.parse(JSON.stringify(this.selected_product)))
+                this.selected_product = {
+                    product: "",
+                    version: "",
+                    access: "NETWORK",
+                    privilege: "user"
+                }
+            }
+        },
+        check_component_details(name) {
+            if (this.component_type == "entry") {
+                this.selected_entry = JSON.parse(JSON.stringify(this.cur_node["entry"][name]))
+            } else if (this.component_type == "cve") {
+                this.selected_cve = JSON.parse(JSON.stringify(this.cur_node["component"][this.component_type][name]))
+            } else {
+                this.selected_product = JSON.parse(JSON.stringify(this.cur_node["component"][this.component_type][name]))
             }
         },
         add_product() {

@@ -10,6 +10,7 @@ from utils.Logger import logger
 from data_updater.updaters.utils import *
 from utils.MultiTask import MultiTask
 from utils.Config import config
+from knowledge_graph.Ontology.ontology import *
 
 CVE = re.compile(r'CVE-\d*-\d*')
 
@@ -33,7 +34,7 @@ class XmlTraverser:
 
 class CAPECTraverser(XmlTraverser):
     def __init__(self):
-        self.TYPE = "Pattern"
+        pass
 
     def traverse(self):
         # df = pd.DataFrame(columns=['id', 'name', 'description', 'cve'])
@@ -59,7 +60,7 @@ class CAPECTraverser(XmlTraverser):
                 src = "CAPEC-" + view["ID"]
                 views.set_postfix(id=src)
                 objective = view.Objective.get_text().strip()
-                pt_df.loc[len(pt_df.index)] = [src, self.TYPE, name, objective, "", type1, str(view)]
+                pt_df.loc[len(pt_df.index)] = [src, CAPEC_TYPE, name, objective, "", type1, str(view)]
                 
                 # Find members
                 members = view.Members
@@ -92,7 +93,7 @@ class CAPECTraverser(XmlTraverser):
                 src = "CAPEC-" + category["ID"]
                 categories.set_postfix(id=src)
                 objective = category.Summary.get_text().strip()
-                pt_df.loc[len(pt_df.index)] = [src, self.TYPE, name, objective, "", type1, str(category)]
+                pt_df.loc[len(pt_df.index)] = [src, CAPEC_TYPE, name, objective, "", type1, str(category)]
 
                 # Find members
                 members = category.Relationships
@@ -128,7 +129,7 @@ class CAPECTraverser(XmlTraverser):
                 
                 description = self.get_value(atkpt, "Description") 
                 extended_des = self.get_value(atkpt, "Extended_Description")
-                pt_df.loc[len(pt_df.index)] = [src, self.TYPE, name, description, extended_des, type1, str(atkpt)]
+                pt_df.loc[len(pt_df.index)] = [src, CAPEC_TYPE, name, description, extended_des, type1, str(atkpt)]
 
 
                 # Related attack patterns
@@ -146,16 +147,15 @@ class CAPECTraverser(XmlTraverser):
                     for related_weakness in related_weaknesses.children:
                         if related_weakness != "\n":
                             dest = "CWE-" + related_weakness['CWE_ID']
-                            relation = related_weakness.name
-                            rel_df.loc[len(rel_df.index)] = [src, dest, relation]
+                            rel_df.loc[len(rel_df.index)] = [src, dest, TECHNIQUE_WEAKNESS_REL]
                             
                 # Find mitigations
                 mitigations = atkpt.find('Mitigations')
                 if mitigations:
                     mitigation_uri = "Mitigation:" + src
                     des = mitigations.text.strip()
-                    misc_df.loc[len(misc_df.index)] = [mitigation_uri, "Mitigation", des]
-                    rel_df.loc[len(rel_df.index)] = [src, mitigation_uri, "Has_Mitigation"]
+                    misc_df.loc[len(misc_df.index)] = [mitigation_uri, MITIGATION_TYPE, des]
+                    rel_df.loc[len(rel_df.index)] = [mitigation_uri, src, MITIGATE_REL]
 
                 # Find indicators
                 indicators = atkpt.find_all('Indicator')
@@ -164,8 +164,8 @@ class CAPECTraverser(XmlTraverser):
                     id = "Indicator:" + src + ".%d"%count
                     des = indicator.text.strip()
                     indicator_node = {'id': id, 'description': des, 'prop': "IOC"}
-                    misc_df.loc[len(misc_df.index)] = [id, "IOC", des]
-                    rel_df.loc[len(rel_df.index)] = [src, id, "Has_IOC"]
+                    misc_df.loc[len(misc_df.index)] = [id, INDICATOR_TYPE, des]
+                    rel_df.loc[len(rel_df.index)] = [id, src, INDICATE_TECHNIQUE_REL]
                     count += 1    
 
                 # For texsimilarity
@@ -177,7 +177,15 @@ class CAPECTraverser(XmlTraverser):
                     for cve in cves:
                         rel_df.loc[len(rel_df.index)] = [src, cve, "Has_Example"]
                 capec_cve_df.loc[len(capec_cve_df.index)] = [src, name, description, cves]
-                
+        
+                # Find related ATT&CK
+                taxonomies = atkpt.find_all('Taxonomy_Mapping')
+                if taxonomies:
+                    for taxonomy in taxonomies:
+                        if taxonomy.attrs['Taxonomy_Name'] != "ATTACK":
+                            continue
+                        entry = "T" + taxonomy.find_all("Entry_ID")[0].text.strip()
+                        rel_df.loc[len(rel_df.index)] = [src, entry, CAPEC_ATTACK_REL]
 
         base = config.get("KnowledgeGraph", "neo4j_path")
         pt_df.drop_duplicates()
@@ -189,7 +197,7 @@ class CAPECTraverser(XmlTraverser):
         if not os.path.exists:
             os.mkdir(os.path.join(base, "capec"))
         base = config.get("DeepLearning", "base_path")
-        capec_cve_df.to_csv(os.path.join(base, "capec/capec.csv"), index=False)
+        # capec_cve_df.to_csv(os.path.join(base, "capec/capec.csv"), index=False)
 
 
 class CWETraverser(XmlTraverser):
@@ -218,7 +226,7 @@ class CWETraverser(XmlTraverser):
                 src = "CWE-" + view["ID"]
                 views.set_postfix(id=src)
                 objective = view.Objective.text
-                wk_df.loc[len(wk_df.index)] = [src, self.TYPE, name, objective, type1, str(view)]
+                wk_df.loc[len(wk_df.index)] = [src, CWE_TYPE, name, objective, type1, str(view)]
 
                 #Find members
                 members = view.Members
@@ -241,7 +249,7 @@ class CWETraverser(XmlTraverser):
                 src = "CWE-" + view["ID"]
                 categories.set_postfix(id=src)
                 objective = view.Summary.text
-                wk_df.loc[len(wk_df.index)] = [src, self.TYPE, name, objective, type1, str(view)]
+                wk_df.loc[len(wk_df.index)] = [src, CWE_TYPE, name, objective, type1, str(view)]
 
                 # Find members
                 members = view.Relationships
@@ -264,7 +272,7 @@ class CWETraverser(XmlTraverser):
                 src = "CWE-" + weakness["ID"]
                 weaknesses.set_postfix(id=src)
                 objective = weakness.Description.text
-                wk_df.loc[len(wk_df.index)] = [src, self.TYPE, name, objective, type1, str(weakness)]
+                wk_df.loc[len(wk_df.index)] = [src, CWE_TYPE, name, objective, type1, str(weakness)]
           
             # Find members
             members = weakness.Relationships
@@ -283,8 +291,8 @@ class CWETraverser(XmlTraverser):
                     id = mitigation['Mitigation_ID'] if 'Mitigation_ID' in mitigation else "Mitigation:" + src + ".%d"%count
                     count += 1
                     des = str(mitigation)
-                    misc_df.loc[len(misc_df.index)] = [id, "Mitigation", des]
-                    rel_df.loc[len(rel_df.index)] = [src, id, "Has_Mitigation"]
+                    misc_df.loc[len(misc_df.index)] = [id, MITIGATION_TYPE, des]
+                    rel_df.loc[len(rel_df.index)] = [id, src, MITIGATE_REL]
         base = config.get("KnowledgeGraph", "neo4j_path")
         wk_df.drop_duplicates()
         wk_df.to_csv(os.path.join(base, 'neo4j/nodes/cwe_wk.csv'), index=False)
@@ -321,7 +329,7 @@ class ATTACKTraverser(XmlTraverser):
             cur = root_node[name]
             id = cur['id']
             description = cur["description"]
-            misc_df.loc[len(misc_df.index)] = [id, "Tactic", name, description]
+            misc_df.loc[len(misc_df.index)] = [id, TACTIC_TYPE, name, description]
 
         with open(technique_path, "r", encoding='utf-8') as file:
             soup = BeautifulSoup(file, "xml")
@@ -342,7 +350,7 @@ class ATTACKTraverser(XmlTraverser):
             attrs['impact_type'] = text_proc(tech.find('Impact_Type').text) if tech.find('Impact_Type') else ""
                 
             tech_df.loc[len(tech_df.index)] = [
-                attrs['id'], "Technique", attrs['name'], attrs['des'], attrs['type'], attrs['platforms'], 
+                attrs['id'], ATTACK_TYPE, attrs['name'], attrs['des'], attrs['type'], attrs['platforms'], 
                 attrs['permissions_required'], attrs['effective_permissions'], attrs['impact_type'], attrs['complete']
                 ]
             
@@ -359,14 +367,14 @@ class ATTACKTraverser(XmlTraverser):
             tactic = tactics.text.split(', ')
             for tac in tactic:
                 # Save RDF
-                rel_df.loc[len(rel_df.index)] = [root_node[tac.strip()]['id'], attrs['id'], "Has_Technique"]
+                rel_df.loc[len(rel_df.index)] = [attrs['id'], root_node[tac.strip()]['id'], TECHNIQUE_TACTIC_REL]
             
             # Find capec
-            capec = tech.find('CAPEC_ID')
-            if capec:
-                capec = capec.text.split(', ')
-                for cap in capec:
-                    rel_df.loc[len(rel_df.index)] = [cap.strip(), attrs['id'], "In_CAPEC"]
+            # capec = tech.find('CAPEC_ID')
+            # if capec:
+            #     capec = capec.text.split(', ')
+            #     for cap in capec:
+            #         rel_df.loc[len(rel_df.index)] = [cap.strip(), attrs['id'], "In_CAPEC"]
                     
             # Find examples
             examples = tech.find_all('Example')
@@ -375,12 +383,12 @@ class ATTACKTraverser(XmlTraverser):
                     id = example['id']
                     name = example['name']
                     # group_type = "Software" if id[0] == "S" else "Group"
-                    misc_df.loc[len(misc_df.index)] = [id, "Threats", name, ""]
+                    misc_df.loc[len(misc_df.index)] = [id, THREAT_TYPE, name, ""]
                     uri = id + ":" +attrs['id']
                     des = text_proc(example.next)
-                    misc_df.loc[len(misc_df.index)] = [uri, "Procedure", "", des]
-                    rel_df.loc[len(rel_df.index)] = [id, uri, "Has_Procedure"]
-                    rel_df.loc[len(rel_df.index)] = [uri, attrs['id'], "Utilize"]
+                    misc_df.loc[len(misc_df.index)] = [uri, PROCEDURE_TYPE, "", des]
+                    rel_df.loc[len(rel_df.index)] = [id, uri, THREAT_PROCEDURE_REL]
+                    rel_df.loc[len(rel_df.index)] = [uri, attrs['id'], PROCEDURE_TECHNIQUE_REL]
                 
             # Find mitigations
             mitigations = tech.find_all('Mitigation')
@@ -389,8 +397,8 @@ class ATTACKTraverser(XmlTraverser):
                     id = mitigation['id'] + ":%s"%attrs['id']
                     name = mitigation['name']
                     des = text_proc(mitigation.text)
-                    misc_df.loc[len(misc_df.index)] = [id, "Mitigation", name, des]
-                    rel_df.loc[len(rel_df.index)] = [attrs['id'], id, "Has_Mitigation"]
+                    misc_df.loc[len(misc_df.index)] = [id, MITIGATION_TYPE, name, des]
+                    rel_df.loc[len(rel_df.index)] = [id, attrs['id'], MITIGATE_REL]
                     
             # Find detections
             detections = tech.find_all('Detection')
@@ -399,8 +407,8 @@ class ATTACKTraverser(XmlTraverser):
                     id = detection['id'] + ":%s"%attrs['id']
                     name = detection['name']
                     des = text_proc(detection.text)
-                    misc_df.loc[len(misc_df.index)] = [id, "IOC", name, des]
-                    rel_df.loc[len(rel_df.index)] = [attrs['id'], id, "Has_IOC"]
+                    misc_df.loc[len(misc_df.index)] = [id, INDICATOR_TYPE, name, des]
+                    rel_df.loc[len(rel_df.index)] = [id, attrs['id'], INDICATE_TECHNIQUE_REL]
         base = config.get("KnowledgeGraph", "neo4j_path")
         tech_df = tech_df.drop_duplicates()
         tech_df.to_csv(os.path.join(base, 'neo4j/nodes/attack_tech_%s.csv'%kind), index=False)

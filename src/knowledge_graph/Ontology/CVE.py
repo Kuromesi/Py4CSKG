@@ -1,17 +1,19 @@
 import json
 
 # constants
+ACCESS_PHYSICAL = "PHYSICAL"
 ACCESS_LOCAL = "LOCAL"
-ACCESS_NETWORK = "NETWORK"
 ACCESS_ADJACENT = "ADJACENT_NETWORK"
+ACCESS_NETWORK = "NETWORK"
 
 CIA_LOSS = "system cia loss"
-APP_EXEC = "application arbitrary code execution"
-SYS_EXEC = "system arbitrary code execution"
 APP_PRIV = "gain privilege on application"
-PRIV_ESC = "privilege escalation"
 USER_PRIV = "gain user privilege"
 ROOT_PRIV = "gain root privilege"
+
+APP_EXEC = "application arbitrary code execution"
+SYS_EXEC = "system arbitrary code execution"
+PRIV_ESC = "privilege escalation"
 PRIV_UND = "component privilege based privilege"
 EXEC_UND = "component privilege based execution"
 
@@ -20,6 +22,27 @@ GAIN_PRIV_CVED = "privilege escalation"
 
 IMPACT_ORDER = ["system CIA loss", "gain privilege on application", "application arbitrary code execution", "system arbitrary code execution", 
                 "gain user privilege", "privilege escalation", "gain root privilege"]
+
+ACCESS_ORDER = [ACCESS_PHYSICAL, ACCESS_LOCAL, ACCESS_ADJACENT, ACCESS_NETWORK]
+IMPACT_ORDER = []
+
+def cmp_access(a, b):
+    if a not in ACCESS_ORDER or b not in ACCESS_ORDER:
+        raise ValueError(f"{a} or {b} not in default access types") 
+    if ACCESS_ORDER.index(a) > ACCESS_ORDER.index(b):
+        return 1
+    elif ACCESS_ORDER.index(a) == ACCESS_ORDER.index(b):
+        return 0
+    else:
+        return -1
+
+def cmp_impact(a, b):
+    if IMPACT_ORDER.index(a) > IMPACT_ORDER.index(b):
+        return 1
+    elif IMPACT_ORDER.index(a) == IMPACT_ORDER.index(b):
+        return 0
+    else:
+        return -1
 
 def cmp_cve(a, b):
     if IMPACT_ORDER.index(a.impact) > IMPACT_ORDER.index(b.impact):
@@ -47,13 +70,50 @@ def get_max_pos_entries(entries):
                 res[access][priv_req] = entry
         return res
 
-def get_vul_type(cvss2, cvss3, impact):
+def get_vul_type(cvss2=None, cvss3=None, impact=[]):
+    impact = [i.lower() for i in impact]
+    if cvss2:
+        if cvss2["obtainUserPrivilege"]:
+            return USER_PRIV
+        if cvss2["obtainAllPrivilege"]:
+            return ROOT_PRIV
+        if cvss2["obtainOtherPrivilege"]:
+            return APP_PRIV
+        
+        cvss2 = cvss2['cvssV2']
+
+        if cvss2["confidentialityImpact"] == "NONE" or cvss2["integrityImpact"] == "NONE" or cvss2["availabilityImpact"] == "NONE":
+            return CIA_LOSS
+        elif cvss2["confidentialityImpact"] == "COMPLETE" and cvss2["integrityImpact"] == "COMPLETE" and cvss2["availabilityImpact"] == "COMPLETE":
+            if GAIN_PRIV_CVED in impact or CODE_EXEC_CVED in impact:
+                return ROOT_PRIV
+        else:
+            if GAIN_PRIV_CVED in impact or CODE_EXEC_CVED in impact:
+                return USER_PRIV
+    
+    elif cvss3:
+        cvss3 = cvss3['cvssV3']
+        if cvss3["confidentialityImpact"] == "HIGH" and cvss3["integrityImpact"] == "HIGH" and cvss3["availabilityImpact"] == "HIGH":
+            if GAIN_PRIV_CVED in impact or CODE_EXEC_CVED in impact:
+                if cvss3["baseSeverity"] == "CRITICAL":
+                    return ROOT_PRIV
+                else:
+                    return USER_PRIV
+        elif GAIN_PRIV_CVED in impact or CODE_EXEC_CVED in impact:
+            return APP_PRIV
+        else:
+            return CIA_LOSS
+    else:
+        raise ValueError("neither CVSSv2 nor CVSSv3 exists")
+
+    return CIA_LOSS
+
+def _get_vul_type(cvss2, cvss3, impact):
     impact = [i.lower() for i in impact]
     effect = ""
     if cvss2 and cvss3:
         cvss2_full = cvss2
         cvss2 = cvss2['cvssV2']
-        cvss3_full = cvss3
         cvss3 = cvss3['cvssV3']
         if cvss2["confidentialityImpact"] == "PARTIAL" and cvss2["integrityImpact"] == "PARTIAL" and cvss2["availabilityImpact"] == "PARTIAL":
             if GAIN_PRIV_CVED in impact:
@@ -85,7 +145,6 @@ def get_vul_type(cvss2, cvss3, impact):
             effect = CIA_LOSS
     
     elif cvss3:
-        cvss3_full = cvss3
         cvss3 = cvss3['cvssV3']
         if cvss3["confidentialityImpact"] == "HIGH" and cvss3["integrityImpact"] == "HIGH" and cvss3["availabilityImpact"] == "HIGH":
             if GAIN_PRIV_CVED in impact:

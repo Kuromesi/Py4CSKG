@@ -144,6 +144,7 @@
                     <li><a class="dropdown-item" @click="select_component('firmware')">Firmware</a></li>
                     <li><a class="dropdown-item" @click="select_component('hardware')">Hardware</a></li>
                     <li><a class="dropdown-item" @click="select_component('cve')">CVE</a></li>
+                    <li><a class="dropdown-item" @click="select_component('entry')">Entry</a></li>
                 </ul>
             </div>
             <div class="mt-3" id="buttons">
@@ -152,12 +153,41 @@
                 <button @click="modify_node" class="btn btn-outline-primary">Modify Node</button>
             </div>
         </div>
-        <div class="col-md-4 pre-scrollable" id="product-list" v-if="component_type != 'cve'">
+        
+        <div class="col-md-4 pre-scrollable" id="cve-list" v-if="component_type == 'cve'">
+            <label>CVEs</label>
+            <div class="list-group list-group-checkable" style="overflow-y: auto; max-height: 280px;">
+                <div v-for="(v, k) in cur_node['component'][component_type]">
+                    <input class="list-group-item-check" type="radio" name="listGroupCheckableRadios" :id="k" value=""
+                        checked @click="check_component_details(k)">
+                    <label class="list-group-item py-3" :for="k">
+                        {[ v["cve"] ]}
+                        <span class="d-block small opacity-50">{[ v["cve"] ]}</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 pre-scrollable" id="entry-list" v-else-if="component_type == 'entry'">
+            <label>Entry</label>
+            <div class="list-group list-group-checkable" style="overflow-y: auto; max-height: 280px;">
+                <div v-for="(v, k) in cur_node['entry']">
+                    <input class="list-group-item-check" type="radio" name="listGroupCheckableRadios" :id="k" value=""
+                        checked @click="check_component_details(k)">
+                    <label class="list-group-item py-3" :for="k">
+                        {[ v["entry"] ]}
+                        <span class="d-block small opacity-50">{[ v["entry"] ]}</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 pre-scrollable" id="product-list" v-else>
             <label>Products</label>
             <div class="list-group list-group-checkable" style="overflow-y: auto; max-height: 280px;">
                 <div v-for="(v, k) in cur_node['component'][component_type]">
                     <input class="list-group-item-check" type="radio" name="listGroupCheckableRadios" :id="k" value=""
-                        checked @click="select_product(k)">
+                        checked @click="check_component_details(k)">
                     <label class="list-group-item py-3" :for="k">
                         {[ v["product"] ]}
                         <span class="d-block small opacity-50">{[ v["product"] ]}-{[ v["version"] ]}-{[ v["access"]
@@ -166,20 +196,38 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 pre-scrollable" id="cve-list" v-else>
-            <label>CVEs</label>
-            <div class="list-group list-group-checkable" style="overflow-y: auto; max-height: 280px;">
-                <div v-for="(v, k) in cur_node['component'][component_type]">
-                    <input class="list-group-item-check" type="radio" name="listGroupCheckableRadios" :id="k" value=""
-                        checked @click="select_cve(k)">
-                    <label class="list-group-item py-3" :for="k">
-                        {[ v["cve"] ]}
-                        <span class="d-block small opacity-50">{[ v["cve"] ]}</span>
-                    </label>
-                </div>
+
+        <div class="col-md-4" id="cve-details" v-if="component_type == 'cve'">
+            <div class="row mt-3">
+                <label>CVE</label>
+                <input class="form-control" type="text" name="cve" v-model="selected_cve['cve']">
+            </div>
+            <div class="row mt-3">
+                <label>Description</label>
+                <input class="form-control" type="text" name="description" v-model="selected_cve['description']">
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-outline-primary" @click="add_component">Add</button>
+                <button class="btn btn-outline-primary" @click="delete_component">Delete</button>
             </div>
         </div>
-        <div class="col-md-4" id="product-details" v-if="component_type != 'cve'">
+
+        <div class="col-md-4" id="entry-details" v-else-if="component_type == 'entry'">
+            <div class="row mt-3">
+                <label>Entry</label>
+                <input class="form-control" type="text" name="entry" v-model="selected_entry['entry']">
+            </div>
+            <div class="row mt-3">
+                <label>Description</label>
+                <input class="form-control" type="text" name="description" v-model="selected_entry['description']">
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-outline-primary" @click="add_component">Add</button>
+                <button class="btn btn-outline-primary" @click="delete_component">Delete</button>
+            </div>
+        </div>
+
+        <div class="col-md-4" id="product-details" v-else>
             <div>
                 <label>Product</label>
                 <input class="form-control" type="text" name="product" v-model="selected_product['product']"
@@ -204,12 +252,12 @@
                         Access
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'network')">network</a>
+                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'NETWORK')">network</a>
                         </li>
-                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'adjacent')">adjacent</a>
+                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'ADJACENT_NETWORK')">adjacent</a>
                         </li>
-                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'local')">local</a></li>
-                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'physical')">physical</a>
+                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'LOCAL')">local</a></li>
+                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'PHYSICAL')">physical</a>
                         </li>
                     </ul>
                 </div>
@@ -233,23 +281,8 @@
                 </div>
             </div>
             <div class="mt-3">
-                <button class="btn btn-outline-primary" @click="add_product">Add product</button>
-                <button class="btn btn-outline-primary" @click="delete_product">Delete product</button>
-                <button class="btn btn-outline-primary">Save changes</button>
-            </div>
-        </div>
-        <div class="col-md-4" id="cve-details" v-else>
-            <div class="row mt-3">
-                <label>CVE</label>
-                <input class="form-control" type="text" name="cve" v-model="selected_cve['cve']">
-            </div>
-            <div class="row mt-3">
-                <label>Description</label>
-                <input class="form-control" type="text" name="description" v-model="selected_cve['description']">
-            </div>
-            <div class="mt-3">
-                <button class="btn btn-outline-primary" @click="add_cve">Add</button>
-                <button class="btn btn-outline-primary" @click="delete_cve">Delete</button>
+                <button class="btn btn-outline-primary" @click="add_component">Add product</button>
+                <button class="btn btn-outline-primary" @click="delete_component">Delete product</button>
             </div>
         </div>
     </div>
