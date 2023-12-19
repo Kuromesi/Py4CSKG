@@ -7,6 +7,128 @@ from service.GDBSaver import GDBSaver
 from knowledge_graph.Ontology.CVE import *
 from analyzer.tests.tests import gen_test_graph
 from utils.Logger import logger
+from analyzer.ontologies.ontology import REL_ACCESS, REL_CONTROL, REL_PEER, AtomicAttack, AttackChain
+
+class CVETree():
+    search_tree: dict[str, dict[str, list[CVEEntry]]]
+    cve_tree: dict[str, dict[str, AttackChain]]
+    def __init__(self, cves: list[CVEEntry]) -> None:
+        self.cve_tree = {
+            ACCESS_NETWORK: {
+                PRIV_REQ_NONE: [],
+                PRIV_REQ_LOW: [],
+                PRIV_REQ_HIGH: []
+            },
+            ACCESS_ADJACENT: {
+                PRIV_REQ_NONE: [],
+                PRIV_REQ_LOW: [],
+                PRIV_REQ_HIGH: []
+            },
+            ACCESS_LOCAL: {
+                PRIV_REQ_NONE: [],
+                PRIV_REQ_LOW: [],
+                PRIV_REQ_HIGH: []
+            },
+            ACCESS_PHYSICAL: {
+                PRIV_REQ_NONE: [],
+                PRIV_REQ_LOW: [],
+                PRIV_REQ_HIGH: []
+            }
+        }
+
+        self.search_tree = {
+            ACCESS_NETWORK: {
+                PRIV_REQ_NONE: [],
+                PRIV_REQ_LOW: [],
+                PRIV_REQ_HIGH: []
+            },
+            ACCESS_ADJACENT: {
+                PRIV_REQ_NONE: [],
+                PRIV_REQ_LOW: [],
+                PRIV_REQ_HIGH: []
+            },
+            ACCESS_LOCAL: {
+                PRIV_REQ_NONE: [],
+                PRIV_REQ_LOW: [],
+                PRIV_REQ_HIGH: []
+            },
+            ACCESS_PHYSICAL: {
+                PRIV_REQ_NONE: [],
+                PRIV_REQ_LOW: [],
+                PRIV_REQ_HIGH: []
+            }
+        }
+
+        for cve in cves:
+            self.search_tree[cve.access][cve.privileges_required].append(cve)
+
+        self.build_cve_tree()
+
+    def build_cve_tree(self):
+        # fist check max privilege can be obtained of network access
+        self.cve_tree[ACCESS_NETWORK][PRIV_REQ_NONE] = self.check_max_privilege_obtained(self.search_tree[ACCESS_NETWORK][PRIV_REQ_NONE])
+        self.cve_tree[ACCESS_NETWORK][PRIV_REQ_LOW] = self.check_max_privilege_obtained(self.search_tree[ACCESS_NETWORK][PRIV_REQ_LOW])
+        self.cve_tree[ACCESS_NETWORK][PRIV_REQ_HIGH] = self.check_max_privilege_obtained(self.search_tree[ACCESS_NETWORK][PRIV_REQ_HIGH])
+
+        self.cve_tree[ACCESS_ADJACENT][PRIV_REQ_NONE] = self.check_max_privilege_obtained(self.search_tree[ACCESS_ADJACENT][PRIV_REQ_NONE])
+        self.cve_tree[ACCESS_ADJACENT][PRIV_REQ_LOW] = self.check_max_privilege_obtained(self.search_tree[ACCESS_ADJACENT][PRIV_REQ_LOW])
+        self.cve_tree[ACCESS_ADJACENT][PRIV_REQ_HIGH] = self.check_max_privilege_obtained(self.search_tree[ACCESS_ADJACENT][PRIV_REQ_HIGH])
+
+        self.cve_tree[ACCESS_LOCAL][PRIV_REQ_NONE] = self.check_max_privilege_obtained(self.search_tree[ACCESS_LOCAL][PRIV_REQ_NONE])
+        self.cve_tree[ACCESS_LOCAL][PRIV_REQ_LOW] = self.check_max_privilege_obtained(self.search_tree[ACCESS_LOCAL][PRIV_REQ_LOW])
+        self.cve_tree[ACCESS_LOCAL][PRIV_REQ_HIGH] = self.check_max_privilege_obtained(self.search_tree[ACCESS_LOCAL][PRIV_REQ_HIGH])
+
+        self.cve_tree[ACCESS_PHYSICAL][PRIV_REQ_NONE] = self.check_max_privilege_obtained(self.search_tree[ACCESS_PHYSICAL][PRIV_REQ_NONE])
+        self.cve_tree[ACCESS_PHYSICAL][PRIV_REQ_LOW] = self.check_max_privilege_obtained(self.search_tree[ACCESS_PHYSICAL][PRIV_REQ_LOW])
+        self.cve_tree[ACCESS_PHYSICAL][PRIV_REQ_HIGH] = self.check_max_privilege_obtained(self.search_tree[ACCESS_PHYSICAL][PRIV_REQ_HIGH])
+
+        for access in ACCESS_ORDER:
+            for priv in PRIV_REQ_ORDER:
+                cur_ac = self.cve_tree[access][priv]
+                attacks = cur_ac.get_atomic_attacks()
+                for i in range(ACCESS_ORDER.index(access), len(ACCESS_ORDER)):
+                    for j in range(PRIV_REQ_ORDER.index(priv), len(PRIV_REQ_ORDER)):
+                        if self.cve_tree[ACCESS_ORDER[i]][PRIV_REQ_ORDER[j]].get_atomic_attacks():
+                            cmp_attack = self.cve_tree[ACCESS_ORDER[i]][PRIV_REQ_ORDER[j]].get_atomic_attacks()[0]
+                            if attacks:
+                                if cmp_impact(cmp_attack.privileges_gain, attacks[0].privileges_gain) >= 0:
+                                    attacks[0] = cmp_attack
+                            else:
+                                attacks.append(cmp_attack)
+        
+        for access in ACCESS_ORDER[1: ]:
+            for priv in PRIV_REQ_ORDER:
+                cur_ac = self.cve_tree[access][priv]
+                attacks = cur_ac.get_atomic_attacks()
+                if attacks[0].privileges_gain == PRIV_USER:
+                    latter_attacks = self.cve_tree[ACCESS_LOCAL][PRIV_REQ_LOW].get_atomic_attacks()
+                elif attacks[0].privileges_gain == PRIV_ROOT:
+                    latter_attacks = self.cve_tree[ACCESS_LOCAL][PRIV_REQ_HIGH].get_atomic_attacks()
+                else:
+                    latter_attacks = []
+                if attacks[0] in latter_attacks:
+                    cur_ac.set_atomic_attacks(latter_attacks)
+                else:
+                    cur_ac.get_atomic_attacks().extend(latter_attacks)
+
+    def check_max_privilege_obtained(self, cves: list[CVEEntry]) -> AttackChain:
+        ac = AttackChain()
+        for cve in cves:
+            if not ac.get_atomic_attacks():
+                attack = AtomicAttack(cve.id, cve.access, cve.privileges_required, cve.effect, cve.score)
+                ac.get_atomic_attacks().append(attack)
+            else:
+                if cmp_impact(cve.effect, attack.privileges_gain) > 0:
+                    attack.score = cve.score
+                    attack.privileges_gain = cve.effect
+                elif cmp_impact(cve.effect, attack.privileges_gain) == 0 and cve.score > attack.score:
+                    attack.score = cve.score
+        return ac  
+    
+    def get_max_privilege(self, access):
+        return self.cve_tree[access]
+    
+
 
 class ModelAnalyzer():
     def __init__(self, gs, graph) -> None:
@@ -17,7 +139,7 @@ class ModelAnalyzer():
         self.vul_graph = vul_graph
         self.attack_graph = None
 
-    def gen_vul_graph(self, graph: dict):
+    def gen_vul_graph(self, graph: nx.Graph):
         """return data like
         {
             node_name: {
@@ -99,7 +221,7 @@ class ModelAnalyzer():
                     for component_type, vul_products in vul_map.items():
                         for product, entries in vul_products.items():
                             for entry in entries:
-                                if self.is_node_access(entry.access, vul_graph[node[0]]['entry']) and entry.effect not in (CIA_LOSS, APP_PRIV):
+                                if self.is_node_access(entry.access, vul_graph[node[0]]['entry']) and entry.effect not in (CIA_LOSS, PRIV_APP):
                                 # if entry.access in (ACCESS_ADJACENT, ACCESS_NETWORK) :
                                     if max_pos_entry:
                                         max_pos_entry = entry if entry.score > max_pos_entry.score else max_pos_entry

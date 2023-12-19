@@ -11,9 +11,9 @@ model = AutoModel.from_pretrained("Muennighoff/SGPT-125M-weightedmean-msmarco-sp
 model.eval()
 
 batch_size = 32
-
+embedding_path = "data/deep/embeddings/doc_embeddings.pt"
 queries = [
-    "ssh",
+    "gps module",
 ]
 
 df = pd.read_csv("myData/learning/CVE2CAPEC/capec_nlp.csv")
@@ -47,9 +47,9 @@ def get_doc_embeddings(docs, loaded=False):
                 doc_embeddings = tmp
             else:
                 doc_embeddings = torch.cat((doc_embeddings, tmp), dim=0)
-        torch.save(doc_embeddings, "doc_embeddings.pt")
+        torch.save(doc_embeddings, embedding_path)
     else:
-        doc_embeddings = torch.load("doc_embeddings.pt")
+        doc_embeddings = torch.load(embedding_path)
     return doc_embeddings
 
 def get_query_embeddings(queries):
@@ -127,4 +127,4 @@ for doc_embedding in doc_embeddings:
     res_df.loc[len(res_df.index)] = [df['id'][cnt], df['name'][cnt], cosine_sim]
     cnt += 1
 res_df = res_df.sort_values(by='cosine_sim', ascending=False)
-print(df)
+print(res_df)

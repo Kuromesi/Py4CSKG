@@ -550,7 +550,7 @@ if __name__ == '__main__':
     df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
     # df = pd.read_csv('./data/attack_nlp.csv')
     ts = TextSimilarity(df)
-    text = "password"
+    text = "content management system"
     # text = "shared folder"
     # ts.test_similarity("weakness", "vulnerability")
     ts.init_ner()

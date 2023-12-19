@@ -1,7 +1,7 @@
 from neo4j import GraphDatabase
 
 from service.ConfReader import ConfReader
-
+from utils.Logger import logger
 
 class GDBSaver:
 
@@ -17,10 +17,11 @@ class GDBSaver:
             return 0
     
     def _result(self, tx, query):
-        result = tx.run(query)
         try:
+            result = tx.run(query)
             return result.values()
-        except:
+        except Exception as e:
+            logger.error(e)
             return 0
         
     def addSlashes(self, string):

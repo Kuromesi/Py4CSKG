@@ -6,7 +6,7 @@ sys.path.append(os.path.join(BASE_DIR))
 # from TextClassification.cve2cwe import *
 # from analyzer.bk.analyze import *
 from analyzer.tests.tests import gen_test_graph
-from analyzer.analyze import ModelAnalyzer
+from analyzer.analyze import *
 from analyzer.graph.GraphProcessor import GraphProcessor
 from service.GDBSaver import GDBSaver
 
@@ -39,7 +39,17 @@ def analyzer_test():
     ma = ModelAnalyzer(gs, graph)
     ma.find_attack_path("employee workstation", "engineering workstation", graph, ma.vul_graph)
 
+def build_cve_tree_test():
+    gdb = GDBSaver()
+    # query = "MATCH(n:Vulnerability) RETURN n ORDER BY rand() LIMIT 10"
+    query = "MATCH (n:Vulnerability) WHERE n.id='CVE-2013-7172' or n.id='CVE-2012-0931' RETURN n"
+    cves = gdb.sendQuery(query)
+    cve_entries: list[CVEEntry] = []
+    for cve in cves:
+        cve_entries.append(CVEEntry(cve[0]))
+    cve_tree = CVETree(cve_entries)
+
 
 
 if __name__ == '__main__':
-    analyzer_test()
+    build_cve_tree_test()

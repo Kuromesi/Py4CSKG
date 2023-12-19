@@ -7,9 +7,13 @@ ACCESS_ADJACENT = "ADJACENT_NETWORK"
 ACCESS_NETWORK = "NETWORK"
 
 CIA_LOSS = "system cia loss"
-APP_PRIV = "gain privilege on application"
-USER_PRIV = "gain user privilege"
-ROOT_PRIV = "gain root privilege"
+PRIV_APP = "gain privilege on application"
+PRIV_USER = "gain user privilege"
+PRIV_ROOT = "gain root privilege"
+
+PRIV_REQ_NONE = "None"
+PRIV_REQ_LOW = "Low"
+PRIV_REQ_HIGH = "High"
 
 APP_EXEC = "application arbitrary code execution"
 SYS_EXEC = "system arbitrary code execution"
@@ -20,11 +24,12 @@ EXEC_UND = "component privilege based execution"
 CODE_EXEC_CVED = "code execution"
 GAIN_PRIV_CVED = "privilege escalation"
 
-IMPACT_ORDER = ["system CIA loss", "gain privilege on application", "application arbitrary code execution", "system arbitrary code execution", 
-                "gain user privilege", "privilege escalation", "gain root privilege"]
+# IMPACT_ORDER = ["system CIA loss", "gain privilege on application", "application arbitrary code execution", "system arbitrary code execution", 
+#                 "gain user privilege", "privilege escalation", "gain root privilege"]
 
 ACCESS_ORDER = [ACCESS_PHYSICAL, ACCESS_LOCAL, ACCESS_ADJACENT, ACCESS_NETWORK]
-IMPACT_ORDER = []
+IMPACT_ORDER = [CIA_LOSS, PRIV_APP, PRIV_USER, PRIV_ROOT]
+PRIV_REQ_ORDER = [PRIV_REQ_HIGH, PRIV_REQ_LOW, PRIV_REQ_NONE]
 
 def cmp_access(a, b):
     if a not in ACCESS_ORDER or b not in ACCESS_ORDER:
@@ -74,11 +79,11 @@ def get_vul_type(cvss2=None, cvss3=None, impact=[]):
     impact = [i.lower() for i in impact]
     if cvss2:
         if cvss2["obtainUserPrivilege"]:
-            return USER_PRIV
+            return PRIV_USER
         if cvss2["obtainAllPrivilege"]:
-            return ROOT_PRIV
+            return PRIV_ROOT
         if cvss2["obtainOtherPrivilege"]:
-            return APP_PRIV
+            return PRIV_APP
         
         cvss2 = cvss2['cvssV2']
 
@@ -86,21 +91,21 @@ def get_vul_type(cvss2=None, cvss3=None, impact=[]):
             return CIA_LOSS
         elif cvss2["confidentialityImpact"] == "COMPLETE" and cvss2["integrityImpact"] == "COMPLETE" and cvss2["availabilityImpact"] == "COMPLETE":
             if GAIN_PRIV_CVED in impact or CODE_EXEC_CVED in impact:
-                return ROOT_PRIV
+                return PRIV_ROOT
         else:
             if GAIN_PRIV_CVED in impact or CODE_EXEC_CVED in impact:
-                return USER_PRIV
+                return PRIV_USER
     
     elif cvss3:
         cvss3 = cvss3['cvssV3']
         if cvss3["confidentialityImpact"] == "HIGH" and cvss3["integrityImpact"] == "HIGH" and cvss3["availabilityImpact"] == "HIGH":
             if GAIN_PRIV_CVED in impact or CODE_EXEC_CVED in impact:
                 if cvss3["baseSeverity"] == "CRITICAL":
-                    return ROOT_PRIV
+                    return PRIV_ROOT
                 else:
-                    return USER_PRIV
+                    return PRIV_USER
         elif GAIN_PRIV_CVED in impact or CODE_EXEC_CVED in impact:
-            return APP_PRIV
+            return PRIV_APP
         else:
             return CIA_LOSS
     else:
@@ -117,12 +122,12 @@ def _get_vul_type(cvss2, cvss3, impact):
         cvss3 = cvss3['cvssV3']
         if cvss2["confidentialityImpact"] == "PARTIAL" and cvss2["integrityImpact"] == "PARTIAL" and cvss2["availabilityImpact"] == "PARTIAL":
             if GAIN_PRIV_CVED in impact:
-                effect = USER_PRIV if cvss2_full["obtainUserPrivilege"] else APP_PRIV
+                effect = PRIV_USER if cvss2_full["obtainUserPrivilege"] else PRIV_APP
             elif CODE_EXEC_CVED in impact:
                 effect = APP_EXEC
         elif cvss2["confidentialityImpact"] == "COMPLETE" and cvss2["integrityImpact"] == "COMPLETE" and cvss2["availabilityImpact"] == "COMPLETE":
             if GAIN_PRIV_CVED in impact:
-                effect = ROOT_PRIV if cvss3['privilegesRequired'] == "NONE" else PRIV_ESC
+                effect = PRIV_ROOT if cvss3['privilegesRequired'] == "NONE" else PRIV_ESC
             elif CODE_EXEC_CVED in impact:
                 effect = SYS_EXEC
         else:
@@ -133,12 +138,12 @@ def _get_vul_type(cvss2, cvss3, impact):
         cvss2 = cvss2['cvssV2']
         if cvss2["confidentialityImpact"] == "PARTIAL" and cvss2["integrityImpact"] == "PARTIAL" and cvss2["availabilityImpact"] == "PARTIAL":
             if GAIN_PRIV_CVED in impact:
-                effect = USER_PRIV if cvss2_full["obtainUserPrivilege"] else APP_PRIV
+                effect = PRIV_USER if cvss2_full["obtainUserPrivilege"] else PRIV_APP
             elif CODE_EXEC_CVED in impact:
                 effect = APP_EXEC
         elif cvss2["confidentialityImpact"] == "COMPLETE" and cvss2["integrityImpact"] == "COMPLETE" and cvss2["availabilityImpact"] == "COMPLETE":
             if GAIN_PRIV_CVED in impact:
-                effect = ROOT_PRIV if cvss2['authentication'] == "NONE" else PRIV_ESC # differ from both cvss2 and cvss3 exists state
+                effect = PRIV_ROOT if cvss2['authentication'] == "NONE" else PRIV_ESC # differ from both cvss2 and cvss3 exists state
             elif CODE_EXEC_CVED in impact:
                 effect = SYS_EXEC
         else:
@@ -159,6 +164,12 @@ def _get_vul_type(cvss2, cvss3, impact):
         effect = CIA_LOSS
     return effect
 
+PRIV_REQ_MAP = {
+    "NONE": PRIV_REQ_NONE,
+    "LOW": PRIV_REQ_LOW,
+    "HIGH": PRIV_REQ_HIGH
+}
+
 class CVEEntry():
     def __init__(self, record=None) -> None:
         if not record:
@@ -168,14 +179,15 @@ class CVEEntry():
         self.impact = record['impact']
         cvss2 = None
         cvss3 = None
-        if 'baseMetricV2' in record and 'baseMetricV3' in record:
+        if record['baseMetricV2'] != "{}" and record['baseMetricV3'] != "{}":
             cvss2 = json.loads(record['baseMetricV2'])
             self.access = cvss2['cvssV2']['accessVector']
             self.score = cvss2['cvssV2']['baseScore']
             cvss3 = json.loads(record['baseMetricV3'])
-            self.privileges_required = cvss3['cvssV3']['privilegesRequired']
-            self.effect = get_vul_type(cvss2, cvss3, self.impact.split(", "))
-        elif 'baseMetricV2' in record:
+            self.privileges_required = PRIV_REQ_MAP[cvss3['cvssV3']['privilegesRequired']]
+            # self.effect = get_vul_type(cvss2, cvss3, self.impact.split(", "))
+            self.effect = self.impact
+        elif record['baseMetricV2'] != "{}":
             cvss2 = json.loads(record['baseMetricV2'])
             self.access = cvss2['cvssV2']['accessVector']
             self.score = cvss2['cvssV2']['baseScore']
@@ -183,12 +195,13 @@ class CVEEntry():
                 self.privileges_required = "Low"
             else:
                 self.privileges_required = "None"
-            self.effect = get_vul_type(cvss2, None, self.impact.split(", "))
-        elif 'baseMetricV3' in record:
+            # self.effect = get_vul_type(cvss2, None, self.impact.split(", "))
+        elif record['baseMetricV3'] != "{}":
             cvss3 = json.loads(record['baseMetricV3'])
             self.access = cvss3['cvssV3']['attackVector']
             self.score = cvss3['cvssV3']['baseScore']
-            self.privileges_required = cvss3['cvssV3']['privilegesRequired']
-            self.effect = get_vul_type(None, cvss3, self.impact.split(", "))
+            self.privileges_required = PRIV_REQ_MAP[cvss3['cvssV3']['privilegesRequired']]
+            # self.effect = get_vul_type(None, cvss3, self.impact.split(", "))
         else:
             raise ValueError("neither CVSSv2 nor CVSSv3 exists")
+        self.effect = self.impact

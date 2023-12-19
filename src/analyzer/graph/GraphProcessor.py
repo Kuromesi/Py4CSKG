@@ -1,6 +1,56 @@
 import networkx as nx
 import json
 
+class GraphAdapter:
+    """convert different source of graphs into networkx graph for analyzing
+    """    
+    def __init__(self, source):
+        """_summary_
+
+        Args:
+            source (_type_): available options: pyvis
+        """        
+        if source == "pyvis":
+            self.adpater = PyvisAdapter()
+
+    def convert(self, path) -> nx.DiGraph:
+        return self.adpater.convert(path)
+
+class PyvisAdapter:
+    """convert pyvis graph
+    """    
+    def convert(self, path: str):
+        with open(path, 'r') as f:
+            pyvis_graph = json.load(f)
+
+        nodes = []
+        for node in graph['nodes']:
+            id = node['id']
+            tmp = {"os": [], "software": [], "hardware": [], "firmware": [], "cve": []}
+            for component, products in node['component'].items():
+                if component == "cve":
+                    for cve in products:
+                        tmp[component].append(cve)
+                else:
+                    for _, product in products.items():
+                        tmp[component].append(gen_tuple(product))
+                        
+            node.update(tmp)
+            del(node['component'])
+            del(node['id'])
+            nodes.append((node['name'], node))
+            node_dict.update({id: node})
+        # Edges
+        edges = []
+        for edge in graph['edges']:
+            if 'from' in edge and 'to' in edge:
+                src = edge.pop('src')
+                dest = edge.pop('dst')
+                edges.append((src, dest, edge))
+                if edge['edge_type'] == "undirected":
+                    edges.append((src, dest, edge))
+        return data
+
 def gen_tuple(product):
     name = product['product']
     name = name.replace(" ", "_")

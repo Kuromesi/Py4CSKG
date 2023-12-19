@@ -209,7 +209,7 @@ class CVETraverser():
                 for cwe in cwes:
                     cwe = cwe['value']
                     if cwe != "NVD-CWE-noinfo" and cwe != "NVD-CWE-Other":
-                        rel_df.loc[len(rel_df.index)] = [cwe, src, VULNERABILITY_WEAKNESS_REL]
+                        rel_df.loc[len(rel_df.index)] = [src, cwe, VULNERABILITY_WEAKNESS_REL]
 
                 # Find CPE
                 if 'configurations' in cur and 'nodes' in cur['configurations']:

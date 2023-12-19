@@ -5,7 +5,7 @@ sys.path.append(os.path.join(BASE_DIR))
 import json, os, re
 import pandas as pd
 import matplotlib.pyplot as plt
-from knowledge_graph.Ontology.CVE import get_vul_type, APP_PRIV, ROOT_PRIV, USER_PRIV, CIA_LOSS
+from knowledge_graph.Ontology.CVE import get_vul_type, PRIV_APP, PRIV_ROOT, PRIV_USER, CIA_LOSS
 
 SKIP_FILES = ['CVE-Modified.json', 'CVE-Recent.json', 'product.csv', 'cve.json', 'CVE-2023.json']
 YEAR_REG = re.compile(r'CVE-(\d+).json')
@@ -60,7 +60,7 @@ def read_json(path, impact_all):
             else:
                 other_entry += 1
             vul_type = get_vul_type(cvss2=cvss_v2, impact=cved_impact)
-            if all and vul_type == ROOT_PRIV or user and vul_type == USER_PRIV or other and vul_type == APP_PRIV:
+            if all and vul_type == PRIV_ROOT or user and vul_type == PRIV_USER or other and vul_type == PRIV_APP:
                 continue
             false_entry += 1
                 
