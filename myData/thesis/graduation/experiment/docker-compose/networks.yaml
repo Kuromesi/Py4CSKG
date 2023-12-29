@@ -1,0 +1,15 @@
+version: '3.5'
+services:
+  pause:
+    container_name: networks
+    image: gcr.io/google_containers/pause-amd64:3.0
+    networks:
+      - workstation-net
+      - dmz-net
+networks:
+  workstation-net:
+    driver: bridge
+    name: workstation-net
+  dmz-net:
+    driver: bridge
+    name: dmz-net

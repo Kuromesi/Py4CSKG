@@ -76,5 +76,6 @@ def is_gain_privileges(text) -> bool:
 
 
 if __name__ == "__main__":
-    plot_graph()
+    # plot_graph()
+    count_false_privilege_entries("data/base/cve")
     

@@ -10,112 +10,67 @@ from utils.Logger import logger
 from analyzer.ontologies.ontology import REL_ACCESS, REL_CONTROL, REL_PEER, AtomicAttack, AttackChain
 
 class CVETree():
-    search_tree: dict[str, dict[str, list[CVEEntry]]]
-    cve_tree: dict[str, dict[str, AttackChain]]
+    search_tree: dict[str, list[CVEEntry]]
+    cve_tree: dict[str, AttackChain]
     def __init__(self, cves: list[CVEEntry]) -> None:
         self.cve_tree = {
-            ACCESS_NETWORK: {
-                PRIV_REQ_NONE: [],
-                PRIV_REQ_LOW: [],
-                PRIV_REQ_HIGH: []
-            },
-            ACCESS_ADJACENT: {
-                PRIV_REQ_NONE: [],
-                PRIV_REQ_LOW: [],
-                PRIV_REQ_HIGH: []
-            },
-            ACCESS_LOCAL: {
-                PRIV_REQ_NONE: [],
-                PRIV_REQ_LOW: [],
-                PRIV_REQ_HIGH: []
-            },
-            ACCESS_PHYSICAL: {
-                PRIV_REQ_NONE: [],
-                PRIV_REQ_LOW: [],
-                PRIV_REQ_HIGH: []
-            }
+            ACCESS_NETWORK: None,
+            ACCESS_ADJACENT: None,
+            ACCESS_LOCAL: None,
+            ACCESS_PHYSICAL: None
         }
 
         self.search_tree = {
-            ACCESS_NETWORK: {
-                PRIV_REQ_NONE: [],
-                PRIV_REQ_LOW: [],
-                PRIV_REQ_HIGH: []
-            },
-            ACCESS_ADJACENT: {
-                PRIV_REQ_NONE: [],
-                PRIV_REQ_LOW: [],
-                PRIV_REQ_HIGH: []
-            },
-            ACCESS_LOCAL: {
-                PRIV_REQ_NONE: [],
-                PRIV_REQ_LOW: [],
-                PRIV_REQ_HIGH: []
-            },
-            ACCESS_PHYSICAL: {
-                PRIV_REQ_NONE: [],
-                PRIV_REQ_LOW: [],
-                PRIV_REQ_HIGH: []
-            }
+            ACCESS_NETWORK: [],
+            ACCESS_ADJACENT: [],
+            ACCESS_LOCAL: [],
+            ACCESS_PHYSICAL: []
         }
 
         for cve in cves:
-            self.search_tree[cve.access][cve.privileges_required].append(cve)
+            self.search_tree[cve.access].append(cve)
 
         self.build_cve_tree()
 
     def build_cve_tree(self):
         # fist check max privilege can be obtained of network access
-        self.cve_tree[ACCESS_NETWORK][PRIV_REQ_NONE] = self.check_max_privilege_obtained(self.search_tree[ACCESS_NETWORK][PRIV_REQ_NONE])
-        self.cve_tree[ACCESS_NETWORK][PRIV_REQ_LOW] = self.check_max_privilege_obtained(self.search_tree[ACCESS_NETWORK][PRIV_REQ_LOW])
-        self.cve_tree[ACCESS_NETWORK][PRIV_REQ_HIGH] = self.check_max_privilege_obtained(self.search_tree[ACCESS_NETWORK][PRIV_REQ_HIGH])
+        self.cve_tree[ACCESS_NETWORK] = self.check_max_privilege_obtained(self.search_tree[ACCESS_NETWORK])
+    
+        self.cve_tree[ACCESS_ADJACENT] = self.check_max_privilege_obtained(self.search_tree[ACCESS_ADJACENT])
 
-        self.cve_tree[ACCESS_ADJACENT][PRIV_REQ_NONE] = self.check_max_privilege_obtained(self.search_tree[ACCESS_ADJACENT][PRIV_REQ_NONE])
-        self.cve_tree[ACCESS_ADJACENT][PRIV_REQ_LOW] = self.check_max_privilege_obtained(self.search_tree[ACCESS_ADJACENT][PRIV_REQ_LOW])
-        self.cve_tree[ACCESS_ADJACENT][PRIV_REQ_HIGH] = self.check_max_privilege_obtained(self.search_tree[ACCESS_ADJACENT][PRIV_REQ_HIGH])
+        self.cve_tree[ACCESS_LOCAL] = self.check_max_privilege_obtained(self.search_tree[ACCESS_LOCAL])
 
-        self.cve_tree[ACCESS_LOCAL][PRIV_REQ_NONE] = self.check_max_privilege_obtained(self.search_tree[ACCESS_LOCAL][PRIV_REQ_NONE])
-        self.cve_tree[ACCESS_LOCAL][PRIV_REQ_LOW] = self.check_max_privilege_obtained(self.search_tree[ACCESS_LOCAL][PRIV_REQ_LOW])
-        self.cve_tree[ACCESS_LOCAL][PRIV_REQ_HIGH] = self.check_max_privilege_obtained(self.search_tree[ACCESS_LOCAL][PRIV_REQ_HIGH])
-
-        self.cve_tree[ACCESS_PHYSICAL][PRIV_REQ_NONE] = self.check_max_privilege_obtained(self.search_tree[ACCESS_PHYSICAL][PRIV_REQ_NONE])
-        self.cve_tree[ACCESS_PHYSICAL][PRIV_REQ_LOW] = self.check_max_privilege_obtained(self.search_tree[ACCESS_PHYSICAL][PRIV_REQ_LOW])
-        self.cve_tree[ACCESS_PHYSICAL][PRIV_REQ_HIGH] = self.check_max_privilege_obtained(self.search_tree[ACCESS_PHYSICAL][PRIV_REQ_HIGH])
+        self.cve_tree[ACCESS_PHYSICAL] = self.check_max_privilege_obtained(self.search_tree[ACCESS_PHYSICAL])
 
         for access in ACCESS_ORDER:
-            for priv in PRIV_REQ_ORDER:
-                cur_ac = self.cve_tree[access][priv]
-                attacks = cur_ac.get_atomic_attacks()
-                for i in range(ACCESS_ORDER.index(access), len(ACCESS_ORDER)):
-                    for j in range(PRIV_REQ_ORDER.index(priv), len(PRIV_REQ_ORDER)):
-                        if self.cve_tree[ACCESS_ORDER[i]][PRIV_REQ_ORDER[j]].get_atomic_attacks():
-                            cmp_attack = self.cve_tree[ACCESS_ORDER[i]][PRIV_REQ_ORDER[j]].get_atomic_attacks()[0]
-                            if attacks:
-                                if cmp_impact(cmp_attack.privileges_gain, attacks[0].privileges_gain) >= 0:
-                                    attacks[0] = cmp_attack
-                            else:
-                                attacks.append(cmp_attack)
+            cur_ac = self.cve_tree[access]
+            attacks = cur_ac.get_atomic_attacks()
+            for i in range(ACCESS_ORDER.index(access), len(ACCESS_ORDER)):
+                if self.cve_tree[ACCESS_ORDER[i]].get_atomic_attacks():
+                    cmp_attack = self.cve_tree[ACCESS_ORDER[i]].get_atomic_attacks()[0]
+                    if attacks:
+                        if cmp_impact(cmp_attack.privileges_gain, attacks[0].privileges_gain) >= 0:
+                            attacks[0] = cmp_attack
+                    else:
+                        attacks.append(cmp_attack)
         
-        for access in ACCESS_ORDER[1: ]:
-            for priv in PRIV_REQ_ORDER:
-                cur_ac = self.cve_tree[access][priv]
-                attacks = cur_ac.get_atomic_attacks()
-                if attacks[0].privileges_gain == PRIV_USER:
-                    latter_attacks = self.cve_tree[ACCESS_LOCAL][PRIV_REQ_LOW].get_atomic_attacks()
-                elif attacks[0].privileges_gain == PRIV_ROOT:
-                    latter_attacks = self.cve_tree[ACCESS_LOCAL][PRIV_REQ_HIGH].get_atomic_attacks()
-                else:
-                    latter_attacks = []
-                if attacks[0] in latter_attacks:
-                    cur_ac.set_atomic_attacks(latter_attacks)
-                else:
-                    cur_ac.get_atomic_attacks().extend(latter_attacks)
+        for access in ACCESS_ORDER[2: ]:
+            cur_ac = self.cve_tree[access]
+            attacks = cur_ac.get_atomic_attacks()
+            if attacks[0].privileges_gain in [PRIV_USER, PRIV_ROOT]:
+                latter_attacks = self.cve_tree[ACCESS_LOCAL].get_atomic_attacks()
+            else:
+                latter_attacks = []
+            if attacks[0] in latter_attacks:
+                cur_ac.set_atomic_attacks(latter_attacks)
+            else:
+                cur_ac.get_atomic_attacks().extend(latter_attacks)
 
     def check_max_privilege_obtained(self, cves: list[CVEEntry]) -> AttackChain:
         ac = AttackChain()
         for cve in cves:
             if not ac.get_atomic_attacks():
-                attack = AtomicAttack(cve.id, cve.access, cve.privileges_required, cve.effect, cve.score)
+                attack = AtomicAttack(cve.id, cve.access, cve.effect, cve.score)
                 ac.get_atomic_attacks().append(attack)
             else:
                 if cmp_impact(cve.effect, attack.privileges_gain) > 0:

@@ -1,0 +1,17 @@
+version: '2'
+services:
+  pause:
+    container_name: ftp_server
+    image: gcr.io/google_containers/pause-amd64:3.0
+    networks:
+      - workstation-net
+    ipc: shareable
+  web:
+    image: kuromesi/ruby:2.4.1
+    ports:
+      - "8080:8080"
+    depends_on:
+    - pause
+    network_mode: "container:ftp_server"
+    ipc: "container:ftp_server"
+    pid: "container:ftp_server"

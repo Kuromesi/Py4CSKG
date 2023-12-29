@@ -1,0 +1,8 @@
+version: '2'
+services:
+  ssh:
+   image: kuromesi/ubuntu:18.04
+networks:
+  default:
+   name: workstation-net
+   external: true

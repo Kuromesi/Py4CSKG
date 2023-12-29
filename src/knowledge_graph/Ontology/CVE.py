@@ -78,12 +78,12 @@ def get_max_pos_entries(entries):
 def get_vul_type(cvss2=None, cvss3=None, impact=[]):
     impact = [i.lower() for i in impact]
     if cvss2:
-        if cvss2["obtainUserPrivilege"]:
-            return PRIV_USER
-        if cvss2["obtainAllPrivilege"]:
-            return PRIV_ROOT
-        if cvss2["obtainOtherPrivilege"]:
-            return PRIV_APP
+        # if cvss2["obtainUserPrivilege"]:
+        #     return PRIV_USER
+        # if cvss2["obtainAllPrivilege"]:
+        #     return PRIV_ROOT
+        # if cvss2["obtainOtherPrivilege"]:
+        #     return PRIV_APP
         
         cvss2 = cvss2['cvssV2']
 
@@ -100,10 +100,10 @@ def get_vul_type(cvss2=None, cvss3=None, impact=[]):
         cvss3 = cvss3['cvssV3']
         if cvss3["confidentialityImpact"] == "HIGH" and cvss3["integrityImpact"] == "HIGH" and cvss3["availabilityImpact"] == "HIGH":
             if GAIN_PRIV_CVED in impact or CODE_EXEC_CVED in impact:
-                if cvss3["baseSeverity"] == "CRITICAL":
-                    return PRIV_ROOT
-                else:
-                    return PRIV_USER
+                # if cvss3["baseSeverity"] == "CRITICAL":
+                #     return PRIV_ROOT
+                # else:
+                return PRIV_USER
         elif GAIN_PRIV_CVED in impact or CODE_EXEC_CVED in impact:
             return PRIV_APP
         else:

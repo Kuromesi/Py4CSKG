@@ -23,9 +23,8 @@ ACCESS_ADJACENT = "adjacent"
 ACCESS_NETWORK = "network"
 
 class AtomicAttack():
-    def __init__(self, id, access: str, privileges_required: str, privileges_gain: str, score: float) -> None:
+    def __init__(self, id, access: str, privileges_gain: str, score: float) -> None:
         self.access = access
-        self.privileges_required = privileges_required
         self.privileges_gain = privileges_gain
         self.score = score
         self.id = id

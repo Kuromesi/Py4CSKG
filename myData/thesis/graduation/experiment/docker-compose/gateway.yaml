@@ -1,0 +1,36 @@
+version: "2"
+services:
+  pause:
+    container_name: gateway
+    image: gcr.io/google_containers/pause-amd64:3.0
+    networks:
+      - workstation-net
+    ipc: shareable
+  apisix:
+    image: vulhub/apisix:2.11.0
+    volumes:
+      - ./config.yml:/usr/local/apisix/conf/config.yaml:ro
+    ports:
+      - "9080:9080"
+      - "9091:9091"
+      - "9443:9443"
+    depends_on:
+      - etcd
+      - pause
+    network_mode: "container:ftp_server"
+    ipc: "container:ftp_server"
+    pid: "container:ftp_server"
+  etcd:
+    image: bitnami/etcd:3.4.15
+    environment:
+      ETCD_ENABLE_V2: "true"
+      ALLOW_NONE_AUTHENTICATION: "yes"
+      ETCD_ADVERTISE_CLIENT_URLS: "http://0.0.0.0:2379"
+      ETCD_LISTEN_CLIENT_URLS: "http://0.0.0.0:2379"
+    ports:
+      - "2379:2379/tcp"
+    depends_on:
+    - pause
+    network_mode: "container:ftp_server"
+    ipc: "container:ftp_server"
+    pid: "container:ftp_server"

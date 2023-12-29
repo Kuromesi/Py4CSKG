@@ -1,0 +1,22 @@
+version: '2'
+services:
+  pause:
+    container_name: database_server
+    image: gcr.io/google_containers/pause-amd64:3.0
+    networks:
+      - workstation-net
+    ipc: shareable
+  mysql:
+    image: mysql:5.5
+    environment: 
+    - MYSQL_ROOT_PASSWORD=root
+    - MYSQL_DATABASE=test
+    depends_on:
+    - pause
+    network_mode: "container:database_server"
+    ipc: "container:database_server"
+    pid: "container:database_server"
+networks:
+  workstation-net:
+   name: workstation-net
+   external: true
