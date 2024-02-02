@@ -1,3 +1,7 @@
+import sys, os
+BASE_DIR=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(BASE_DIR))
+
 import networkx as nx
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -236,7 +240,9 @@ class KGQuery():
             node = node[0]
             version_start = node['versionStart']
             version_end = node['versionEnd']
-            if cmp_version(version, version_start) != -1 and cmp_version(version, version_end) != 1:
+            if cmp_version(version, version_start) != -1 and cmp_version(version, version_end) != 1 or\
+                version_start == "-" and version_end == "-" or\
+                version_start == "0" and version_end == "0":
                 vul_products.append(node['id'])
         query = []
         cves = []
@@ -258,6 +264,11 @@ class KGQuery():
         return ret
         
 if __name__ == "__main__":
-    G = gen_test_graph()
-    ma = ModelAnalyzer()
-    ma.find_attack_path(1, 4, G)
+    # G = gen_test_graph()
+    # ma = ModelAnalyzer()
+    # ma.find_attack_path(1, 4, G)
+    gdb = GDBSaver()
+    kg = KGQuery(gdb)
+    res = kg.find_vuls("polkit_project_polkit", "0.105")
+    print(1)
+    

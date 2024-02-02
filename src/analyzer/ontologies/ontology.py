@@ -23,11 +23,12 @@ ACCESS_ADJACENT = "adjacent"
 ACCESS_NETWORK = "network"
 
 class AtomicAttack():
-    def __init__(self, id, access: str, privileges_gain: str, score: float) -> None:
+    def __init__(self, id, access: str, gain: str, score: float, require: str) -> None:
         self.access = access
-        self.privileges_gain = privileges_gain
+        self.gain = gain
         self.score = score
         self.id = id
+        self.require = require
 
 class AttackChain():
     def __init__(self) -> None:
@@ -45,22 +46,25 @@ class Product:
         self.des = "N/A"
         self.product = "N/A"
         self.version = "N/A"
-        self.privilege = ""
-        self.exposed = "" # Network, Adjacent, Local, Physical
 
-class Node:
+class PhysicalNode:
     """Logical nodes that composed of single or multiple components.
        Depending on the complexity of the system. 
     """    
     def __init__(self) -> None:
-        self.name = "N/A"
-        self.des = "N/A"
-        self.group = []
-        self.entry_point = []
-        self.software = []
-        self.hardware = []
-        self.os = []
-        self.firmware = []
+        self.name: str = "N/A"
+        self.des: str = "N/A"
+        self.software: list[Software] = []
+        self.hardware: list[Hardware] = []
+        self.os: list[OS] = []
+        self.firmware: list[Firmware] = []
+        self.attacks: list[AtomicAttack] = []
+
+class LogicalNode:
+    def __init__(self) -> None:
+        self.name: str = "N/A"
+        self.des: str = "N/A"
+        self.attacks: list[AtomicAttack] = []
 
 class Software(Product):
     def __init__(self) -> None:

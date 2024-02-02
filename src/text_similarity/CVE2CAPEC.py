@@ -24,7 +24,7 @@ class TextSimilarity():
         # bert_config = BertConfig.from_pretrained(model_name)
         self.bert = AutoModel.from_pretrained(model_name)
         self.batch_size = 16
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.device = "cpu" if torch.cuda.is_available() else "cpu"
         self.bert.to(self.device)
         
         self.docs = docs
@@ -453,7 +453,8 @@ def preprocess(text, NLP):
 
 def tfidf():
     # df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
-    df = pd.read_csv('./data/attack/attack.csv')
+    df = pd.read_csv('tmp.csv')
+    # df = pd.read_csv('./data/attack/attack.csv')
     corpus = df['description'].tolist()
     bar = trange(len(corpus))
     NLP = spacy.load('en_core_web_trf')
@@ -462,7 +463,8 @@ def tfidf():
         corpus[i] = preprocess(corpus[i], NLP)
     df['processed'] = corpus
     # df.to_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv', index=False)
-    df.to_csv('./data/attack/attack_nlp.csv', index=False)
+    # df.to_csv('./data/attack/attack_nlp.csv', index=False)
+    df.to_csv('tmp.csv', index=False)
     # tv=TfidfVectorizer()#初始化一个空的tv。
     # tv_fit=tv.fit_transform(corpus)#用训练数据充实tv,也充实了tv_fit。
     # print("fit后，所有的词汇如下：")
@@ -470,6 +472,8 @@ def tfidf():
     # print("fit后，训练数据的向量化表示为：")
     # a = tv_fit.toarray()
     # print(tv_fit.toarray())
+
+tfidf()
 
 def calculate(sim, capec_df, fuzzy_num, true):
     pred = []
@@ -550,7 +554,7 @@ if __name__ == '__main__':
     df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
     # df = pd.read_csv('./data/attack_nlp.csv')
     ts = TextSimilarity(df)
-    text = "kibana"
+    text = "ftp server"
     # text = "shared folder"
     # ts.test_similarity("weakness", "vulnerability")
     ts.init_ner()

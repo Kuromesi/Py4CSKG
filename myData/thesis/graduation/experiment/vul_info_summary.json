@@ -1,0 +1,33 @@
+{
+    "polkit_project_polkit": {
+        "cwe": {
+            "CWE-362": 1,
+            "CWE-862": 1,
+            "CWE-189": 1,
+            "CWE-264": 2,
+            "CWE-1021": 1,
+            "CWE-754": 1,
+            "CWE-787": 1
+        },
+        "capec": {
+            "CAPEC-29": 1,
+            "CAPEC-26": 1,
+            "CAPEC-665": 1,
+            "CAPEC-31": 1,
+            "CAPEC-226": 1,
+            "CAPEC-196": 2,
+            "CAPEC-104": 1,
+            "CAPEC-74": 1,
+            "CAPEC-227": 1,
+            "CAPEC-21": 1,
+            "CAPEC-633": 1,
+            "CAPEC-234": 2,
+            "CAPEC-114": 1,
+            "CAPEC-564": 1,
+            "CAPEC-509": 2,
+            "CAPEC-561": 1,
+            "CAPEC-480": 1,
+            "CAPEC-69": 1
+        }
+    }
+}

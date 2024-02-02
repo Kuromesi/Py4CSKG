@@ -1,0 +1,17 @@
+version: "0.1"
+ruleName: "experiment"
+properties:
+- none
+- access
+- user
+- root
+internalTransitions:
+- "root:user"
+- "user:access"
+- "user:none"
+exploitTransitions:
+- "gain user privilege:user"
+- "gain root privilege:root"
+- "system cia loss:none"
+prerequisites:
+- "None:access"

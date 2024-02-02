@@ -38,27 +38,28 @@ class RealTextSimilarity():
         self.ner = NERFactory()
 
     def embedding(self, text, weight=None, weighted=False):
-        tokens = self.tokenizer(text, padding=True, return_tensors="pt", truncation=True, max_length=512).to(self.device)
-        attention_mask = tokens['attention_mask'].to(self.device)
-        tokens_ids = tokens['input_ids'].to(self.device)
-        
-        embedding = self.bert(tokens_ids)[0]
-        mask = attention_mask.unsqueeze(-1).expand(embedding.size()).float()
-        if weighted:
-            feature = weight['feature']
-            tfidf = weight['tfidf']
-            weight = []
-            for tokens_id in tokens_ids:
-                temp = [tfidf[np.where(feature==str(i.item()))][0] if i != 0 else 0.0 for i in tokens_id ]
-                weight.append(temp)
-            weight = torch.tensor(weight).to(self.device)
-            weight = weight.unsqueeze(-1).expand(embedding.size()).float()
-            masked_embeddings = embedding * mask * weight
-        else:
-            masked_embeddings = embedding * mask
-        summed = torch.sum(masked_embeddings, 1)
-        summed_mask = torch.clamp(mask.sum(1), min=1e-9)
-        mean_pooled = summed / summed_mask
+        with torch.no_grad():
+            tokens = self.tokenizer(text, padding=True, return_tensors="pt", truncation=True, max_length=512).to(self.device)
+            attention_mask = tokens['attention_mask'].to(self.device)
+            tokens_ids = tokens['input_ids'].to(self.device)
+            
+            embedding = self.bert(tokens_ids)[0]
+            mask = attention_mask.unsqueeze(-1).expand(embedding.size()).float()
+            if weighted:
+                feature = weight['feature']
+                tfidf = weight['tfidf']
+                weight = []
+                for tokens_id in tokens_ids:
+                    temp = [tfidf[np.where(feature==str(i.item()))][0] if i != 0 else 0.0 for i in tokens_id ]
+                    weight.append(temp)
+                weight = torch.tensor(weight).to(self.device)
+                weight = weight.unsqueeze(-1).expand(embedding.size()).float()
+                masked_embeddings = embedding * mask * weight
+            else:
+                masked_embeddings = embedding * mask
+            summed = torch.sum(masked_embeddings, 1)
+            summed_mask = torch.clamp(mask.sum(1), min=1e-9)
+            mean_pooled = summed / summed_mask
         return {'embedding': mean_pooled}
 
     def weighted_embedding(self, text, weighted=False):
@@ -146,6 +147,7 @@ class RealTextSimilarity():
             df.loc[len(df.index)] = [doc_id, doc_name, doc_des, sim]
         df = df.sort_values(by='similarity', ascending=False)
         df.drop_duplicates(subset=['id'], keep='first', inplace=True)
+        df = df[df['similarity'] > 0.3]
         return df
 
     def create_embedding(self, docs, path, weighted=True):
@@ -159,9 +161,11 @@ class RealTextSimilarity():
 class TextSimilarity():
     def __init__(self) -> None:
         logger.info("Initializing TextSimilarity")
-        df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+        # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
+        df = pd.read_csv("myData/thesis/graduation/modeling/tmp.csv")
         self.rts = RealTextSimilarity(df)
-        doc_weight = config.get("TextSimilarity", "doc_weight")
+        # doc_weight = config.get("TextSimilarity", "doc_weight")
+        doc_weight = "data/deep/embeddings/query.npy"
         self.rts.init_weight(doc_weight)
         self.rts.init_ner()
 
@@ -169,7 +173,22 @@ class TextSimilarity():
         res = self.rts.calculate_similarity(query, filter)
         return res
 
-if __name__ == "__main__":
+def batch_similarity():
     ts = TextSimilarity()
-    txt = "test test"
-    ts.calculate_similarity(txt, ["CAPEC-1"])
+    df = pd.DataFrame(columns=['query', 'id', 'name'])
+    texts = [
+        "ftp server", "web server", "mail merver", "scada monitor", "workstation", "database server",
+        "WIFI module", "Imagery Module", "NMEA GPS", "FCS Radio Module", "Pressure sensor"
+    ]
+    for text in texts:
+        tmp_df = ts.calculate_similarity(text)
+        for i in range(len(tmp_df)):
+            df.loc[len(df.index)] = [text, tmp_df.iloc[i]['id'], tmp_df.iloc[i]['name']]
+    df.to_csv("myData/thesis/graduation/modeling/query.csv", index=False)
+
+if __name__ == "__main__":
+    # ts = TextSimilarity()
+    # txt = "pressure sensor"
+    # tmp_df = ts.calculate_similarity(txt)
+    # print(tmp_df)
+    batch_similarity()
