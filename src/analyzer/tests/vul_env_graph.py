@@ -15,7 +15,7 @@ monitor = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": []
+    "atomic_attacks": []
 }
 database = {
     "name": "database",
@@ -23,7 +23,7 @@ database = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": []
+    "atomic_attacks": []
 }
 workstation = {
     "name": "workstation",
@@ -31,7 +31,7 @@ workstation = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": []
+    "atomic_attacks": []
 }
 ftp_server = {
     "name": "ftp_server",
@@ -39,7 +39,7 @@ ftp_server = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": []
+    "atomic_attacks": []
 }
 web_server = {
     "name": "web_server",
@@ -47,7 +47,7 @@ web_server = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": []
+    "atomic_attacks": []
 }
 mail_server = {
     "name": "mail_server",
@@ -55,7 +55,7 @@ mail_server = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": []
+    "atomic_attacks": []
 }
 
 # networks
@@ -65,7 +65,7 @@ work_zone = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": []
+    "atomic_attacks": []
 }
 scada_zone = {
     "name": "scada_zone",
@@ -73,7 +73,7 @@ scada_zone = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": []
+    "atomic_attacks": []
 }
 dmz_zone = {
     "name": "dmz_zone",
@@ -81,7 +81,7 @@ dmz_zone = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": []
+    "atomic_attacks": []
 }
 internet = {
     "name": "internet",
@@ -89,7 +89,7 @@ internet = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": []
+    "atomic_attacks": []
 }
 
 # products
@@ -99,7 +99,7 @@ ruby = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": [{
+    "atomic_attacks": [{
         "name": "CVE-2017-17405",
         "access": ACCESS_NETWORK,
         "gain": PRIV_ROOT,
@@ -114,7 +114,7 @@ gitlab = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": [{
+    "atomic_attacks": [{
         "name": "CVE-2016-9086",
         "access": ACCESS_NETWORK,
         "gain": CIA_LOSS,
@@ -128,7 +128,7 @@ oracle = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": [{
+    "atomic_attacks": [{
         "name": "CVE-2023-21839",
         "access": ACCESS_NETWORK,
         "gain": CIA_LOSS,
@@ -142,7 +142,7 @@ git_shell = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": [{
+    "atomic_attacks": [{
         "name": "CVE-2017-8386",
         "access": ACCESS_NETWORK,
         "gain": PRIV_USER,
@@ -156,7 +156,7 @@ opensmtpd = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": [{
+    "atomic_attacks": [{
         "name": "CVE-2020-7247",
         "access": ACCESS_NETWORK,
         "gain": PRIV_ROOT,
@@ -170,7 +170,7 @@ phpmailer = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": [{
+    "atomic_attacks": [{
         "name": "CVE-2017-5223",
         "access": ACCESS_LOCAL,
         "gain": CIA_LOSS,
@@ -184,7 +184,7 @@ jenkins = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": [{
+    "atomic_attacks": [{
         "name": "CVE-2017-1000353",
         "access": ACCESS_NETWORK,
         "gain": PRIV_USER,
@@ -198,7 +198,7 @@ neo4j = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": [{
+    "atomic_attacks": [{
         "name": "CVE-2021-34371",
         "access": ACCESS_NETWORK,
         "gain": PRIV_USER,
@@ -212,7 +212,7 @@ openssh = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": [{
+    "atomic_attacks": [{
         "name": "CVE-2018-15473",
         "access": ACCESS_NETWORK,
         "gain": CIA_LOSS,
@@ -226,7 +226,7 @@ polkit = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": [{
+    "atomic_attacks": [{
         "name": "CVE-2021-4034",
         "access": ACCESS_LOCAL,
         "gain": PRIV_ROOT,
@@ -240,7 +240,7 @@ kibana = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": [{
+    "atomic_attacks": [{
         "name": "CVE-2018-17246",
         "access": ACCESS_NETWORK,
         "gain": PRIV_USER,
@@ -254,7 +254,7 @@ phpmyadmin = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": [{
+    "atomic_attacks": [{
         "name": "CVE-2016-5734",
         "access": ACCESS_NETWORK,
         "gain": PRIV_USER,
@@ -268,7 +268,7 @@ mysql = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": [{
+    "atomic_attacks": [{
         "name": "CVE-2012-2122",
         "access": ACCESS_NETWORK,
         "gain": CIA_LOSS,
@@ -284,7 +284,7 @@ mail_expose = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": []
+    "atomic_attacks": []
 }
 workstation_expose = {
     "name": "workstation_expose",
@@ -292,7 +292,7 @@ workstation_expose = {
     "software": [],
     "hardware": [],
     "firmware": [],
-    "atomic": []
+    "atomic_attacks": []
 }
 
 # edges

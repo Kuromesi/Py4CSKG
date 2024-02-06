@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-
+import pandas as pd
 
 plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']
 plt.rcParams['font.size'] = 20
@@ -64,7 +64,21 @@ def plot_total():
     plt.savefig("total.png", dpi=500)
     plt.show()
 
+def to_csv(*args, **kwargs):
+    df_dict = {}
+    col_name = 0
+    for col in args:
+        df_dict[str(col_name)] = col
+        col_name += 1
+    df = pd.DataFrame(df_dict)
+    df.to_csv('time.csv', index=False)
+
+
 if __name__ == "__main__":
     # plot_total()
-    plot_attack_path_time()
-    plot_attack_graph_time()
+    # plot_attack_path_time()
+    # plot_attack_graph_time()
+    time = [100, 1000, 3000, 5000, 7000, 9000, 11000, 13000, 15000, 17000, 19000, 20000]
+    time1 = [0.003002166748046875, 0.04111981391906738, 0.15100643634796143, 0.26891064643859863, 0.41330931186676023, 0.5782417058944702, 0.7442359924316406, 0.8887013673782349, 1.1206831693649293, 1.295570158958435, 1.6570986747741698, 1.710800290107727]
+    time2 = [0.00015374422073364258, 0.0005534052848815918, 0.0009964418411254883, 0.0019069242477416993, 0.002433798313140869, 0.0028776073455810546, 0.003753204345703125, 0.00403771162033081, 0.004932050704956055, 0.007560615539550781, 0.009774432182312012, 0.011056378364562989]
+    to_csv(time, time1, time2)

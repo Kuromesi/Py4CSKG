@@ -9,7 +9,7 @@ internalTransitions:
 - "root:user"
 - "user:access"
 - "user:none"
-exploitTransitions:
+exploitTransitions: # how gain of atomic attacks transit to properties
 - "gain user privilege:user"
 - "gain root privilege:root"
 - "system cia loss:none"

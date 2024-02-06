@@ -7,8 +7,8 @@ sys.path.append(os.path.join(BASE_DIR))
 # from analyzer.bk.analyze import *
 from analyzer.tests.tests import gen_test_graph
 # from analyzer.analyze import *
-from analyzer.graph.GraphProcessor import GraphProcessor
-from analyzer.new_analyzer import ModelAnalyzer
+# from analyzer.graph.GraphAdapter import GraphProcessor
+from analyzer.analyzer import ModelAnalyzer
 from analyzer.ontologies.ontology import AtomicAttack
 from knowledge_graph.Ontology.CVE import *
 from service.GDBSaver import GDBSaver
@@ -220,9 +220,15 @@ def test_vul_env():
     plt.margins(0, 0)
     plt.savefig(f"src/analyzer/tests/vul_env.png", dpi=200, bbox_inches='tight')
     # plt.show()
-    ma.analyze_attack_path(model, "internet:access", "phpmailer:none", "score")
-    ma.analyze_attack_path(model, "internet:access", "phpmailer:none", "weight")
+    # ma.analyze_attack_path(model, "internet:access", "mysql:none", "score")
+    # ma.analyze_attack_path(model, "internet:access", "mysql:none", "weight")
+    # ma.analyze_attack_path(model, "internet:access", "workstation:root", "score")
+    # ma.analyze_attack_path(model, "internet:access", "workstation:root", "weight")
+    # ma.analyze_attack_path(model, "internet:access", "mail_server:user", "score")
+    # ma.analyze_attack_path(model, "internet:access", "mail_server:user", "weight")
+    ma.analyze_attack_path(model, "internet:access", "neo4j:none", "score")
+    ma.analyze_attack_path(model, "internet:access", "neo4j:none", "weight")
     
 if __name__ == '__main__':
-    # test_vul_env()
-    test_random_graph()
+    test_vul_env()
+    # test_random_graph()
