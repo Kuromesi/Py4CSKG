@@ -1,19 +1,9 @@
+from .cve import cmp_impact
+
 # Field of ontologies are determined by the knowledge bases, e.g. CVE, CPE etc.
 # Once the information of product and version is provided, the vulnerabilities of the product could be obtained,
 # if the attack prerequisites are satisfied, the attack can happen. 
 # A information system can be divided into assets, bridge, protection.
-
-# PRIVILEGES
-# PRIV_NONE = "none"
-# PRIV_APP = "app"
-# PRIV_USER = "user"
-# PRIV_ROOT = "root"
-
-# # ACCESS
-# ACCESS_PHYSICAL = "physical"
-# ACCESS_LOCAL = "local"
-# ACCESS_ADJACENT = "adjacent"
-# ACCESS_NETWORK = "network"
 
 class Product:
     def __init__(self, name: str, des="", product="", version="") -> None:
@@ -47,8 +37,6 @@ class AtomicAttack():
         self.name = name
         self.require = require
 
-
-
 class PhysicalNode:
     """Logical nodes that composed of single or multiple components.
        Depending on the complexity of the system. 
@@ -72,7 +60,6 @@ class LogicalNode:
         self.des: str = des
         self.atomic_attacks: list[AtomicAttack] = atomic_attacks
 
-
 class Relation:
     def __init__(self, name: str, src: str, dst: str, 
                  access="", transitions=[], bidirectional=False) -> None:
@@ -83,6 +70,13 @@ class Relation:
         self.transitions: list = transitions
         self.bidirectional: bool = bidirectional
 
-if __name__ == "__main__":
-    t = Node()
-    print(1)
+def cmp_atomic_attack(a: AtomicAttack, b: AtomicAttack):
+    impact = cmp_impact(a.gain, b.gain)
+    if impact == 0:
+        if a.score > b.score:
+            return 1
+        elif a.score == b.score:
+            return 0
+        else:
+            return -1
+    return impact

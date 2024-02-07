@@ -1,8 +1,6 @@
 import logging
 
 class Logger():
-
-    # 初始化 Logger
     def __init__(self,
                  name='root',
                  logger_level= 'INFO',

@@ -1,27 +1,17 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import numpy as np
 
 from utils.Logger import logger
 from analyzer.utils.load_rule import load_rule
 from analyzer.utils.knowledge_query import KGQuery
-from knowledge_graph.Ontology.CVE import *
-from analyzer.ontologies.ontology import AtomicAttack
+from ontologies.modeling import *
+from ontologies.cve import *
 from service.GDBSaver import GDBSaver
 
-def cmp_atomic_attack(a: AtomicAttack, b: AtomicAttack):
-    impact = cmp_impact(a.gain, b.gain)
-    if impact == 0:
-        if a.score > b.score:
-            return 1
-        elif a.score == b.score:
-            return 0
-        else:
-            return -1
-    return impact
-
-def get_weight(model: nx.DiGraph, path: list, weight: str) -> float:
-    return nx.path_weight(model, path, weight=weight)
-
+SHORTEST_PATH = "shortest"
+MAX_IMPACT_PATH = "impact"
+ALL_PATH = "all"
 class ModelAnalyzer:
     def __init__(self, rule_path) -> None:
         self.rules = load_rule(rule_path)
@@ -29,31 +19,24 @@ class ModelAnalyzer:
     
     def analyze(self, model: nx.DiGraph):
         self.analyze_vul(model)
-        vul_graph = self.analyze_status(model)
+        vul_graph = self.generate_attack_graph(model)
         return vul_graph
 
-    def analyze_attack_path(self, model: nx.DiGraph, src: str, dst: str, weight="weight"):
+    def generate_attack_path(self, model: nx.DiGraph, src: str, dst: str, kind="shortest"):
         try:
-            if weight == "score":
+            if kind == MAX_IMPACT_PATH:
                 heaviest_path = max((path for path in nx.all_simple_paths(model, src, dst)),
-                        key=lambda path: get_weight(model, path, "score"))
-                self.print_path([heaviest_path])
-                length_total = nx.path_weight(model, heaviest_path, weight="weight")
-                score_total = nx.path_weight(model, heaviest_path, weight="score")
-                print(f"length of path is: {length_total}")
-                print(f"score of path is: {score_total}")
-            else:
-                shortest_path = nx.shortest_path(model, src, dst, weight=weight)
-                self.print_path([shortest_path])
-                length_total = nx.path_weight(model, shortest_path, weight="weight")
-                score_total = nx.path_weight(model, shortest_path, weight="score")
-                print(f"length of path is: {length_total}")
-                print(f"score of path is: {score_total}")
+                        key=lambda path: nx.path_weight(model, path, weight="score"))
+                return [heaviest_path]
+            elif kind == SHORTEST_PATH:
+                shortest_path = nx.shortest_path(model, src, dst, weight="weight")
+                return [shortest_path]
+            elif kind == ALL_PATH:
+                return nx.all_simple_paths(model, src, dst)
         except Exception as e:
             print(e)
 
-    def analyze_status(self, model: nx.DiGraph) -> nx.DiGraph:
-        self.analyze_vul(model)
+    def generate_attack_graph(self, model: nx.DiGraph) -> nx.DiGraph:
         new_model = nx.DiGraph()
         nodes, edges = [], []
         internal_transitions = self.rules.transitions
@@ -130,9 +113,35 @@ class ModelAnalyzer:
                     )
         return classified_atomic_attacks
     
-    def print_path(self, paths):
+    def generate_layout(self, model: nx.DiGraph, seed: int=1) -> dict[str, np.ndarray]:
+        pos = nx.spring_layout(model, seed=seed)
+        distance = 0.035
+        status_pos = {}
+        properties = self.rules.properties
+        for node, node_pos in pos.items():
+            node_root = f"{node}:root"
+            node_user = f"{node}:user"
+            node_access = f"{node}:access"
+            node_none = f"{node}:none"
+
+            root_pos = np.array([node_pos[0], node_pos[1] + distance / 2])
+            user_pos = np.array([node_pos[0] - distance, node_pos[1]])
+            access_pos = np.array([node_pos[0] - 2 * distance, node_pos[1] - distance])
+            none_pos = np.array([node_pos[0] - 2 * distance, node_pos[1] + distance])
+
+            status_pos[node_root] = root_pos
+            status_pos[node_user] = user_pos
+            status_pos[node_access] = access_pos
+            status_pos[node_none] = none_pos
+
+        return status_pos
+
+    def print_path(self, model, paths):
         idx = 1
         print("Attack path: ")
         for path in paths:
             print(f"\t[{idx}] " + " --> ".join(path))
             idx += 1
+            length_total = nx.path_weight(model, path, weight="weight")
+            score_total = nx.path_weight(model, path, weight="score")
+            print(f"\tlength: {length_total}, score of path is: {score_total}")

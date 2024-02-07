@@ -6,8 +6,8 @@ import networkx as nx
 import json, re
 import matplotlib.pyplot as plt
 from ipaddress import ip_network, ip_address
-from analyzer.ontologies.ontology import *
-from knowledge_graph.Ontology.CVE import *
+from ontologies.modeling import *
+from ontologies.constants import *
 from analyzer.utils.generate_atomic_attack import convert_cve_to_atomic_attack
 
 class GraphAdapter:
@@ -21,6 +21,8 @@ class GraphAdapter:
         """        
         if source == "pyvis":
             self.adpater = PyvisAdapter()
+        elif source == "flan":
+            self.adpater = FlanAdapter()
 
     def convert(self, graph_file) -> nx.DiGraph:
         return self.adpater.convert(graph_file)
@@ -47,7 +49,7 @@ class PyvisAdapter:
             nodes.append((node['name'], node))
         # Edges
         edges = []
-        for edge in graph['edges']:
+        for edge in pyvis_graph['edges']:
             if 'from' in edge and 'to' in edge:
                 src = edge.pop('src')
                 dest = edge.pop('dst')

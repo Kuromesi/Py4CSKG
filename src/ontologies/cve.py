@@ -1,42 +1,5 @@
-import json, re
-
-# constants
-ACCESS_PHYSICAL = "PHYSICAL"
-ACCESS_LOCAL = "LOCAL"
-ACCESS_ADJACENT = "ADJACENT_NETWORK"
-ACCESS_NETWORK = "NETWORK"
-
-CIA_LOSS = "system cia loss"
-PRIV_APP = "gain privilege on application"
-PRIV_USER = "gain user privilege"
-PRIV_ROOT = "gain root privilege"
-
-PRIV_REQ_NONE = "None"
-PRIV_REQ_LOW = "Low"
-PRIV_REQ_HIGH = "High"
-
-APP_EXEC = "application arbitrary code execution"
-SYS_EXEC = "system arbitrary code execution"
-PRIV_ESC = "privilege escalation"
-PRIV_UND = "component privilege based privilege"
-EXEC_UND = "component privilege based execution"
-
-CODE_EXEC_CVED = "code execution"
-GAIN_PRIV_CVED = "privilege escalation"
-
-# IMPACT_ORDER = ["system CIA loss", "gain privilege on application", "application arbitrary code execution", "system arbitrary code execution", 
-#                 "gain user privilege", "privilege escalation", "gain root privilege"]
-
-ACCESS_ORDER = [ACCESS_PHYSICAL, ACCESS_LOCAL, ACCESS_ADJACENT, ACCESS_NETWORK]
-IMPACT_ORDER = [CIA_LOSS, PRIV_APP, PRIV_USER, PRIV_ROOT]
-PRIV_REQ_ORDER = [PRIV_REQ_HIGH, PRIV_REQ_LOW, PRIV_REQ_NONE]
-
-SKIP_FILES = ['CVE-Modified.json', 'CVE-Recent.json', 'product.csv', 'cve.json', 'CVE-2023.json']
-YEAR_REG = re.compile(r'CVE-(\d+).json')
-SAVE_PATH = "myData/thesis/graduation/analyze/false_privilege_entries.csv"
-FIG_PATH = "myData/thesis/graduation/analyze/false_privilege_entries.png"
-IMPACT_PATH = "data/base/cve_details/impact.json"
-CVE_PATH = "data/base/cve"
+import re, json
+from ontologies.constants import *
 
 regs = [re.compile(r".*gain.*privilege.*"), 
              re.compile(r".*escalat.*"), 
@@ -46,6 +9,21 @@ regs = [re.compile(r".*gain.*privilege.*"),
              re.compile(r".*execut.*"),
              re.compile(r".*takeover.*")]
 
+def convert_cve_to_atomic_attack(cve_id, cve_des, cvss_v2, cvss_v3):
+    access = ""
+    gain = get_privilege_level(cve_des, cvss_v2, cvss_v3)
+    score = 0.0
+    if cvss_v3 is not None:
+        access = cvss_v3['attackVector']
+        score = cvss_v3['impactScore']
+    elif cvss_v2 is not None:
+        access = cvss_v2['accessVector']
+        score = cvss_v2['impactScore']
+    else:
+        raise Exception("Neither cvss2 nor cvss3 exists")
+
+    return AtomicAttack(cve_id, access, gain, score, "None")
+        
 def get_privilege_level(description, cvss_v2=None, cvss_v3=None):
     cved_impact = []
     if is_code_exec(description):
@@ -106,7 +84,7 @@ def get_vul_type(cvss2=None, cvss3=None, impact=[]):
         if cvss2["obtainOtherPrivilege"]:
             return PRIV_APP
         
-        cvss2 = cvss2['cvssV2']
+        # cvss2 = cvss2['cvssV2']
 
         if cvss2["confidentialityImpact"] == "NONE" or cvss2["integrityImpact"] == "NONE" or cvss2["availabilityImpact"] == "NONE":
             return CIA_LOSS
@@ -118,7 +96,7 @@ def get_vul_type(cvss2=None, cvss3=None, impact=[]):
                 return PRIV_USER
     
     elif cvss3:
-        cvss3 = cvss3['cvssV3']
+        # cvss3 = cvss3['cvssV3']
         if cvss3["confidentialityImpact"] == "HIGH" and cvss3["integrityImpact"] == "HIGH" and cvss3["availabilityImpact"] == "HIGH":
             if GAIN_PRIV_CVED in impact or CODE_EXEC_CVED in impact:
                 # if cvss3["baseSeverity"] == "CRITICAL":
@@ -134,12 +112,6 @@ def get_vul_type(cvss2=None, cvss3=None, impact=[]):
 
     return CIA_LOSS
 
-PRIV_REQ_MAP = {
-    "NONE": PRIV_REQ_NONE,
-    "LOW": PRIV_REQ_LOW,
-    "HIGH": PRIV_REQ_HIGH
-}
-
 class CVEEntry():
     id: str
     score: float
@@ -147,6 +119,9 @@ class CVEEntry():
     impact: str
     description: str
     def __init__(self, record=None) -> None:
+        self.parse_record(record)
+    
+    def parse_record(self, record):
         if not record:
             self.score = 1.0
             return
@@ -161,7 +136,6 @@ class CVEEntry():
             self.score = cvss2['cvssV2']['baseScore']
             cvss3 = json.loads(record['baseMetricV3'])
             self.privileges_required = PRIV_REQ_MAP[cvss3['cvssV3']['privilegesRequired']]
-            # self.effect = get_vul_type(cvss2, cvss3, self.impact.split(", "))
             self.effect = self.impact
         elif record['baseMetricV2'] != "{}":
             cvss2 = json.loads(record['baseMetricV2'])
@@ -171,13 +145,10 @@ class CVEEntry():
                 self.privileges_required = "Low"
             else:
                 self.privileges_required = "None"
-            # self.effect = get_vul_type(cvss2, None, self.impact.split(", "))
         elif record['baseMetricV3'] != "{}":
             cvss3 = json.loads(record['baseMetricV3'])
             self.access = cvss3['cvssV3']['attackVector']
             self.score = cvss3['cvssV3']['baseScore']
             self.privileges_required = PRIV_REQ_MAP[cvss3['cvssV3']['privilegesRequired']]
-            # self.effect = get_vul_type(None, cvss3, self.impact.split(", "))
         else:
             raise ValueError("neither CVSSv2 nor CVSSv3 exists")
-        self.effect = self.impact

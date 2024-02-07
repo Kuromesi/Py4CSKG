@@ -5,7 +5,7 @@ sys.path.append(os.path.join(BASE_DIR))
 
 import networkx as nx
 import matplotlib.pyplot as plt
-from analyzer.ontologies.ontology import *
+from ontologies.modeling import *
 from knowledge_graph.Ontology.CVE import *
 
 # servers

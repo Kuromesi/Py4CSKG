@@ -9,7 +9,7 @@ from analyzer.tests.tests import gen_test_graph
 # from analyzer.analyze import *
 # from analyzer.graph.GraphAdapter import GraphProcessor
 from analyzer.analyzer import ModelAnalyzer
-from analyzer.ontologies.ontology import AtomicAttack
+from ontologies.modeling import AtomicAttack
 from knowledge_graph.Ontology.CVE import *
 from service.GDBSaver import GDBSaver
 import networkx as nx
@@ -141,7 +141,7 @@ def test_attack_graph_performance(ma: ModelAnalyzer, model: nx.DiGraph, src: str
     # ma.analyze_attack_path(model, src, dst)
 
 def test_attack_path_performance(ma: ModelAnalyzer, model: nx.DiGraph, src: str, dst: str):
-    ma.analyze_attack_path(model, src, dst)
+    ma.generate_attack_path(model, src, dst)
 
 def test_random_graph():
     samplings = [100, 1000, 3000, 5000, 7000, 9000, 11000, 13000, 15000, 17000, 19000, 20000]
@@ -226,8 +226,8 @@ def test_vul_env():
     # ma.analyze_attack_path(model, "internet:access", "workstation:root", "weight")
     # ma.analyze_attack_path(model, "internet:access", "mail_server:user", "score")
     # ma.analyze_attack_path(model, "internet:access", "mail_server:user", "weight")
-    ma.analyze_attack_path(model, "internet:access", "neo4j:none", "score")
-    ma.analyze_attack_path(model, "internet:access", "neo4j:none", "weight")
+    ma.generate_attack_path(model, "internet:access", "neo4j:none", "score")
+    ma.generate_attack_path(model, "internet:access", "neo4j:none", "weight")
     
 if __name__ == '__main__':
     test_vul_env()

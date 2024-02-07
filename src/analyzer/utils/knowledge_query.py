@@ -1,5 +1,5 @@
 from service.GDBSaver import GDBSaver
-from knowledge_graph.Ontology.CVE import CVEEntry
+from ontologies.cve import CVEEntry
 from analyzer.utils.version_compare import cmp_version
 
 class KGQuery():

@@ -4,12 +4,16 @@ services:
     container_name: networks
     image: gcr.io/google_containers/pause-amd64:3.0
     networks:
-      - workstation-net
+      - work-net
       - dmz-net
+      - scada-net
 networks:
-  workstation-net:
+  work-net:
     driver: bridge
-    name: workstation-net
+    name: work-net
   dmz-net:
     driver: bridge
     name: dmz-net
+  scada-net:
+    driver: bridge
+    name: scada-net
