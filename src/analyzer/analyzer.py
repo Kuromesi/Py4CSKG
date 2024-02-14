@@ -8,17 +8,22 @@ from analyzer.utils.knowledge_query import KGQuery
 from ontologies.modeling import *
 from ontologies.cve import *
 from service.GDBSaver import GDBSaver
+from analyzer.extension import AnalyzerExtension
 
 SHORTEST_PATH = "shortest"
 MAX_IMPACT_PATH = "impact"
 ALL_PATH = "all"
 class ModelAnalyzer:
-    def __init__(self, rule_path) -> None:
+    def __init__(self, rule_path, extension: AnalyzerExtension) -> None:
         self.rules = load_rule(rule_path)
-        self.kg = KGQuery(GDBSaver())
+        # self.kg = KGQuery(GDBSaver())
+        self.extension = extension
+    
+    def load_model(self, **kwargs):
+        return self.extension.load_model(**kwargs)
     
     def analyze(self, model: nx.DiGraph):
-        self.analyze_vul(model)
+        # self.analyze_vul(model)
         vul_graph = self.generate_attack_graph(model)
         return vul_graph
 
@@ -43,19 +48,21 @@ class ModelAnalyzer:
         for node_name, node_prop in model.nodes(data=True):
             for trans in internal_transitions:
                 edges.append((f"{node_name}:{trans[0]}", f"{node_name}:{trans[1]}", {'weight': 0, 'score': 0}))
-            atomic_attacks: dict[str, AtomicAttack] = node_prop['classified_atomic_attacks']
+            # atomic_attacks: dict[str, AtomicAttack] = node_prop['classified_atomic_attacks']
             for src_name, _, edge_prop in model.in_edges(node_name, data=True):
                 transitions = edge_prop['transitions']
                 for trans in transitions:
                     trans_src, trans_dst = trans.split(":")
                     edges.append((f"{src_name}:{trans_src}", f"{node_name}:{trans_dst}", {'weight': 0, 'score': 0}))
                 access = edge_prop['access']
-                if atomic_attacks[access] is None:
+                atomic_attack = self.extension.get_max_pos_atomic_attack(node_name, access, "none")
+                if atomic_attack is None:
                     continue
-                src_status = f"{src_name}:{self.rules.prerequisites[atomic_attacks[access].require]}"
-                dst_status = f"{node_name}:{self.rules.exploit_transitions[atomic_attacks[access].gain]}"
-                edges.append((src_status, dst_status, {'weight': 1, 'score': atomic_attacks[access].score, 'exploit_name': atomic_attacks[access].name}))
+                src_status = f"{src_name}:{self.rules.prerequisites[atomic_attack.require]}"
+                dst_status = f"{node_name}:{self.rules.exploit_transitions[atomic_attack.gain]}"
+                edges.append((src_status, dst_status, {'weight': 1, 'score': atomic_attack.score, 'exploit': atomic_attack}))
         new_model.add_edges_from(edges)
+        
         return new_model
 
     def analyze_vul(self, model: nx.DiGraph):
@@ -138,10 +145,21 @@ class ModelAnalyzer:
 
     def print_path(self, model, paths):
         idx = 1
-        print("Attack path: ")
+        if not paths:
+            print("No attack path found.")
+            return
         for path in paths:
-            print(f"\t[{idx}] " + " --> ".join(path))
+            print(f"Attack path[{idx}]")
+            print("\t" + " --> ".join(path))
             idx += 1
             length_total = nx.path_weight(model, path, weight="weight")
             score_total = nx.path_weight(model, path, weight="score")
+            
+            print("Exploits")
+            for i in range(len(path) - 1):
+                edge_attrib = model.edges[path[i], path[i + 1]]
+                if 'exploit' in edge_attrib:    
+                    print(f"\t{path[i]} --> {path[i + 1]} # {edge_attrib['exploit'].name}")
+
+            print("Summary")
             print(f"\tlength: {length_total}, score of path is: {score_total}")

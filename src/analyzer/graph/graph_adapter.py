@@ -73,7 +73,7 @@ class FlanAdapter:
     cidr_pattern = re.compile(r'^(?:(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\/([1-9]|[1-2]\d|3[0-2])$')
     cpe_pattern = re.compile(r'cpe:[^)]+')
     product_pattern = re.compile(r'^[^(]*')
-    cve_pattern = re.compile(r'^CVE-[0-9]+-[0-9]+$')
+    cve_pattern = re.compile(r'CVE-[0-9]+-[0-9]+')
 
     def convert(self, json_report: dict):
         converted_graph = nx.DiGraph()
@@ -90,7 +90,7 @@ class FlanAdapter:
             if self.is_valid_cidr(ip):
                 nodes.append(LogicalNode(ip))
                 cidrs.append(ip)
-                edges.append(Relation("network", ip, scan_node.name, ACCESS_ADJACENT, ["access:access"], bidirectional=True))
+                edges.append(Relation("network", scan_node.name, ip, ACCESS_ADJACENT, ["access:access"]))
 
         vulnerable_services: dict = json_report['vulnerable']
         self.process_services(vulnerable_services, hosts, nodes, edges, scan_node, cidrs)
@@ -135,7 +135,7 @@ class FlanAdapter:
                         edges.append(Relation("network", host_ip, scan_node.name, ACCESS_ADJACENT, ["access:access"]))
                         
                 service_name = f"{host_ip}:{product_name}"
-                service_node = PhysicalNode(service_name)
+                service_node = PhysicalNode(service_name, atomic_attacks=[])
                 # convert vulnerabilities to atomic attacks
                 for vulnerability in vulnerabilities:
                     cve_id = self.cve_pattern.findall(vulnerability['name'])

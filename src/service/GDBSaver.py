@@ -78,6 +78,8 @@ class GDBSaver:
                 res = session.write_transaction(self._result, query)
         return res
 
+gdb = GDBSaver()
+
 if __name__=="__main__":
     gdb = GDBSaver()
     print (gdb.sendQuery("MATCH (n) RETURN n"))

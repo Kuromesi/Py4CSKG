@@ -1,7 +1,12 @@
+import sys, os
+BASE_DIR=os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.join(BASE_DIR))
+
 from ontologies.modeling import AtomicAttack
 from ontologies.constants import *
 from ontologies.cve import CVEEntry
-import requests, re
+from service import gdb
+import requests, re, json
 
 regs = [re.compile(r".*gain.*privilege.*"), 
              re.compile(r".*escalat.*"), 
@@ -59,7 +64,7 @@ def get_vul_type(cvss2=None, cvss3=None, impact=[]):
         if cvss2["obtainAllPrivilege"]:
             return PRIV_ROOT
         if cvss2["obtainOtherPrivilege"]:
-            return PRIV_APP
+            return CIA_LOSS
         
         cvss2 = cvss2['cvssV2']
 
@@ -81,7 +86,7 @@ def get_vul_type(cvss2=None, cvss3=None, impact=[]):
                 # else:
                 return PRIV_USER
         elif GAIN_PRIV_CVED in impact or CODE_EXEC_CVED in impact:
-            return PRIV_APP
+            return CIA_LOSS
         else:
             return CIA_LOSS
     else:
@@ -90,6 +95,27 @@ def get_vul_type(cvss2=None, cvss3=None, impact=[]):
     return CIA_LOSS
 
 def get_cve_data(cve_id):
+    print(f"getting cve data: {cve_id}")
+    query = f"MATCH (n:Vulnerability) WHERE n.id=\"{cve_id}\" RETURN n"
+    nodes = gdb.sendQuery(query)
+    if not nodes:
+        return False, "", "", None, None
+    des = nodes[0][0]['description']
+    cvss3, cvss2 = None, None
+    access = ""
+    if  nodes[0][0]['baseMetricV3'] != "{}":
+        cvss3 = json.loads(nodes[0][0]['baseMetricV3'])
+        access = cvss3['cvssV3']['attackVector']
+    if nodes[0][0]['baseMetricV2'] != "{}":
+        cvss2 = json.loads(nodes[0][0]['baseMetricV2'])
+        if not access:
+            access = cvss2['cvssV2']['accessVector']
+    if cvss2 or cvss3:
+        return True, des, access, cvss2, cvss3
+    print(f"neither cvss2 nor cvss3 exists: {cve_id}")
+    return False, "", "", None, None
+
+def get_cve_data_from_api(cve_id):
     success = False
     cve_data = request_cve_api(cve_id)
     if cve_data is None:
@@ -124,5 +150,4 @@ def request_cve_api(cve_id):
         print(e)
         return None
 if __name__ == "__main__":
-    res = requests.get("https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2020-15778")
-    print(res.json())
+    get_cve_data("CVE-2022-0001")
