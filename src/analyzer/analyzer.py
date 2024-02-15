@@ -8,7 +8,7 @@ from analyzer.utils.knowledge_query import KGQuery
 from ontologies.modeling import *
 from ontologies.cve import *
 from service.GDBSaver import GDBSaver
-from analyzer.extension import AnalyzerExtension
+from analyzer.extensions.extension import AnalyzerExtension
 
 SHORTEST_PATH = "shortest"
 MAX_IMPACT_PATH = "impact"
@@ -21,11 +21,6 @@ class ModelAnalyzer:
     
     def load_model(self, **kwargs):
         return self.extension.load_model(**kwargs)
-    
-    def analyze(self, model: nx.DiGraph):
-        # self.analyze_vul(model)
-        vul_graph = self.generate_attack_graph(model)
-        return vul_graph
 
     def generate_attack_path(self, model: nx.DiGraph, src: str, dst: str, kind="shortest"):
         try:

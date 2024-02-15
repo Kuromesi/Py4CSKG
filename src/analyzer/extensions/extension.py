@@ -8,9 +8,24 @@ from analyzer.graph_editor import GraphEditor
 
 class AnalyzerExtension:
     def load_model(self, **kwargs) -> nx.DiGraph:
+        """Return processed system model
+
+        Returns:
+            nx.DiGraph: system model
+        """        
         pass
 
-    def get_max_pos_atomic_attack(self, node_name, access, require) -> AtomicAttack:
+    def get_max_pos_atomic_attack(self, node_name: str, access: str, require: str) -> AtomicAttack:
+        """Return the most likely happens AtomicAttack to occur under the current node_name, access, and require conditions.
+
+        Args:
+            node_name (str): current node_name
+            access (str): access
+            require (str): require
+
+        Returns:
+            AtomicAttack: most likely happens AtomicAttack
+        """        
         pass
 
 

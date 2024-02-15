@@ -2,7 +2,7 @@ import sys, os
 BASE_DIR=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 
-from CVE2CAPEC import *
+from text_similarity.tests.CVE2CAPEC import *
 import pandas as pd
 from tqdm import tqdm
 

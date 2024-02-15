@@ -27,13 +27,10 @@ def do_request(url, retries=0, max_retries=5, headers=None):
             raise Exception("status code of request is %d"%res.status_code)
     except Exception as e:
         if retries < max_retries:
-            try:
-                res = do_request(url, retries=retries + 1, max_retries=max_retries, headers=headers)
-            except:
-                raise
+            res = do_request(url, retries=retries + 1, max_retries=max_retries, headers=headers)
         else:
             logger.error("failed to request %s: %s"%(url, e))
-            raise
+            raise Exception(f"failed to request after {max_retries} retries")
     return res
 
 def text_proc(text):

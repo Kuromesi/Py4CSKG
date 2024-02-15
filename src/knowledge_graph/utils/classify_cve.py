@@ -7,7 +7,7 @@ import pandas as pd
 from service.GDBSaver import GDBSaver
 from utils.Config import config
 from text_classification.TextClassification import CVE2CWE
-from text_similarity.TextSimilarity import TextSimilarity
+from text_similarity.wsbert import TextSimilarity
 from knowledge_graph.Ontology.ontology import *
 from utils.Logger import logger
 from tqdm import tqdm

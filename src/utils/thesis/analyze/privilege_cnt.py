@@ -11,7 +11,8 @@ FIG_PATH = "myData/thesis/graduation/analyze/false_privilege_entries.png"
 def plot_graph():
     df = pd.read_csv(SAVE_PATH)
     width = 0.4
-    plt.rc('font', family='Times New Roman')
+    plt.rcParams['font.sans-serif'] = ['SimHei']
+    # plt.rc('font', family='Times New Roman')
 
     year = df['year'].tolist()
     x_year = year.copy()
@@ -20,10 +21,10 @@ def plot_graph():
     plt.figure(figsize=(9, 3.2))
     for i in range(len(year)):
         year[i] -= width / 2
-    plt.bar(year, total, width=width, label='Total Entry', color='white', alpha=1, edgecolor='k')
+    plt.bar(year, total, width=width, label='CVE总数', color='white', alpha=1, edgecolor='k')
     for i in range(len(year)):
         year[i] += width
-    plt.bar(year, false, width=width, label='False Entry', color='k', alpha=0.5, edgecolor='k')
+    plt.bar(year, false, width=width, label='错误描述的CVE数量', color='k', alpha=0.5, edgecolor='k')
     plt.legend()
     plt.xticks(x_year, rotation=300)
     plt.savefig(FIG_PATH, dpi=1000, bbox_inches='tight')
@@ -76,6 +77,6 @@ def is_gain_privileges(text) -> bool:
 
 
 if __name__ == "__main__":
-    # plot_graph()
-    count_false_privilege_entries("data/base/cve")
+    plot_graph()
+    # count_false_privilege_entries("data/base/cve")
     

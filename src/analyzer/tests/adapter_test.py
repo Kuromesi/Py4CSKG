@@ -4,7 +4,7 @@ sys.path.append(os.path.join(BASE_DIR))
 
 from analyzer.graph.graph_adapter import FlanAdapter
 from analyzer.analyzer import ModelAnalyzer
-from analyzer.extension import FlanAnalyzerExtension
+from analyzer.extensions.extension import FlanAnalyzerExtension
 import networkx as nx
 import matplotlib.pyplot as plt
 from analyzer.graph_editor import GraphEditor
