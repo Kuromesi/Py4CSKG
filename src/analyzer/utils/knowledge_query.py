@@ -1,10 +1,10 @@
-from service.GDBSaver import GDBSaver
+from service import gdb
 from ontologies.cve import CVEEntry
-from analyzer.utils.version_compare import cmp_version
+from utils.version_compare import cmp_version
 
 class KGQuery():
-    def __init__(self, gs: GDBSaver) -> None:
-        self.gs = gs
+    def __init__(self) -> None:
+        self.gs = gdb
     
     def find_vuls(self, product, version) -> list[CVEEntry]:
         """_summary_

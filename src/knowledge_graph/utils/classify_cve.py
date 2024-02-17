@@ -6,7 +6,7 @@ import json, os
 import pandas as pd
 from service.GDBSaver import GDBSaver
 from utils.Config import config
-from text_classification.TextClassification import CVE2CWE
+from text_classification.TextClassification import TextClassification
 from text_similarity.wsbert import TextSimilarity
 from knowledge_graph.Ontology.ontology import *
 from utils.Logger import logger
@@ -15,7 +15,7 @@ from tqdm import tqdm
 MAX_CAPEC = 3
 gdb = GDBSaver()
 ts = TextSimilarity()
-tc = CVE2CWE()
+tc = TextClassification()
 tc.init_bert()
 
 def classify_cwe(des):

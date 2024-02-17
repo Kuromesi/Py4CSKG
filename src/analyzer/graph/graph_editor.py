@@ -1,7 +1,3 @@
-import sys, os, json
-BASE_DIR=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.join(BASE_DIR))
-
 import yaml
 import networkx as nx
 from utils.Logger import logger

@@ -1,6 +1,6 @@
 import spacy
 # from gensim.models import Word2Vec
-from utils.NLP import NLP
+from misc.NLP import NLP
 from utils.Cluster import Cluster
 import numpy as np
 

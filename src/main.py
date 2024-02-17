@@ -1,6 +1,6 @@
 from data_updater.updater import *
 from knowledge_graph.KGBuilder import *
-from text_classification.TextClassification import CVE2CWE
+from text_classification.TextClassification import TextClassification
 
 import os
 os.environ['NUMEXPR_MAX_THREADS'] = '16'

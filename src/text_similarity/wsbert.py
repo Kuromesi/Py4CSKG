@@ -109,7 +109,7 @@ class RealTextSimilarity():
         return embedding
     
     def transform_tfidf(self, corpus):
-        tv=TfidfVectorizer()#初始化一个空的tv。
+        tv=TfidfVectorizer()
         corpus_vec = []
         for corp in corpus:
             text = ""
@@ -118,7 +118,7 @@ class RealTextSimilarity():
             for i in self.tokenizer.encode(corp, truncation=True, max_length=512):
                 text += str(i) + " "
             corpus_vec.append(text.strip())
-        tv.fit_transform(corpus_vec)#用训练数据充实tv,也充实了tv_fit。
+        tv.fit_transform(corpus_vec)
         features = tv.get_feature_names_out()
         tfidf = tv.idf_
         return {'feature': features, 'tfidf': tfidf}      
@@ -133,7 +133,7 @@ class RealTextSimilarity():
             result = self.docs[self.docs['id'].isin(filter)].index
             docs_embedding = self.docs_embedding[result]
         else:
-            docs_embedding =self.docs_embedding
+            docs_embedding = self.docs_embedding
         for i in range(len(docs_embedding)):
             doc_vec = docs_embedding[i]
             sim = cosine_similarity([doc_vec], [query_embedding[0]])[0][0]
@@ -172,23 +172,3 @@ class TextSimilarity():
     def calculate_similarity(self, query, filter=None):
         res = self.rts.calculate_similarity(query, filter)
         return res
-
-def batch_similarity():
-    ts = TextSimilarity()
-    df = pd.DataFrame(columns=['query', 'id', 'name'])
-    texts = [
-        "ftp server", "web server", "mail merver", "scada monitor", "workstation", "database server",
-        "WIFI module", "Imagery Module", "NMEA GPS", "FCS Radio Module", "Pressure sensor"
-    ]
-    for text in texts:
-        tmp_df = ts.calculate_similarity(text)
-        for i in range(len(tmp_df)):
-            df.loc[len(df.index)] = [text, tmp_df.iloc[i]['id'], tmp_df.iloc[i]['name']]
-    df.to_csv("myData/thesis/graduation/modeling/query.csv", index=False)
-
-if __name__ == "__main__":
-    # ts = TextSimilarity()
-    # txt = "pressure sensor"
-    # tmp_df = ts.calculate_similarity(txt)
-    # print(tmp_df)
-    batch_similarity()

@@ -6,7 +6,7 @@ import requests
 import os, re
 from lxml import etree
 from tqdm import tqdm
-from data_updater.updaters.utils import *
+from data_updater.utils.utils import *
 from utils.Logger import logger
 from utils.Config import config
 
@@ -21,11 +21,7 @@ class CVEUpdater():
             dict: a diction of cve links
         """        
         index = 'https://nvd.nist.gov/vuln/data-feeds'
-        try:
-            res = do_request(index)
-        except:
-            logger.error("Failed to update cve: %s"%index)
-            raise
+        res = do_request(index)
         res = etree.HTML(res.content)
         links_tab = res.xpath('//*[@id="vuln-feed-table"]/div/table/tbody/tr[@class="xml-feed-data-row"]/td/a')
         names_tab = res.xpath('//*[@id="vuln-feed-table"]/div/table/tbody/tr[@class="xml-feed-desc-row"]/td[1]')
@@ -51,7 +47,7 @@ class CVEUpdater():
 
     def update(self):
         logger.info("Starting to update CVE")
-        base = config.get("DataUpdater", "base_path")
+        base = config.get("KnowledgeGraph", "base_path")
         cve_loc = os.path.join(base, "base/cve")
         index = 'https://nvd.nist.gov'
         try:

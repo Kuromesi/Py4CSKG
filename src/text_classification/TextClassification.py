@@ -7,7 +7,7 @@ from text_classification.utils.Dataset import *
 from text_classification.config.BERTConfig import *
 from utils.Config import config
 
-class CVE2CWE():
+class TextClassification():
     def init_bert(self):
         self.bert = BERT.from_pretrained(config.get("TextClassification", "cve2cwe_path"))
         self.device = config.get("TextClassification", "device")
@@ -29,7 +29,7 @@ class CVE2CWE():
         return self.bert_labels[pred[0]]
 
 if __name__ == "__main__":
-    cve2cwe = CVE2CWE()
+    cve2cwe = TextClassification()
     cve2cwe.init_bert()
     text = "HTTP request smuggling vulnerability in Sun Java System Proxy Server before 20061130, when used with Sun Java System Application Server or Sun Java System Web Server, allows remote attackers to bypass HTTP request filtering, hijack web sessions, perform cross-site scripting (XSS), and poison web caches via unspecified attack vectors."
     print(cve2cwe.bert_predict(text))

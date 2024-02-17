@@ -155,7 +155,6 @@ class FlanAdapter:
         return ""
     
     def is_valid_cidr(self, cidr):
-        # 正则表达式匹配CIDR
         return bool(self.cidr_pattern.match(cidr))
 
 if __name__ == "__main__":

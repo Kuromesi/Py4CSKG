@@ -7,7 +7,7 @@ sys.path.append(os.path.join(BASE_DIR))
 
 from tqdm import tqdm
 from utils.Logger import logger
-from data_updater.updaters.utils import *
+from data_updater.utils.utils import *
 from utils.MultiTask import MultiTask
 from utils.Config import config
 from knowledge_graph.Ontology.ontology import *
@@ -40,8 +40,8 @@ class CAPECTraverser(XmlTraverser):
         # df = pd.DataFrame(columns=['id', 'name', 'description', 'cve'])
         # Find views
         logger.info("Starting to traverse CAPEC")
-        base = config.get("DataUpdater", "base_path")
-        path = os.path.join(base, "capec/CAPEC.xml")
+        base = config.get("KnowledgeGraph", "base_path")
+        path = os.path.join(base, "base/capec/CAPEC.xml")
         with open(path, 'r', encoding='utf-8') as f:
             soup = BeautifulSoup(f, 'xml')
         vc_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'name', 'description', 'type', 'complete'])
@@ -187,7 +187,7 @@ class CAPECTraverser(XmlTraverser):
                         entry = "T" + taxonomy.find_all("Entry_ID")[0].text.strip()
                         rel_df.loc[len(rel_df.index)] = [src, entry, CAPEC_ATTACK_REL]
 
-        base = config.get("KnowledgeGraph", "neo4j_path")
+        base = config.get("KnowledgeGraph", "base_path")
         pt_df.drop_duplicates()
         pt_df.to_csv(os.path.join(base, 'neo4j/nodes/capec_pt.csv'), index=False)
         misc_df.drop_duplicates()
@@ -196,7 +196,7 @@ class CAPECTraverser(XmlTraverser):
         rel_df.to_csv(os.path.join(base, 'neo4j/relations/capec_rel.csv'), index=False)
         if not os.path.exists:
             os.mkdir(os.path.join(base, "capec"))
-        base = config.get("DeepLearning", "base_path")
+        # base = config.get("DeepLearning", "base_path")
         # capec_cve_df.to_csv(os.path.join(base, "capec/capec.csv"), index=False)
 
 
@@ -205,8 +205,8 @@ class CWETraverser(XmlTraverser):
         self.TYPE = "Weakness"
     
     def traverse(self):
-        base = config.get("DataUpdater", "base_path")
-        path = os.path.join(base, "cwe/CWE.xml")
+        base = config.get("KnowledgeGraph", "base_path")
+        path = os.path.join(base, "base/cwe/CWE.xml")
         with open(path, "r", encoding='utf-8') as file:
             soup = BeautifulSoup(file, "xml")
         wk_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'name', 'description', 'type', 'complete'])
@@ -293,7 +293,7 @@ class CWETraverser(XmlTraverser):
                     des = str(mitigation)
                     misc_df.loc[len(misc_df.index)] = [id, MITIGATION_TYPE, des]
                     rel_df.loc[len(rel_df.index)] = [id, src, MITIGATE_REL]
-        base = config.get("KnowledgeGraph", "neo4j_path")
+        base = config.get("KnowledgeGraph", "base_path")
         wk_df.drop_duplicates()
         wk_df.to_csv(os.path.join(base, 'neo4j/nodes/cwe_wk.csv'), index=False)
         misc_df.drop_duplicates()
@@ -307,10 +307,10 @@ class ATTACKTraverser(XmlTraverser):
 
     def traverse(self):
         names = ["enterprise", "mobile", "ics"]
-        base = config.get("DataUpdater", "base_path")
+        base = config.get("KnowledgeGraph", "base_path")
         mt = MultiTask()
         mt.create_pool(8)
-        base = os.path.join(base, "attack")
+        base = os.path.join(base, "base/attack")
         tasks = [(os.path.join(base, "%s_tactic.json"%name), os.path.join(base, "%s.xml"%name), name) for name in names]
         mt.apply_task(self.traverse_single, tasks)
         mt.delete_pool()
@@ -409,7 +409,7 @@ class ATTACKTraverser(XmlTraverser):
                     des = text_proc(detection.text)
                     misc_df.loc[len(misc_df.index)] = [id, INDICATOR_TYPE, name, des]
                     rel_df.loc[len(rel_df.index)] = [id, attrs['id'], INDICATE_TECHNIQUE_REL]
-        base = config.get("KnowledgeGraph", "neo4j_path")
+        base = config.get("KnowledgeGraph", "base_path")
         tech_df = tech_df.drop_duplicates()
         tech_df.to_csv(os.path.join(base, 'neo4j/nodes/attack_tech_%s.csv'%kind), index=False)
         misc_df = misc_df.drop_duplicates()

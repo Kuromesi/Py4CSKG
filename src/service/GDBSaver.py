@@ -1,6 +1,6 @@
 from neo4j import GraphDatabase
 
-from service.ConfReader import ConfReader
+from service.conf_reader import ConfReader
 from utils.Logger import logger
 
 class GDBSaver:

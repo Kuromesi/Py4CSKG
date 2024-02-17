@@ -1,34 +1,33 @@
-import json, os
+import requests, zipfile, io, re
+from utils.Logger import logger
 
-def old_cved_proc():
-    cved = {}
-    old2new = {
-        "Overflow": "Overflow",
-        "Mem. Corr.": "Memory Corruption",
-        "Exec Code": "Code Execution",
-        "Dir. Trav.": "Directory Traversal",
-        "Bypass": "Bypass",
-        "File Inclusion": "File Inclusion",
-        "XSS": "XSS",
-        "CSRF": "CSRF",
-        "Sql": "Sql Injection",
-        "DoS": "Denial of Service",
-        "+Info": "Information Leak",
-        "+Priv": "Privilege Escalation",
-    }
-    for file in os.listdir("./data/base/cve_details"):
-        if file == "impact.json":
-            continue
-        with open(os.path.join("./data/base/cve_details", file), "r") as f:
-            cved.update(json.load(f))
-    ncved = {}
-    for entry, impact in cved.items():
-        ncved[entry] = []
-        for k, v in old2new.items():
-            if k in impact:
-                ncved[entry].append(v)
-    with open("./data/base/cve_details/nImpact.json", "w") as f:
-        json.dump(ncved, f, sort_keys=True, indent=4)
+def download_and_unzip(url, path="", retries=0, max_retries=5):
+        """Downloads and unzips a file.
 
-if __name__ == "__main__":
-    old_cved_proc()
+        Keyword Args:
+            link to zipped xml file.
+
+        Returns:
+            unzipped data file in the current directory.
+        """
+        res = do_request(url)
+        z = zipfile.ZipFile(io.BytesIO(res.content))
+        return z.extractall(path)
+
+def do_request(url, retries=0, max_retries=5, headers=None):
+    try:
+        res = requests.get(url, headers=headers)
+        if res.status_code != 200:
+            raise Exception("status code of request is %d"%res.status_code)
+    except Exception as e:
+        if retries < max_retries:
+            res = do_request(url, retries=retries + 1, max_retries=max_retries, headers=headers)
+        else:
+            logger.error("failed to request %s: %s"%(url, e))
+            raise Exception(f"failed to request after {max_retries} retries")
+    return res
+
+def text_proc(text):
+    text = text.strip()
+    re.sub(" +", " ", text)
+    return text

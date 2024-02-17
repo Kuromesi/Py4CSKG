@@ -1,5 +1,5 @@
 import redis
-from service.ConfReader import ConfReader
+from service.conf_reader import ConfReader
 
 class RDBSaver():
 

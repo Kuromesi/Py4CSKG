@@ -9,21 +9,10 @@ from lxml import etree
 from functools import wraps
 import time, json
 from utils.Logger import logger
-from data_updater.updaters.utils import *
+from data_updater.utils.utils import *
 from utils.Config import config
-from data_updater.updaters.utils import do_request
+from data_updater.utils.utils import do_request
 from utils.MultiTask import MultiTask
-
-def logging(source):
-    def decorator(func):
-        @wraps(func)
-        def wrapper(self, url, *args, **kw):
-            cur = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
-            print("%s [%s] %s"%(cur, source, url))
-            return func(self, url, *args, **kw)
-        return wrapper
-    return decorator
-
 
 class CVEDetailsUpdater():
     url_prefix = "https://www.cvedetails.com"
@@ -82,8 +71,7 @@ class CVEDetailsUpdater():
                 urls[urls.index(url)] = "https://www.cvedetails.com/vulnerability-list/opinpv-1/vulnerabilities.html"
                 break
         return headers, urls
-    
-    # @logging('www.cvedetails.com')
+
     def find_type_page_urls(self, url):
         """find type page urls in type pages
 
@@ -97,42 +85,13 @@ class CVEDetailsUpdater():
         headers = {
                 'User-Agent': self.user_agents[randint(0, len(self.user_agents) - 1)],
             }
-        try:
-            res = do_request(url, headers=headers)
-        except:
-            print("Connection to %s Failed!"%url)
-            exit()
+        res = do_request(url, headers=headers)
         idx = etree.HTML(res.content)
         urls_tab = idx.xpath('//*[@id="pagingb"]/a[@href]')
         urls = [url + u.attrib['href'] for u in urls_tab[1: ]]
         return urls        
-    
-    # @logging('www.cvedetails.com')
-    def _type_page_proc(self, url, q, impact, max_retries=0):
-        """process a single page of type of vulnerabilities, get types (for old version)
 
-        Args:
-            url (_type_): _description_
-
-        Returns:
-            _type_: _description_
-        """     
-        headers = {
-            'User-Agent': self.user_agents[randint(0, len(self.user_agents) - 1)],
-        }
-        try:
-            res = do_request(url, headers=headers)
-            idx = etree.HTML(res.content)
-            ids = idx.xpath('//*[@id="searchresults"]/div/div[1]/div[1]/h3/a')
-            cves = {}
-            for id in ids:
-                id = text_proc(id.text)
-                cves[id] = [impact]
-            q.put(cves)
-        except Exception as e:
-            logger.error("Failed to update CVE details: %s"%e)
-
-    def type_page_proc(self, url, q, impact, max_retries=0):
+    def type_page_proc(self, url, q, impact, max_retries=5):
         """process a single page of type of vulnerabilities, get types (for new version)
 
         Args:
@@ -145,7 +104,7 @@ class CVEDetailsUpdater():
             'User-Agent': self.user_agents[randint(0, len(self.user_agents) - 1)],
         }
         try:
-            res = do_request(url, headers=headers)
+            res = do_request(url, headers=headers, max_retries=max_retries)
             idx = etree.HTML(res.content)
             ids = idx.xpath('//*[@id="searchresults"]/div/div/div[1]/div[1]/h3/a')
             cves = {}
@@ -154,7 +113,7 @@ class CVEDetailsUpdater():
                 cves[id] = [impact]
             q.put(cves)
         except Exception as e:
-            logger.error("Failed to update CVE details: %s"%e)
+            logger.error(f"Failed to update CVE details: {e}")
         
     def update(self):
         logger.info("Starting to update CVE details")
@@ -169,7 +128,6 @@ class CVEDetailsUpdater():
         imapct_urls = {}
         for header, url in zip(headers, type_page_urls):
             imapct_urls[header] = self.find_type_page_urls(url)
-        # urls.extend(self.find_type_page_urls(type_page_urls[0]))
         
         mt = MultiTask()
         mt.create_pool()
@@ -195,8 +153,8 @@ class Saver():
         self.size = 500
 
     def save(self, queue):
-        base = config.get("DataUpdater", "base_path")
-        path = os.path.join(base, "cve_details")
+        base = config.get("KnowledgeGraph", "base_path")
+        path = os.path.join(base, "base/cve_details")
         content = {}
         while True:
             try:

@@ -7,20 +7,24 @@ from analyzer.utils.load_rule import load_rule
 from analyzer.utils.knowledge_query import KGQuery
 from ontologies.modeling import *
 from ontologies.cve import *
-from service.GDBSaver import GDBSaver
 from analyzer.extensions.extension import AnalyzerExtension
+from analyzer.graph.graph_editor import GraphEditor
 
 SHORTEST_PATH = "shortest"
 MAX_IMPACT_PATH = "impact"
 ALL_PATH = "all"
 class ModelAnalyzer:
-    def __init__(self, rule_path, extension: AnalyzerExtension) -> None:
+    def __init__(self, rule_path, extension: AnalyzerExtension, graph_editor: GraphEditor, **kwargs) -> None:
         self.rules = load_rule(rule_path)
-        # self.kg = KGQuery(GDBSaver())
         self.extension = extension
+        self. graph_editor = graph_editor
     
-    def load_model(self, **kwargs):
-        return self.extension.load_model(**kwargs)
+    def load_model(self, data_path="", **kwargs):
+        model = self.extension.load_model(**kwargs)
+        if data_path:
+            self.graph_editor.edit_graph(model, data_path)
+        self.extension.analyze_model(model)
+        return model
 
     def generate_attack_path(self, model: nx.DiGraph, src: str, dst: str, kind="shortest"):
         try:
@@ -59,61 +63,17 @@ class ModelAnalyzer:
         new_model.add_edges_from(edges)
         
         return new_model
-
-    def analyze_vul(self, model: nx.DiGraph):
-        for node_name, node_prop in model.nodes(data=True):
-            vuls: list[CVEEntry] = []
-            atomic_attacks: list[AtomicAttack] = []
-            if 'os' in node_prop:
-                for product in node_prop['os']:
-                    vuls.extend(self.kg.find_vuls(product['name'], product['version']))
-                for product in node_prop['software']:
-                    vuls.extend(self.kg.find_vuls(product['name'], product['version']))
-                for product in node_prop['firmware']:
-                    vuls.extend(self.kg.find_vuls(product['name'], product['version']))
-                for product in node_prop['hardware']:
-                    vuls.extend(self.kg.find_vuls(product['name'], product['version']))
-                for vul in vuls:
-                    atomic_attacks.append(AtomicAttack(vul.id, vul.access, vul.impact, vul.score, "None"))
-            for atomic in node_prop["atomic_attacks"]:
-                atomic_attacks.append(AtomicAttack(atomic['name'], atomic['access'], atomic['gain'], atomic['score'], atomic['require']))
-            classified_atomic_attacks = self.analyze_atomic_attacks(atomic_attacks)
-            node_prop["classified_atomic_attacks"] = classified_atomic_attacks
-
-    def analyze_atomic_attacks(self, atomic_attacks: list[AtomicAttack]) -> dict[str, AtomicAttack]:
-        classified_atomic_attacks: dict[str, AtomicAttack] = {
-            ACCESS_PHYSICAL: None,
-            ACCESS_LOCAL: None,
-            ACCESS_ADJACENT: None,
-            ACCESS_NETWORK: None,
-        }
-        for atomic_attack in atomic_attacks:
-            access = atomic_attack.access
-            if classified_atomic_attacks[access] is None:
-                classified_atomic_attacks[access] = atomic_attack
-            else:
-                if cmp_atomic_attack(atomic_attack, classified_atomic_attacks[access]) > 0:
-                    classified_atomic_attacks[access] = atomic_attack
-        for access_idx in range(len(ACCESS_ORDER)):
-            access = ACCESS_ORDER[access_idx]
-            for lower_access in ACCESS_ORDER[access_idx + 1: ]:
-                if classified_atomic_attacks[lower_access] is None:
-                    continue
-                if classified_atomic_attacks[access] is None \
-                    or cmp_atomic_attack(classified_atomic_attacks[lower_access], classified_atomic_attacks[access]) > 0:
-                    classified_atomic_attacks[access] = classified_atomic_attacks[lower_access]
-        for access in [ACCESS_NETWORK, ACCESS_ADJACENT]:
-            if classified_atomic_attacks[access] is None:
-                continue
-            if classified_atomic_attacks[access].gain in [PRIV_ROOT, PRIV_USER]:
-                if classified_atomic_attacks[ACCESS_LOCAL] != classified_atomic_attacks[access]:
-                    classified_atomic_attacks[access] = AtomicAttack(
-                        f"{classified_atomic_attacks[access]}->{classified_atomic_attacks[ACCESS_LOCAL]}",
-                        access, classified_atomic_attacks[access].gain,
-                        classified_atomic_attacks[access].score + classified_atomic_attacks[ACCESS_LOCAL].score,
-                        "None"
-                    )
-        return classified_atomic_attacks
+    
+    def plot_attack_graph(self, model: nx.DiGraph, attack_graph: nx.DiGraph):
+        pos = self.generate_layout(model)
+        nx.draw(attack_graph, pos, with_labels=True, node_color="#8adacf", font_size=15, font_family="Times New Roman", font_weight="bold")
+        plt.show()
+    
+    def plot_attack_path(self, model: nx.DiGraph, attack_graph, attack_path: list[str]):
+        pos = self.generate_layout(model)
+        nx.draw(attack_graph, pos, with_labels=True, node_color="#8adacf", font_size=15, font_family="Times New Roman", font_weight="bold")
+        nx.draw_networkx_nodes(attack_graph, pos, nodelist=attack_path, node_color="#ff0000")
+        plt.show()
     
     def generate_layout(self, model: nx.DiGraph, seed: int=1) -> dict[str, np.ndarray]:
         pos = nx.spring_layout(model, seed=seed)

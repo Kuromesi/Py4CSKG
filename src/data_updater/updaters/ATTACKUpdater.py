@@ -5,7 +5,7 @@ import re, json
 import multiprocessing
 from tqdm import tqdm
 from utils.Logger import logger
-from data_updater.updaters.utils import *
+from data_updater.utils.utils import *
 from lxml import etree
 from utils.MultiTask import *
 from utils.Config import config
@@ -15,7 +15,7 @@ class ATTACKUpdater():
         self.pattern = re.compile('\[.*\]' )
         
 
-    def extract_content(self, url:str, retries=0, max_retries=5) -> str:
+    def extract_content(self, url:str, max_retries=5) -> str:
         """extract content from web pages
 
         Args:
@@ -26,7 +26,7 @@ class ATTACKUpdater():
         """        
         soup = bs(features='xml')
         try:
-            res = do_request(url)
+            res = do_request(url, max_retries=max_retries)
         except:
             logger.error("Failed to update ATT&CK techniques: %s"%url)
             return ""
@@ -136,7 +136,8 @@ class ATTACKUpdater():
                         #     print(pattern.sub("", miti.get_text()))
 
             # find detections
-            detections = s.find("table", attrs={"class": "table datasources-table table-bordered"})
+            detections = s.find("h2", attrs={"id": "detection"})
+            # detections = s.find("table", attrs={"class": "table datasources-table table-bordered"})
             if detections:
                 detections = detections.find_next_sibling()
                 detections = detections.find_all("p")
@@ -197,8 +198,8 @@ class ATTACKUpdater():
             soup.append(soup.new_tag("Techniques"))
             try:
                 res = do_request(url)
-            except:
-                print("Failed to update ATT&CK techniques: %s"%url)
+            except Exception as e:
+                print(f"failed to update ATT&CK techniques {url}: {e}")
                 continue
             s = bs(res.content, "lxml")
             s.find("table", attrs={"class": "table-techniques"})
@@ -208,6 +209,7 @@ class ATTACKUpdater():
                 links = tr.find_all("a")
                 sub_url = url_main + links[0]["href"]
                 urls.append((sub_url, ))
+            # self.extract_content(urls[0][0])
             result = mt.apply_task(self.extract_content, urls)
             for temp in result:
                 if temp:
@@ -221,6 +223,7 @@ class ATTACKUpdater():
 
     def update_tactic(self, base):
         logger.info("Updating ATT&CK tactics")
+        base = os.path.join(base, "base/attack")
         urls = {
             "enterprise": "https://attack.mitre.org/tactics/enterprise/",
             "mobile": "https://attack.mitre.org/tactics/mobile/",
@@ -229,9 +232,9 @@ class ATTACKUpdater():
         for n, url in urls.items():
             try:
                 res = do_request(url)
-            except:
-                logger.error("Failed to update ATT&CK tactic: %s"%url)
-                continue
+            except Exception as e:
+                logger.error(f"failed to update ATT&CK tactic: {e}")
+                raise e
             res = etree.HTML(res.content)
             rows = res.xpath('//*[@id="v-attckmatrix"]/div[2]/div/div/div/div/div[2]/div/table/tbody/tr')
             tactics = {}
@@ -242,7 +245,6 @@ class ATTACKUpdater():
                 tactics[name] = {}
                 tactics[name]['id'] = id
                 tactics[name]['description'] = des
-            base = os.path.join(base, "base/attack")
             with open(os.path.join(base, n + "_tactic.json"), 'w') as f:
                 json.dump(tactics, f)
 
@@ -256,7 +258,7 @@ class ATTACKUpdater():
         """        
         # init process pool
         logger.info("Starting to update ATT&CK")
-        base = config.get("DataUpdater", "base_path")
+        base = config.get("KnowledgeGraph", "base_path")
         self.update_tactic(base)
         self.update_technique(base)
 

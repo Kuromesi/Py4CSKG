@@ -1,10 +1,19 @@
 import yaml
+from typing import Optional, List
+from pydantic import BaseModel
 
 PROPERTY_KEY = "properties"
 TRANSITION_KEY = "internalTransitions"
 EXPLOIT_KEY = "exploitTransitions"
-PREREQUISITE_KEY = "prerequisites"
+PREREQUISITE_KEY = "prerequisiteTransitions"
 DELIMITER = ":"
+
+class AnalyzerRuleYaml(BaseModel):
+    ruleName: str
+    properties: List[str]
+    internalTransitions: List[str]
+    exploitTransitions: List[str]
+    prerequisiteTransitions: List[str]
 
 class AnalyzerRule:
     def __init__(self, properties: list[str], transitions: list[tuple], 
@@ -20,10 +29,12 @@ def check_rule(properties: list[str], transitions: list[str]) -> bool:
 def load_rule(path: str) -> AnalyzerRule:
     with open(path, 'r', encoding='utf-8') as file:
         rule_file = yaml.safe_load(file)
-    properties: list[str] = rule_file[PROPERTY_KEY]
-    transition: list[str] = rule_file[TRANSITION_KEY]
-    exploit: list[str] = rule_file[EXPLOIT_KEY]
-    prerequisites: list[str] = rule_file[PREREQUISITE_KEY]
+    rule_file = AnalyzerRuleYaml(**rule_file)
+
+    properties: list[str] = rule_file.properties
+    transition: list[str] = rule_file.internalTransitions
+    exploit: list[str] = rule_file.exploitTransitions
+    prerequisites: list[str] = rule_file.prerequisiteTransitions
     if not check_rule(properties, transition):
         raise Exception("bad rules detected")
     transition_list = []

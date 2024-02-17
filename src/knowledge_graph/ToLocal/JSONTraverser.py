@@ -231,12 +231,13 @@ class CVETraverser():
                                     rel_df.loc[len(rel_df.index)] = [sum[1][platform]['uri'], src, PLATFORM_REL]
                                     rel_df.loc[len(rel_df.index)] = [sum[0][product]['uri'], sum[1][platform]['uri'], "And"]
                                     rel_df.loc[len(rel_df.index)] = [sum[1][platform]['uri'], sum[0][product]['uri'], "And"]
+        base = config.get("KnowledgeGraph", "base_path")
         cve_df = cve_df.drop_duplicates()
-        cve_df.to_csv('data/neo4j/nodes/cve_cve%d.csv'%count, index=False)
+        cve_df.to_csv(os.path.join(base, f'neo4j/nodes/cve_cve{count}.csv'), index=False)
         cpe_df = cpe_df.drop_duplicates()
-        cpe_df.to_csv('data/neo4j/nodes/cve_cpe%d.csv'%count, index=False)
+        cpe_df.to_csv(os.path.join(base, f'neo4j/nodes/cve_cpe{count}.csv'), index=False)
         rel_df = rel_df.drop_duplicates()
-        rel_df.to_csv('data/neo4j/relations/cve_rel%d.csv'%count, index=False)
+        rel_df.to_csv(os.path.join(base, f'neo4j/relations/cve_rel{count}.csv'), index=False)
     
     def traverse(self):
         # KURO
@@ -247,8 +248,8 @@ class CVETraverser():
         mt = MultiTask()
         cves = self.get_cves()
         mt.create_pool(32)
-        base = config.get("DataUpdater", "base_path")
-        path = os.path.join(base, "cve_details/impact.json")
+        base = config.get("KnowledgeGraph", "base_path")
+        path = os.path.join(base, "base/cve_details/impact.json")
         with open(path, 'r') as f:
             cve_details = json.load(f)
         tasks = [(task, id, cve_details) for id, task in enumerate(cves)]
@@ -261,8 +262,8 @@ class CVETraverser():
         Returns:
             _type_: _description_
         """        
-        base = config.get("DataUpdater", "base_path")
-        path = os.path.join(base, "cve")
+        base = config.get("KnowledgeGraph", "base_path")
+        path = os.path.join(base, "base/cve")
         cves = os.listdir(path)
         not_included = ["CVE-Modified.json", "CVE-Recent.json", "cve.json"]
         ret = []
