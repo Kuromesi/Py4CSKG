@@ -7,6 +7,7 @@ from ontologies.constants import *
 from ontologies.cve import CVEEntry
 from service import gdb
 import requests, re, json
+from utils.Logger import logger
 
 regs = [re.compile(r".*gain.*privilege.*"), 
              re.compile(r".*escalat.*"), 
@@ -95,10 +96,11 @@ def get_vul_type(cvss2=None, cvss3=None, impact=[]):
     return CIA_LOSS
 
 def get_cve_data(cve_id):
-    print(f"getting cve data: {cve_id}")
+    logger.info(f"getting cve data: {cve_id}")
     query = f"MATCH (n:Vulnerability) WHERE n.id=\"{cve_id}\" RETURN n"
     nodes = gdb.sendQuery(query)
     if not nodes:
+        logger.warning(f"{cve_id} is not recorded")
         return False, "", "", None, None
     des = nodes[0][0]['description']
     cvss3, cvss2 = None, None
@@ -112,7 +114,7 @@ def get_cve_data(cve_id):
             access = cvss2['cvssV2']['accessVector']
     if cvss2 or cvss3:
         return True, des, access, cvss2, cvss3
-    print(f"neither cvss2 nor cvss3 exists: {cve_id}")
+    logger.warning(f"neither cvss2 nor cvss3 exists: {cve_id}")
     return False, "", "", None, None
 
 def get_cve_data_from_api(cve_id):

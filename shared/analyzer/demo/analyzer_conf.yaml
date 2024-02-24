@@ -1,0 +1,10 @@
+reportsPaths: 
+  - "/app/shared/demo/report_2024.02.07-12.32.json"
+analyzerRulePath: "/app/analyzer/rules/experiment/rule.yaml"
+attackPaths: 
+  - src: "172.29.0.5:root"
+    dst: "172.30.0.3:access"
+    plotAll: false
+    pathType: "impact"
+graphAddPath: "/app/shared/demo/graph.yaml"
+outputDir: "/app/shared/demo/"

@@ -5,7 +5,7 @@ sys.path.append(os.path.join(BASE_DIR))
 
 import networkx as nx
 import matplotlib.pyplot as plt
-from knowledge_graph.Ontology.CVE import *
+from ontologies.cve import *
 import random
 
 TRANSITION_ENUM = ["user", "root", "access"]

@@ -18,25 +18,25 @@ from webapp.model.user import User
 app = Flask(__name__)
 
 
-WIN = sys.platform.startswith('win')
-if WIN:  # 如果是 Windows 系统，使用三个斜线
-    prefix = 'sqlite:///'
-else:  # 否则使用四个斜线
-    prefix = 'sqlite:////'
-app.config['SQLALCHEMY_DATABASE_URI'] = prefix + os.path.join(app.root_path, 'data.db')
-app.config['SESSION_TYPE'] = 'filesystem'
-app.config['SECRET_KEY'] = os.urandom(24)
-db.init_app(app)
-login_manager.init_app(app)
-login_manager.login_view = 'sign.signin_form'
+# WIN = sys.platform.startswith('win')
+# if WIN:  # 如果是 Windows 系统，使用三个斜线
+#     prefix = 'sqlite:///'
+# else:  # 否则使用四个斜线
+#     prefix = 'sqlite:////'
+# app.config['SQLALCHEMY_DATABASE_URI'] = prefix + os.path.join(app.root_path, 'data.db')
+# app.config['SESSION_TYPE'] = 'filesystem'
+# app.config['SECRET_KEY'] = os.urandom(24)
+# db.init_app(app)
+# login_manager.init_app(app)
+# login_manager.login_view = 'sign.signin_form'
 
-@login_manager.user_loader
-def load_user(user_id):  # 创建用户加载回调函数，接受用户 ID 作为参数
-    user = User.query.get(int(user_id))  # 用 ID 作为 User 模型的主键查询对应的用户
-    return user  # 返回用户对象
+# @login_manager.user_loader
+# def load_user(user_id):  # 创建用户加载回调函数，接受用户 ID 作为参数
+#     user = User.query.get(int(user_id))  # 用 ID 作为 User 模型的主键查询对应的用户
+#     return user  # 返回用户对象
 
-with app.app_context():
-    db.create_all()
+# with app.app_context():
+#     db.create_all()
 
 app.register_blueprint(sign)
 app.register_blueprint(model)

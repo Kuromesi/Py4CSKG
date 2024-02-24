@@ -3,7 +3,7 @@ BASE_DIR=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.join(BASE_DIR))
 
 import networkx as nx
-import json, re
+import json, re, uuid
 import matplotlib.pyplot as plt
 from ipaddress import ip_network, ip_address
 from ontologies.modeling import *

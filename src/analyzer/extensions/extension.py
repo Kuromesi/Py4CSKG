@@ -6,7 +6,6 @@ from analyzer.utils.knowledge_query import KGQuery
 from analyzer.graph.graph_adapter import FlanAdapter
 from ontologies.modeling import *
 from ontologies.cve import *
-from analyzer.graph.graph_editor import GraphEditor
 
 class AnalyzerExtension:
     def load_model(self, **kwargs) -> nx.DiGraph:
@@ -43,10 +42,12 @@ class FlanAnalyzerExtension(AnalyzerExtension):
 
     def load_model(self, **kwargs) -> nx.DiGraph:
         flan_adapter = FlanAdapter()
-        model_path = kwargs['model_path']
-        with open(model_path, 'r') as f:
-            report = json.load(f)
-        model = flan_adapter.convert(report)
+        model_paths = kwargs['model_path']
+        model = nx.DiGraph()
+        for model_path in model_paths:
+            with open(model_path, 'r') as f:
+                report = json.load(f)
+            model = nx.compose(model, flan_adapter.convert(report))
         return model
     
     def analyze_model(self, model: nx.DiGraph):
@@ -64,8 +65,9 @@ class FlanAnalyzerExtension(AnalyzerExtension):
                     vuls.extend(self.kg.find_vuls(product['name'], product['version']))
                 for vul in vuls:
                     atomic_attacks.append(AtomicAttack(vul.id, vul.access, vul.impact, vul.score, "None"))
-            for atomic in node_prop["atomic_attacks"]:
-                atomic_attacks.append(AtomicAttack(atomic['name'], atomic['access'], atomic['gain'], atomic['score'], atomic['require']))
+            if 'atomic_attacks' in node_prop:
+                for atomic in node_prop["atomic_attacks"]:
+                    atomic_attacks.append(AtomicAttack(atomic['name'], atomic['access'], atomic['gain'], atomic['score'], atomic['require']))
             self.classify_atomic_attacks(node_name, atomic_attacks)
 
 

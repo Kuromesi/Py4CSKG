@@ -3,7 +3,6 @@ from flask import request, render_template
 import json
 # from text_similarity.TextSimilarity import *
 from webapp.utils.draw import *
-from analyzer.analyze import *
 
 predict = Blueprint('predict', __name__)
 
