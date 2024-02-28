@@ -3,39 +3,39 @@ services:
   # hosts in work zone
   workstation-host:
     container_name: workstation-host
-    image: gcr.io/google_containers/pause-amd64:3.0
+    image: registry.cn-hangzhou.aliyuncs.com/google_containers/pause-amd64:3.0
     networks:
       - work-net
     ipc: shareable
   # hosts in dmz zone
   mail-host:
     container_name: mail-host
-    image: gcr.io/google_containers/pause-amd64:3.0
+    image: registry.cn-hangzhou.aliyuncs.com/google_containers/pause-amd64:3.0
     networks:
       - dmz-net
     ipc: shareable
   ftp-host:
     container_name: ftp-host
-    image: gcr.io/google_containers/pause-amd64:3.0
+    image: registry.cn-hangzhou.aliyuncs.com/google_containers/pause-amd64:3.0
     networks:
       - dmz-net
     ipc: shareable
   web-host:
     container_name: web-host
-    image: gcr.io/google_containers/pause-amd64:3.0
+    image: registry.cn-hangzhou.aliyuncs.com/google_containers/pause-amd64:3.0
     networks:
       - dmz-net
     ipc: shareable
   # hosts in scada zone
   monitor-host:
     container_name: monitor-host
-    image: gcr.io/google_containers/pause-amd64:3.0
+    image: registry.cn-hangzhou.aliyuncs.com/google_containers/pause-amd64:3.0
     networks:
       - scada-net
     ipc: shareable
   database-host:
     container_name: database-host
-    image: gcr.io/google_containers/pause-amd64:3.0
+    image: registry.cn-hangzhou.aliyuncs.com/google_containers/pause-amd64:3.0
     networks:
       - scada-net
     ipc: shareable

@@ -14,7 +14,7 @@ class FlanAnalyzerConfiguration(BaseModel):
     reportsPaths: List[str]
     analyzerRulePath: str
     attackPaths: List[AttackPath]
-    graphAddPath: str
+    graphAddPath: Optional[str] = ""
     outputDir: Optional[str] = ""
 
 parser = argparse.ArgumentParser(description='Flan cyber attacks analyzer')
