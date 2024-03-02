@@ -8,8 +8,8 @@ from service import gdb
 
 def test_wsbert():
     ts = TextSimilarity()
-    res = gdb.sendQuery(f"match (n:Vulnerability)-[]-(w:Weakness)-[]-(p:Technique) where n.id='CVE-2018-1000861' return p.id")
-    df = ts.calculate_similarity("A code execution vulnerability exists in the Stapler web framework used by Jenkins 2.153 and earlier, LTS 2.138.3 and earlier in stapler/core/src/main/java/org/kohsuke/stapler/MetaClass.java that allows attackers to invoke some methods on Java objects by accessing crafted URLs that were not intended to be invoked this way.", filter=res[0])
+    # res = gdb.sendQuery(f"match (n:Vulnerability)-[]-(w:Weakness)-[]-(p:Technique) where n.id='CVE-2018-1000861' return p.id")
+    df = ts.calculate_similarity("ftp server")
     print(df)
 
 def test_batch_similarity():

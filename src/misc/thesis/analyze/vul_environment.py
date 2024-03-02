@@ -8,8 +8,8 @@ BASE_DIR=os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path
 sys.path.append(os.path.join(BASE_DIR))
 from service.GDBSaver import GDBSaver
 from knowledge_graph.Ontology.CVE import get_vul_type, PRIV_USER, PRIV_ROOT, GAIN_PRIV_CVED
+from utils import CVE_PATTERN
 
-CVE = re.compile(r".*(CVE-[0-9]{4}-[0-9]{4,}).*")
 regs = [re.compile(r".*gain.*privilege.*"), 
              re.compile(r".*escalat.*"), 
              re.compile(r".*(obtain|gain|as).*(user|administra|root).*"),
@@ -30,7 +30,7 @@ def get_all_folders(path):
 def get_paths(path):
     gdb = GDBSaver()
     paths = get_all_folders(path)
-    cves = [CVE.findall(p)[0] for p in paths if CVE.match(p)]
+    cves = [CVE_PATTERN.findall(p)[0] for p in paths if CVE_PATTERN.match(p)]
     cves = list(set(cves))
     df = pd.DataFrame(columns=["id", "impact", "description"])
     for cve in cves:
@@ -46,7 +46,7 @@ def get_paths(path):
 def get_vul_env_impact(path):
     gdb = GDBSaver()
     paths = get_all_folders(path)
-    cves = [CVE.findall(p)[0] for p in paths if CVE.match(p)]
+    cves = [CVE_PATTERN.findall(p)[0] for p in paths if CVE_PATTERN.match(p)]
     cves = list(set(cves))
     df = pd.DataFrame(columns=["id", "access", "impact", "description"])
     for cve in cves:

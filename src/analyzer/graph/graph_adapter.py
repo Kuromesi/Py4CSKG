@@ -9,6 +9,7 @@ from ipaddress import ip_network, ip_address
 from ontologies.modeling import *
 from ontologies.constants import *
 from analyzer.utils.generate_atomic_attack import convert_cve_to_atomic_attack
+from utils import CVE_PATTERN
 
 class GraphAdapter:
     """convert different source of graphs into networkx graph for analyzing
@@ -73,7 +74,6 @@ class FlanAdapter:
     cidr_pattern = re.compile(r'^(?:(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\/([1-9]|[1-2]\d|3[0-2])$')
     cpe_pattern = re.compile(r'cpe:[^)]+')
     product_pattern = re.compile(r'^[^(]*')
-    cve_pattern = re.compile(r'CVE-[0-9]+-[0-9]+')
 
     def convert(self, json_report: dict):
         converted_graph = nx.DiGraph()
@@ -138,7 +138,7 @@ class FlanAdapter:
                 service_node = PhysicalNode(service_name, atomic_attacks=[])
                 # convert vulnerabilities to atomic attacks
                 for vulnerability in vulnerabilities:
-                    cve_id = self.cve_pattern.findall(vulnerability['name'])
+                    cve_id = CVE_PATTERN.findall(vulnerability['name'])
                     if cve_id:
                         cve_id = cve_id[0]
                         service_node.atomic_attacks.append(convert_cve_to_atomic_attack(cve_id).__dict__)

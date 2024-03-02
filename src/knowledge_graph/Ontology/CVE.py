@@ -99,12 +99,12 @@ def cmp_cve(a, b):
 def get_vul_type(cvss2=None, cvss3=None, impact=[]):
     impact = [i.lower() for i in impact]
     if cvss2:
-        if cvss2["obtainUserPrivilege"]:
-            return PRIV_USER
-        if cvss2["obtainAllPrivilege"]:
-            return PRIV_ROOT
-        if cvss2["obtainOtherPrivilege"]:
-            return PRIV_APP
+        # if cvss2["obtainUserPrivilege"]:
+        #     return PRIV_USER
+        # if cvss2["obtainAllPrivilege"]:
+        #     return PRIV_ROOT
+        # if cvss2["obtainOtherPrivilege"]:
+        #     return PRIV_APP
         
         cvss2 = cvss2['cvssV2']
 

@@ -1,17 +1,12 @@
 import sys, os
 
-from utils.MultiTask import MultiTask
-BASE_DIR=os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append(os.path.join(BASE_DIR))
-
 import json
 import pandas as pd
 from tqdm import tqdm 
 from utils.version_compare import *
-from utils.Logger import logger
-from utils.Config import config
-from knowledge_graph.Ontology.ontology import *
+from utils import logger, config, MultiTask
 from knowledge_graph.Ontology.CVE import get_vul_type, CIA_LOSS
+from ontologies.knowledge_graph import *
 
 type_dict = {
     'a': "Software",
@@ -20,9 +15,6 @@ type_dict = {
 }
 
 class CVETraverser():
-    def __init__(self) -> None:
-        self.type = "Vulnerability"
-        # self.impact = pd.read_csv('./data/base/cve/CVEImpact.csv', index_col=0)
 
     def find_kv(self):
         pass
@@ -113,12 +105,6 @@ class CVETraverser():
                         cpe23uri += ":*"
                     results.append(cpe23uri)
         return results
-
-    def l2s(self, str_list):
-        string = ""
-        for stri in str_list:
-            string += stri + " "
-        return string.strip()
     
     def cpe_summary(self, cpes):
         summary = {}
@@ -150,7 +136,7 @@ class CVETraverser():
         
         result["type"] = type_dict[words[2]] # OS, Hardware or Software
         product = words[3].split('_') + words[4].split('_')
-        product = self.l2s(product)
+        product = " ".join(product)
         result["product"] = product
         result["id"] = product
         version = "0"
@@ -165,23 +151,16 @@ class CVETraverser():
         result["vulnerable"] = True if words[15] == "T" else False
         return result
     
-    def traverse_single(self, path, count, cve_details):
-        logger.info("Starting to traverse cve: %s"%path)
+    def convert_json_to_csv(self, items: dict, cve_details: dict=None):
         cve_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'type', 'description', 'impact', 'cved_impact', 'baseMetricV2', 'baseMetricV3', 'complete'])
         cpe_df = pd.DataFrame(columns=['id:ID', ':LABEL', 'type', 'product', 'versionStart', 'versionEnd', 'vulnerable'])
         rel_df = pd.DataFrame(columns=[':START_ID', ':END_ID', ':TYPE'])
-        with open(path, 'r', encoding='utf-8') as f:
-            items = json.load(f)
         items = items['CVE_Items']
-        # items = tqdm(items)
         for cur in items:
             cve = cur['cve']
             src = cve['CVE_data_meta']['ID']
-            # items.set_postfix(CVE=src)
-            # print(src)
             des = cve['description']['description_data'][0]['value']
             if ("** REJECT **" not in des):
-                # df.loc[len(df.index)] = [src, des]
                 # CVSS
                 cvss = cur['impact']
                 cvss2 = {}
@@ -192,18 +171,22 @@ class CVETraverser():
                 # baseMetricV3
                 if ('baseMetricV3' in cvss):
                     cvss3 = cvss['baseMetricV3']
-                cved_impact = ", ".join(cve_details[src]) if src in cve_details else "unknown"
-                cved_impact = cved_impact.strip()
+                
+                cved_impact = "unknown"
+                cved_impact_list = []
+                if cve_details:
+                    if src in cve_details:
+                        cved_impact_list = cve_details[src]
+                        cved_impact = ", ".join(cve_details[src])
+                        cved_impact = cved_impact.strip()
                 if not cvss2 and not cvss3:
                     impact = CIA_LOSS
-                    logger.info(src)
                 else:
-                    impact = get_vul_type(cvss2, cvss3, cve_details[src] if src in cve_details else [])
+                    impact = get_vul_type(cvss2, cvss3, cved_impact_list)
                 cvss2 = json.dumps(cvss2)
                 cvss3 = json.dumps(cvss3)
                 cve_df.loc[len(cve_df.index)] = [src, CVE_TYPE, "CVE", des, impact, cved_impact, cvss2, cvss3, json.dumps(cve)]
                 
-
                 # Find related CWE
                 cwes = cve['problemtype']['problemtype_data'][0]['description']
                 for cwe in cwes:
@@ -231,28 +214,32 @@ class CVETraverser():
                                     rel_df.loc[len(rel_df.index)] = [sum[1][platform]['uri'], src, PLATFORM_REL]
                                     rel_df.loc[len(rel_df.index)] = [sum[0][product]['uri'], sum[1][platform]['uri'], "And"]
                                     rel_df.loc[len(rel_df.index)] = [sum[1][platform]['uri'], sum[0][product]['uri'], "And"]
+        return cve_df, cpe_df, rel_df
+
+    def traverse_single(self, items: dict, tag: str, cve_details: dict=None):
+        cve_df, cpe_df, rel_df = self.convert_json_to_csv(items, cve_details)
         base = config.get("KnowledgeGraph", "base_path")
         cve_df = cve_df.drop_duplicates()
-        cve_df.to_csv(os.path.join(base, f'neo4j/nodes/cve_cve{count}.csv'), index=False)
+        cve_df.to_csv(os.path.join(base, f'neo4j/nodes/cve_cve_{tag}.csv'), index=False)
         cpe_df = cpe_df.drop_duplicates()
-        cpe_df.to_csv(os.path.join(base, f'neo4j/nodes/cve_cpe{count}.csv'), index=False)
+        cpe_df.to_csv(os.path.join(base, f'neo4j/nodes/cve_cpe_{tag}.csv'), index=False)
         rel_df = rel_df.drop_duplicates()
-        rel_df.to_csv(os.path.join(base, f'neo4j/relations/cve_rel{count}.csv'), index=False)
+        rel_df.to_csv(os.path.join(base, f'neo4j/relations/cve_rel_{tag}.csv'), index=False)
     
     def traverse(self):
-        # KURO
-        # df = pd.DataFrame(columns=['id', 'des'])
-        # product = set()
-        # df = pd.DataFrame(columns=['product'])
-        count = 0
+        logger.info("staring to traverse cve")
         mt = MultiTask()
         cves = self.get_cves()
         mt.create_pool(32)
         base = config.get("KnowledgeGraph", "base_path")
         path = os.path.join(base, "base/cve_details/impact.json")
-        with open(path, 'r') as f:
-            cve_details = json.load(f)
-        tasks = [(task, id, cve_details) for id, task in enumerate(cves)]
+        try:
+            with open(path, 'r') as f:
+                cve_details = json.load(f)
+        except Exception as e:
+            logger.error(f"failed to load cve details: {e}")
+            cve_details = None
+        tasks = [(json.load(open(cve, 'r')), id, cve_details) for id, cve in enumerate(cves)]
         mt.apply_task(self.traverse_single, tasks)
         mt.delete_pool() 
     
