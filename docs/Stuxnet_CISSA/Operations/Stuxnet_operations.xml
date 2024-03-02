@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<model xmlns:uml="uri:1" id="0" name="Stuxnet">
+  <packagedElement name="Stuxnet_Operations" id="1001">
+    <Vertex>Operator logs on to the WinCC/Step 7 terminal<id>1</id><Labelling><Time></Time><Cost /><Requirements /></Labelling><Mapping><User>HMI operator</User><Network>WinCC Web Client, WinCC Client , OS Web Client</Network><Data>Processes, alarms , messages</Data></Mapping></Vertex>
+    <Vertex>Operator compiles Step 7 project codes<id>2</id><Labelling><Time></Time><Cost /><Requirements /></Labelling><Mapping><User>HMI operator</User><Network>WinCC Client , WinCC Server</Network><Data>Project Files</Data></Mapping></Vertex>
+    <Vertex>Operator sends assembly code to PLC<id>3</id><Labelling><Time></Time><Cost /><Requirements /></Labelling><Mapping><User>HMI operator</User><Network>WinCC Client , WinCC Server , PLC</Network><Data>Project codes in assembly format</Data></Mapping></Vertex>
+    <Vertex>PLC executes the code and sends result to industrial process<id>4</id><Labelling><Time></Time><Cost /><Requirements /></Labelling><Mapping><User></User><Network>PLC</Network><Data>Logs, messages , alarms</Data></Mapping></Vertex>
+    <Vertex>Receive request and perform operation<id>5</id><Labelling><Time></Time><Cost /><Requirements /></Labelling><Mapping><User></User><Network>Industrial automation process</Network><Data>Messages , alarms</Data></Mapping></Vertex>
+    <Vertex>Return status of operation<id>6</id><Labelling><Time></Time><Cost /><Requirements /></Labelling><Mapping><User></User><Network>Industrial automation process</Network><Data>Messages , alarms</Data></Mapping></Vertex>
+    <Vertex>Relay status of operation<id>7</id><Labelling><Time></Time><Cost /><Requirements /></Labelling><Mapping><User></User><Network>PLC</Network><Data>Messages , alarms</Data></Mapping></Vertex>
+    <Vertex>HMI Operator sees results<id>8</id><Labelling><Time></Time><Cost /><Requirements /></Labelling><Mapping><User>HMI Operator</User><Network>WinCC Client, WinCC Web Client , WinCC Server</Network><Data>Logs, messages , alarms</Data></Mapping></Vertex>
+    <Edge>
+      <id>9</id>
+      <source>
+        <name>Operator logs on to the WinCC/Step 7 terminal</name>
+      </source>
+      <target>
+        <name>Operator compiles Step7 project codes</name>
+      </target>
+    </Edge>
+    <Edge>
+      <id>10</id>
+      <source>
+        <name>Operator compiles Step7 project codes</name>
+      </source>
+      <target>
+        <name>Operator sends assembly code to PLC</name>
+      </target>
+    </Edge>
+    <Edge>
+      <id>11</id>
+      <source>
+        <name>Operator sends assembly code to PLC</name>
+      </source>
+      <target>
+        <name>PLC executes the code and sends result to industrial process</name>
+      </target>
+    </Edge>
+    <Edge>
+      <id>12</id>
+      <source>
+        <name>PLC executes the code and sends result to industrial process</name>
+      </source>
+      <target>
+        <name>Receive request and perform operation</name>
+      </target>
+    </Edge>
+    <Edge>
+      <id>13</id>
+      <source>
+        <name>Return status of operation</name>
+      </source>
+      <target>
+        <name>Relay status of operation</name>
+      </target>
+    </Edge>
+    <Edge>
+      <id>14</id>
+      <source>
+        <name>Relay status of operation</name>
+      </source>
+      <target>
+        <name>HMI Operator sees results</name>
+      </target>
+    </Edge>
+    <Edge>
+      <id>15</id>
+      <source>
+        <name>Activity Start</name>
+      </source>
+      <target>
+        <name>Operator logs on to the WinCC/Step 7 terminal</name>
+      </target>
+    </Edge>
+    <Edge>
+      <id>16</id>
+      <source>
+        <name>Receive request and perform operation</name>
+      </source>
+      <target>
+        <name>Flow Final</name>
+      </target>
+    </Edge>
+    <Edge>
+      <id>17</id>
+      <source>
+        <name>HMI Operator sees results</name>
+      </source>
+      <target>
+        <name>Activity Final</name>
+      </target>
+    </Edge>
+  </packagedElement>
+</model>

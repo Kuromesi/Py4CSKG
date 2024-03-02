@@ -1,0 +1,31 @@
+# nodes:
+#   create:
+#     - properties:
+#         name: "node1"
+#   modify:
+#     - target: 172.30.0.4
+#       properties:
+#         name: "database server"
+edges:
+  create:
+    - source: "172.26.0.3"
+      destination: "172.30.0.3:Elasticsearch Kibana 5.6.12 "
+      properties:
+        name: "network"
+        access: "NETWORK"
+        transitions:
+        - "access:access"
+    - source: "172.26.0.3"
+      destination: "172.29.0.0/24"
+      properties:
+        name: "network"
+        access: "NETWORK"
+        transitions:
+        - "access:access"
+    - source: "172.29.0.0/24"
+      destination: "172.26.0.3:expose"
+      properties:
+        name: "network"
+        access: "NETWORK"
+        transitions:
+        - "access:access"

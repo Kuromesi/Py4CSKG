@@ -1,0 +1,28 @@
+<Attack_Pattern ID="652" Name="Use of Known Kerberos Credentials" Abstraction="Standard" Status="Draft">
+         <Description>An adversary obtains (i.e. steals or purchases) legitimate Kerberos credentials (e.g. Kerberos service account userID/password or Kerberos Tickets) with the goal of achieving authenticated access to additional systems, applications, or services within the domain.</Description>
+         <Related_Attack_Patterns>
+            <Related_Attack_Pattern Nature="ChildOf" CAPEC_ID="560">
+               <Exclude_Related Exclude_ID="515"/>
+            </Related_Attack_Pattern>
+            <Related_Attack_Pattern Nature="CanPrecede" CAPEC_ID="151"/>
+         </Related_Attack_Patterns>
+         <Indicators>
+            <Indicator>Authentication attempts use expired or invalid credentials.</Indicator>
+            <Indicator>Data is being transferred and/or removed from systems/applications within the network.</Indicator>
+            <Indicator>Suspicious or Malicious software is downloaded/installed on systems within the domain.</Indicator>
+         </Indicators>
+         <Mitigations>
+            <Mitigation>Create a strong password policy and ensure that your system enforces this policy for Kerberos service accounts.</Mitigation>
+            <Mitigation>Ensure Kerberos service accounts are not reusing username/password combinations for multiple systems, applications, or services.</Mitigation>
+         </Mitigations>
+         <Related_Weaknesses>
+            <Related_Weakness CWE_ID="522"/>
+            <Related_Weakness CWE_ID="307"/>
+         </Related_Weaknesses>
+         <Taxonomy_Mappings>
+            <Taxonomy_Mapping Taxonomy_Name="ATTACK">
+               <Entry_ID>1558</Entry_ID>
+               <Entry_Name>Steal or Forge Kerberos Tickets</Entry_Name>
+            </Taxonomy_Mapping>
+         </Taxonomy_Mappings>
+      </Attack_Pattern>

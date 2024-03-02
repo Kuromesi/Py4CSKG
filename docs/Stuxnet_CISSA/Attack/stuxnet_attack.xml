@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<model xmlns:uml="uri:1" id="0" name="Attack" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <packagedElement name="Attacker" id="1000">
+    <node>
+      <id>10</id>
+      <Goal>Lowered productivity,Pre-mature wear</Goal>
+      <Access>NIL</Access>
+      <Skill>Nation-state, no technical limitation , armed with zero day exploits</Skill>
+    </node>
+  </packagedElement>
+  <packagedElement name="Attack Step " id="1001">
+    <node>
+      <id>1</id>
+      <Des>Initial Infection</Des>
+      <Pre>Infected USB , external disk drives; Device in enterprise control network accesible from the internet </Pre>
+      <Post>Infected system in enterprise control network.</Post>
+      <Countermeasure xlink:type="simple" xlink:href="/Countermeasures/stuxnet_countermeasure.xml#1"></Countermeasure>
+      <Countermeasure xlink:type="simple" xlink:href="/Countermeasures/stuxnet_countermeasure.xml#5"></Countermeasure>
+    </node>
+    <node>
+      <id>2</id>
+      <Des>Gain operator privilege</Des>
+      <Pre>Access to exploits of vulnerabilities (CVE-2010-2549,CVE-2010-2743,CVE-2010-2744,CVE-2010-3338);access to private key of accepted SSL certificate</Pre>
+      <Post>Privilege to install malware,hide from detection by OS </Post>
+      <Countermeasure xlink:type="simple" xlink:href="/Countermeasures/stuxnet_countermeasure.xml#2"></Countermeasure>
+    </node>
+    <node>
+      <id>3</id>
+      <Des>Propagation</Des>
+      <Pre>Access to exploits of vulnerability (CVE-2008-4250,CVE-2010-2568,CVE-2010-2729);Privilege to scan network; privilege to send network packets to connected device; privilege to write to portable storage device</Pre>
+      <Post>Infect as many devices possible</Post>
+      <Countermeasure xlink:type="simple" xlink:href="/Countermeasures/stuxnet_countermeasure.xml#3"></Countermeasure>
+      <Countermeasure xlink:type="simple" xlink:href="/Countermeasures/stuxnet_countermeasure.xml#4"></Countermeasure>
+    </node>
+    <node>
+      <id>4</id>
+      <Des>Penetrate across "Air-Gap"</Des>
+      <Pre>Portable storage devices or DVDs;infected laptops </Pre>
+      <Post>Infected a device in SCADA network</Post>
+      <Countermeasure xlink:type="simple" xlink:href="/Countermeasures/stuxnet_countermeasure.xml#5"></Countermeasure>
+    </node>
+    <node>
+      <id>5</id>
+      <Des>Compromise monitoring</Des>
+      <Pre>Access to PLCs or monitoring clients;privilege to change message sent to monitoring clients</Pre>
+      <Post>Field sensor feedback intercepted and tampered with </Post>
+    </node>
+    <node>
+      <id>6</id>
+      <Des>Sabotage centrifuges</Des>
+      <Pre>Privilege to issue commands to PLCs</Pre>
+      <Post>Centrifuge spinning speed malevolently changed</Post>
+    </node>
+  </packagedElement>
+</model>

@@ -1,0 +1,9 @@
+version: '2'
+services:
+  ruby:
+    build: .
+    # ports:
+    #   - "8080:8080"
+    network_mode: "container:ftp-host"
+    ipc: "container:ftp-host"
+    pid: "container:ftp-host"

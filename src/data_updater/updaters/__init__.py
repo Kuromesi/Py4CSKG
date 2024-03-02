@@ -1,0 +1,5 @@
+from data_updater.updaters.ATTACKUpdater import ATTACKUpdater
+from data_updater.updaters.CVEUpdater import CVEUpdater
+from data_updater.updaters.CVEDetailsUpdater import CVEDetailsUpdater
+from data_updater.updaters.CAPECUpdater import CAPECUpdater
+from data_updater.updaters.CWEUpdater import CWEUpdater

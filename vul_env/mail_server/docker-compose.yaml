@@ -1,0 +1,20 @@
+version: '3.5'
+services:
+  # CVE-2020-7247
+  smtpd:
+    image: vulhub/opensmtpd:6.6.1p1
+    # ports:
+    #   - "8825:25"
+    network_mode: "container:mail-host"
+    ipc: "container:mail-host"
+    pid: "container:mail-host"
+  # CVE-2017-5223
+  phpmailer:
+    build: .
+    # ports:
+    #   - "8080:80"
+    env_file:
+      - .env
+    network_mode: "container:mail-host"
+    ipc: "container:mail-host"
+    pid: "container:mail-host"

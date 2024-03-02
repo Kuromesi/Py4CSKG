@@ -1,0 +1,1 @@
+from analyzer.factory import new_flan_analyzer

@@ -1,0 +1,65 @@
+query,id,name
+ftp server,CWE-552,Files or Directories Accessible to External Parties
+ftp server,CAPEC-17,Using Malicious Files
+ftp server,T1105,Ingress Tool Transfer
+ftp server,T1544,Ingress Tool Transfer
+ftp server,T1554,Compromise Client Software Binary
+web server,CWE-650,Trusting HTTP Permission Methods on the Server Side
+web server,CWE-539,Use of Persistent Cookies Containing Sensitive Information
+web server,CAPEC-650,Upload a Web Shell to a Web Server
+web server,T1481.001,Web Service: Dead Drop Resolver
+web server,CAPEC-662,Adversary in the Browser (AiTB)
+web server,CWE-113,Improper Neutralization of CRLF Sequences in HTTP Headers ('HTTP Request/Response Splitting')
+web server,T1481.002,Web Service: Bidirectional Communication
+web server,CAPEC-528,XML Flood
+mail merver,T1070.008,Indicator Removal: Clear Mailbox Data
+mail merver,CAPEC-134,Email Injection
+mail merver,T1564.008,Hide Artifacts: Email Hiding Rules
+mail merver,CAPEC-183,IMAP/SMTP Command Injection
+mail merver,T1566.002,Phishing: Spearphishing Link
+mail merver,T1586.002,Compromise Accounts: Email Accounts
+mail merver,T1071.003,Application Layer Protocol: Mail Protocols
+scada monitor,CAPEC-699,Eavesdropping on a Monitor
+scada monitor,T0868,Detect Operating Mode
+scada monitor,T0858,Change Operating Mode
+scada monitor,CWE-1314,Missing Write Protection for Parametric Data Values
+scada monitor,T0852,Screen Capture
+scada monitor,T1219,Remote Access Software
+scada monitor,T0811,Data from Information Repositories
+scada monitor,T0883,Internet Accessible Device
+workstation,CAPEC-413,Pretexting via Tech Support
+workstation,CAPEC-699,Eavesdropping on a Monitor
+workstation,T1219,Remote Access Software
+workstation,CAPEC-441,Malicious Logic Insertion
+workstation,CWE-1083,Data Access from Outside Expected Data Manager Component
+workstation,CWE-1351,Improper Handling of Hardware Behavior in Exceptionally Cold Environments
+workstation,T0868,Detect Operating Mode
+workstation,CAPEC-446,Malicious Logic Insertion into Product via Inclusion of Third-Party Component
+workstation,T1021.005,Remote Services: VNC
+database server,CWE-1083,Data Access from Outside Expected Data Manager Component
+database server,CAPEC-470,Expanding Control over the Operating System from the Database
+database server,CAPEC-66,SQL Injection
+database server,CWE-1073,Non-SQL Invokable Control Element with Excessive Number of Data Resource Accesses
+database server,T1505.001,Server Software Component: SQL Stored Procedures
+database server,CWE-836,Use of Password Hash Instead of Password for Authentication
+database server,CWE-1327,Binding to an Unrestricted IP Address
+WIFI module,CAPEC-615,Evil Twin Wi-Fi Attack
+WIFI module,CAPEC-619,Signal Strength Tracking
+WIFI module,CAPEC-613,WiFi SSID Tracking
+WIFI module,T0860,Wireless Compromise
+WIFI module,CAPEC-612,WiFi MAC Address Tracking
+WIFI module,T1011,Exfiltration Over Other Network Medium
+WIFI module,CAPEC-399,Cloning RFID Cards or Chips
+Imagery Module,T0835,Manipulate I/O Image
+NMEA GPS,CAPEC-627,Counterfeit GPS Signals
+NMEA GPS,T1430.001,Location Tracking: Remote Device Management Services
+NMEA GPS,T1430,Location Tracking
+NMEA GPS,T1430.002,Location Tracking: Impersonate SS7 Nodes
+NMEA GPS,CAPEC-628,Carry-Off GPS Attack
+NMEA GPS,T1636.001,Protected User Data: Calendar Entries
+FCS Radio Module,CAPEC-399,Cloning RFID Cards or Chips
+FCS Radio Module,CAPEC-400,RFID Chip Deactivation or Destruction
+FCS Radio Module,T0887,Wireless Sniffing
+FCS Radio Module,CWE-1318,Missing Support for Security Features in On-chip Fabrics or Buses
+FCS Radio Module,CWE-1319,Improper Protection against Electromagnetic Fault Injection (EM-FI)
+Pressure sensor,CWE-1314,Missing Write Protection for Parametric Data Values

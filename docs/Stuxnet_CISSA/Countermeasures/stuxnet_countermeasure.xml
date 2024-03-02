@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<model xmlns:uml="uri:1" id="0" name="Countermeasure">
+  <packagedElement id="1000">
+    <node>
+      <id>1</id>
+      <Des>Perimeter security mechanisms</Des>
+      <Mapping>
+        <Effectiveness>Medium</Effectiveness>
+        <Cost>High</Cost>
+        <Component>All devices in Enterprise control network</Component>
+      </Mapping>
+    </node>
+    <node>
+      <id>2</id>
+      <Des>System wide intrusion detection </Des>
+      <Mapping>
+        <Effectiveness>Medium</Effectiveness>
+        <Cost>High</Cost>
+        <Component>All devices in the network</Component>
+      </Mapping>
+    </node>
+    <node>
+      <id>3</id>
+      <Des>Regualar installation of security patches and updates</Des>
+      <Mapping>
+        <Effectiveness>High</Effectiveness>
+        <Cost>Low</Cost>
+        <Component>All devices in the network</Component>
+      </Mapping>
+    </node>
+    <node>
+      <id>4</id>
+      <Des>Dissallow remote access to computers in Control Network</Des>
+      <Mapping>
+        <Effectiveness>High</Effectiveness>
+        <Cost>Low</Cost>
+        <Component>All devices in the control network</Component>
+      </Mapping>
+    </node>
+    <node>
+      <id>5</id>
+      <Des>Dissallow all external media such as USB , disk drives etc</Des>
+      <Mapping>
+        <Effectiveness>High</Effectiveness>
+        <Cost>Low</Cost>
+        <Component>All devices in the network</Component>
+      </Mapping>
+    </node>
+  </packagedElement>
+</model>

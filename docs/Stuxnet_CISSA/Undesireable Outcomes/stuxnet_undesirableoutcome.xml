@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<model xmlns:uml="uri:1" id="0" name="Outcome">
+  <packagedElement name="Undesirable outcomes" id="1000">
+    <node>
+      <id>1</id>
+      <Desc>Lowered productivity</Desc>
+      <Mapping>Centrifuges</Mapping>
+      <Implications>Material wasted;delivery postponed</Implications>
+    </node>
+    <node>
+      <id>2</id>
+      <Desc>Pre-mature wear</Desc>
+      <Mapping>Centrifuges</Mapping>
+      <Implications>Monetary loss;delivery postponed</Implications>
+    </node>
+  </packagedElement>
+</model>
