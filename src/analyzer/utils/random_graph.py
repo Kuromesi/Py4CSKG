@@ -37,7 +37,7 @@ def gen_random_transition() -> str:
     else:
         return ""
     
-def gen_random_network(seed, size):
+def gen_random_network(seed, size) -> nx.DiGraph:
     G = nx.random_internet_as_graph(size, seed)
     DG = nx.DiGraph()
     nodes, edges = [], []
@@ -72,5 +72,57 @@ def gen_random_network(seed, size):
     # plt.show()
     return DG
 
+def random_graph_to_mulval(model: nx.DiGraph):
+    mulval = []
+    atomic_attacks = []
+    
+    excluded = set()
+    for node in nx.neighbors(model, 0):
+        excluded.add(node)
+    mulval.insert(0, "attackerLocated(host_0).")
+    while True:
+        target = random.randint(1, len(model.nodes) - 1)
+        if target in excluded:
+            continue
+        if nx.has_path(model, 0, target):
+            break
+
+    mulval.insert(1, f"attackGoal(netAccess( host_{target}, _, _)).")
+    mulval.append("")
+
+    for node in model.nodes(data=True):
+        for adjacent_node in nx.neighbors(model, node[0]):
+            mulval.append(f"hacl(host_{node[0]}, host_{adjacent_node}, _, _).")
+        atomic_attacks.append(node[1]['atomic'][0])
+    
+    
+    mulval.append("")
+    for i in range(len(atomic_attacks)):
+        mulval.append(f"networkServiceInfo(host_{i} , service_{i}, _, service_{i}_port , service_{i}).")
+    
+    mulval.append("")
+    for i in range(len(atomic_attacks)):
+        mulval.append(f"vulExists(host_{i}, 'vul_{i}', service_{i}).")
+
+    mulval.append("")
+    for i in range(len(atomic_attacks)):
+        atomic_attack = atomic_attacks[i]
+        if atomic_attack['access'] == ACCESS_NETWORK or atomic_attack['access'] == ACCESS_ADJACENT:
+            access = "remoteExploit"
+        else:
+            access = "localExploit"
+        if atomic_attack['gain'] == CIA_LOSS:
+            gain = "ciaLoss"
+        else: 
+            gain = "privEscalation"
+        access = "remoteExploit"
+        mulval.append(f"vulProperty('vul_{i}', {access}, privEscalation).")
+    return mulval
+        
+
 if __name__ == "__main__":
-    gen_random_network(1)
+    model = gen_random_network(100, 90)
+    mulval = random_graph_to_mulval(model)
+    mulval = [f"{line}\n" for line in mulval]
+    with open('test.P', 'w') as f:
+        f.writelines(mulval)

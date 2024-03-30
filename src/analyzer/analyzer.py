@@ -18,7 +18,7 @@ class ModelAnalyzer:
     def __init__(self, rule_path: str, extension: AnalyzerExtension, graph_editor: GraphEditor, **kwargs) -> None:
         self.rules = load_rule(rule_path)
         self.extension = extension
-        self. graph_editor = graph_editor
+        self.graph_editor = graph_editor
     
     def load_model(self, data_path="", **kwargs):
         model = self.extension.load_model(**kwargs)

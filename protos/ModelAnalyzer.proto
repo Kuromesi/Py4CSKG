@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+service ModelAnalyzer {
+  rpc RunDynamicMeasure (DynamicMeasureRequest) returns (DynamicMeasureReply) {}
+}
+
+message DynamicMeasureRequest {
+  int32 measureType = 1;
+  string data = 2;
+}
+
+message DynamicMeasureReply {
+  string message = 1;
+}

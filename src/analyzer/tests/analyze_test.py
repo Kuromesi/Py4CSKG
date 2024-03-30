@@ -19,6 +19,8 @@ import matplotlib.pyplot as plt
 from analyzer.tests.vul_env_graph import vul_env
 import numpy as np
 from memory_profiler import profile
+from analyzer.extensions.extension import FlanAnalyzerExtension
+from analyzer.graph.graph_editor import GraphEditor
 
 def measure_resources(func):
    def wrapper(*args, **kwargs):
@@ -137,7 +139,7 @@ def test_new_analyzer():
     ma.analyze(model)
 
 def test_attack_graph_performance(ma: ModelAnalyzer, model: nx.DiGraph, src: str, dst: str):
-    ma.analyze(model)
+    ma.generate_attack_graph(model)
     # ma.analyze_attack_path(model, src, dst)
 
 def test_attack_path_performance(ma: ModelAnalyzer, model: nx.DiGraph, src: str, dst: str):
@@ -145,14 +147,16 @@ def test_attack_path_performance(ma: ModelAnalyzer, model: nx.DiGraph, src: str,
 
 def test_random_graph():
     samplings = [100, 1000, 3000, 5000, 7000, 9000, 11000, 13000, 15000, 17000, 19000, 20000]
-    ma = ModelAnalyzer("src/analyzer/rules/experiment/rule.yaml")
+    ma = ModelAnalyzer("src/analyzer/rules/experiment/rule.yaml", extension=FlanAnalyzerExtension(), graph_editor=GraphEditor())
     time_result = []
     memory_result = []
     avg_num = 10
     for sampling in samplings:
         model = gen_random_network(1, sampling)
-        vul_graph = ma.analyze(model)
-        tmp_time_result = []
+        ma.extension.analyze_model(model)
+        vul_graph = ma.generate_attack_graph(model)
+        tmp_time_result, tmp_memory_result = [], []
+        rss_before = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         for i in range(avg_num):
             flag = True
             while flag:
@@ -163,16 +167,18 @@ def test_random_graph():
                     while dst == src:
                         dst = random.randint(0, len(model.nodes))
                     start_time = time.time()
-                    rss_before = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-                    test_attack_graph_performance(ma, model, src, dst)
-                    # test_attack_path_performance(ma, vul_graph, src, dst)
+                    # test_attack_graph_performance(ma, model, src, dst)
+                    test_attack_path_performance(ma, vul_graph, src, dst)
                     rss_after = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
                     rss_diff = rss_after - rss_before
                     end_time = time.time()
-            tmp_time_result.append(end_time - start_time)
+                    time_diff = end_time - start_time
+            tmp_time_result.append(time_diff)
+            tmp_memory_result.append(rss_diff)
+            print(f"sampling: {sampling}, loop: {i}, time: {time_diff}, memory: {rss_diff}")
         time_result.append(sum(tmp_time_result) / avg_num)
         # time_result.append(max(tmp_time_result))
-        memory_result.append(rss_diff)
+        memory_result.append(sum(tmp_memory_result) / avg_num)
     print(time_result)
     print(memory_result)
     plt.figure(figsize=(8, 6))
@@ -230,5 +236,5 @@ def test_vul_env():
     ma.generate_attack_path(model, "internet:access", "neo4j:none", "weight")
     
 if __name__ == '__main__':
-    test_vul_env()
-    # test_random_graph()
+    # test_vul_env()
+    test_random_graph()
