@@ -3,7 +3,7 @@ import networkx as nx
 from networkx import DiGraph
 
 from analyzer.utils.knowledge_query import KGQuery
-from analyzer.graph.graph_adapter import FlanAdapter
+from analyzer.graph_adapters.flan_adpter import FlanAdapter
 from ontologies.modeling import *
 from ontologies.cve import *
 
@@ -36,35 +36,22 @@ class AnalyzerExtension:
 
 
 class FlanAnalyzerExtension(AnalyzerExtension):
-    def __init__(self):
+    def __init__(self, atomic_converter):
         self.classified_atomic_attacks: dict[str, dict[str, dict[str, AtomicAttack]]] = {}
-        self.kg = KGQuery()
+        self.flan_adapter = FlanAdapter(atomic_converter)
 
     def load_model(self, **kwargs) -> nx.DiGraph:
-        flan_adapter = FlanAdapter()
         model_paths = kwargs['model_path']
         model = nx.DiGraph()
         for model_path in model_paths:
             with open(model_path, 'r') as f:
                 report = json.load(f)
-            model = nx.compose(model, flan_adapter.convert(report))
+            model = nx.compose(model, self.flan_adapter.convert(report))
         return model
     
     def analyze_model(self, model: nx.DiGraph):
         for node_name, node_prop in model.nodes(data=True):
-            vuls: list[CVEEntry] = []
             atomic_attacks: list[AtomicAttack] = []
-            if 'os' in node_prop:
-                for product in node_prop['os']:
-                    vuls.extend(self.kg.find_vuls(product['name'], product['version']))
-                for product in node_prop['software']:
-                    vuls.extend(self.kg.find_vuls(product['name'], product['version']))
-                for product in node_prop['firmware']:
-                    vuls.extend(self.kg.find_vuls(product['name'], product['version']))
-                for product in node_prop['hardware']:
-                    vuls.extend(self.kg.find_vuls(product['name'], product['version']))
-                for vul in vuls:
-                    atomic_attacks.append(AtomicAttack(vul.id, vul.access, vul.impact, vul.score, "None"))
             if 'atomic_attacks' in node_prop:
                 for atomic in node_prop["atomic_attacks"]:
                     atomic_attacks.append(AtomicAttack(atomic['name'], atomic['access'], atomic['gain'], atomic['score'], atomic['require']))

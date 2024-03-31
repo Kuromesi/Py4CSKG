@@ -9,11 +9,27 @@ from analyzer.utils.load_rule import load_rule
 from ontologies.modeling import *
 from ontologies.cve import *
 from analyzer.extensions.extension import AnalyzerExtension
-from analyzer.graph.graph_editor import GraphEditor
+from analyzer.graph_editors.graph_editor import GraphEditor
 
 SHORTEST_PATH = "shortest"
 MAX_IMPACT_PATH = "impact"
 ALL_PATH = "all"
+class ModelAnalyzerInterface:
+    def load_model(self):
+        pass
+
+    def generate_attack_path(self, model, src, dst, *args, **kwargs):
+        pass
+
+    def generate_attack_graph(self, model, *args, **kwargs):
+        pass
+
+    def plot_attack_graph(self, attack_graph, *args, **kwargs):
+        pass
+
+    def plot_attack_path(self, attack_path, *args, **kwargs):
+        pass
+
 class ModelAnalyzer:
     def __init__(self, rule_path: str, extension: AnalyzerExtension, graph_editor: GraphEditor, **kwargs) -> None:
         self.rules = load_rule(rule_path)
@@ -21,6 +37,7 @@ class ModelAnalyzer:
         self.graph_editor = graph_editor
     
     def load_model(self, data_path="", **kwargs):
+        # GraphAdapter(load graph) --> GraphEditor(edit graph) --> AnalyzerExtension(analyze graph)
         model = self.extension.load_model(**kwargs)
         if data_path:
             self.graph_editor.edit_graph(model, data_path)

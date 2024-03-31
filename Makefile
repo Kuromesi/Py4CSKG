@@ -4,9 +4,10 @@ start-vulenv:
 stop-vulenv:
 	bash ./vul_env/down.sh
 
+DOCKERFILE_BASE = dockerfiles
 ANALYZER_IMG = security-analyzer:test
 build-analyzer:
-	docker build -f Dockerfile.analyzer src -t $(ANALYZER_IMG)
+	docker build -f $(DOCKERFILE_BASE)/Dockerfile.analyzer src -t $(ANALYZER_IMG)
 
 ANALYZER_CONF ?= shared/demo/analyzer_conf.yaml
 analyzer_name = analyzer_$(shell date +'%s')
