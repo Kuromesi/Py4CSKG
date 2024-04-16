@@ -180,7 +180,7 @@ def plot_confusion_matrix(confusion_matrix):
     plt.ylabel('True', fontsize=16)
     plt.xlabel('Predict', fontsize=16)
     plt.tight_layout()
-    plt.savefig('myData/thesis/graduation/analyze/confusion_matrix.png')
+    plt.savefig('myData/thesis/graduation/analyze/confusion_matrix.pdf')
     # plt.show()
 
 if __name__ == "__main__":

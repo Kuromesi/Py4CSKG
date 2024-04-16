@@ -11,7 +11,7 @@ def plot1(path):
     total = df['total'].tolist()
     linked = df['linked'].tolist()
     unlinked = [a - b for a, b in zip(total, linked)]
-    plt.rcParams['font.sans-serif'] = ['SimHei']
+    plt.rcParams['font.sans-serif'] = ['SimSun']
     plt.figure(figsize=(9, 3.2))
     for i in range(len(year)):
         year[i] -= width / 2
@@ -21,7 +21,7 @@ def plot1(path):
     plt.bar(year, unlinked, width=width, label='缺失关系的CVE数量', color='k', alpha=0.5, edgecolor='k')
     plt.legend()
     plt.xticks([i for i in range(1999, 2022)], rotation=300)
-    plt.savefig('./myData/thesis/cve2cwe/image/fig1.png',dpi=1000, bbox_inches='tight')
+    plt.savefig('./myData/thesis/cve2cwe/image/unclassified_cve.pdf',dpi=1000, bbox_inches='tight')
     # plt.show()
 
 def plot2(path):

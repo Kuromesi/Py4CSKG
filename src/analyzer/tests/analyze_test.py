@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, json
 BASE_DIR=os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(os.path.join(BASE_DIR))
 
@@ -19,8 +19,10 @@ import matplotlib.pyplot as plt
 from analyzer.tests.vul_env_graph import vul_env
 import numpy as np
 from memory_profiler import profile
-from analyzer.extensions.extension import FlanAnalyzerExtension
-from analyzer.graph.graph_editor import GraphEditor
+from analyzer.extensions.extension import FlanAnalyzerExtension, OnlyForTestExtension
+from analyzer.graph_editors.graph_editor import GraphEditor
+from matplotlib.lines import Line2D
+
 
 def measure_resources(func):
    def wrapper(*args, **kwargs):
@@ -194,7 +196,11 @@ def test_random_graph():
     # [0.00015374422073364258, 0.0005534052848815918, 0.0009964418411254883, 0.0019069242477416993, 0.002433798313140869, 0.0028776073455810546, 0.003753204345703125, 0.00403771162033081, 0.004932050704956055, 0.007560615539550781, 0.009774432182312012, 0.008056378364562989]
 
 def generate_layout(model: nx.DiGraph, status: nx.DiGraph, ma: ModelAnalyzer, seed: int=1) -> dict[str, np.ndarray]:
-    pos = nx.spring_layout(model, seed=seed)
+    # pos = nx.spring_layout(model, seed=seed)
+    # for k in pos:
+    #     pos[k] = list(pos[k])
+    # json.dump(pos, open("layout.json", "w"))
+    pos = json.load(open("layout.json", "r"))
     distance = 0.035
     status_pos = {}
     properties = ma.rules.properties
@@ -216,15 +222,40 @@ def generate_layout(model: nx.DiGraph, status: nx.DiGraph, ma: ModelAnalyzer, se
 
     return status_pos
 
+def generate_color(model: nx.DiGraph):
+    src = "internet:root"
+    color_map = []
+    for node in model.nodes(data=True):
+        if node[0] == src:
+            color_map.append("#ff0000")
+            continue
+        if nx.has_path(model, src, node[0]):
+            color_map.append("#ff0000")
+        else:
+            color_map.append("#8adacf")
+    return color_map
+
 
 def test_vul_env():
-    ma = ModelAnalyzer("src/analyzer/rules/experiment/rule.yaml")
-    model = ma.analyze(vul_env)
+    plt.rcParams['font.sans-serif'] = ['simsun']
+    # plt.rcParams['font.size'] = 20
+    ma = ModelAnalyzer("src/analyzer/rules/experiment/rule.yaml", extension=OnlyForTestExtension(), graph_editor=GraphEditor())
+    model = ma.load_model(model=vul_env)
+    model = ma.generate_attack_graph(model)
     pos = generate_layout(vul_env, model, ma, 4)
+    color_map = generate_color(model)
     plt.figure(figsize=(26, 20))
-    nx.draw(model, with_labels=True, pos=pos, node_color="#8adacf", font_size=15, font_family="Times New Roman", font_weight="bold")
+
+    legend_elements = [Line2D([0], [0], marker='o', color="#8adacf", label='无法攻击的节点', lw=0,
+                            markerfacecolor="#8adacf", markersize=20),
+                    Line2D([0], [0], marker='o', color="#ff0000", label='可以攻击的节点', lw=0,
+                            markerfacecolor="#ff0000", markersize=20)]
+    ax = plt.gca()
+    ax.legend(handles=legend_elements, loc='lower left', prop = {'size':20})
+    nx.draw(model, with_labels=True, pos=pos, font_size=15, node_color=color_map, font_family="Times New Roman", font_weight="bold")
     plt.margins(0, 0)
-    plt.savefig(f"src/analyzer/tests/vul_env.png", dpi=200, bbox_inches='tight')
+    # plt.show()
+    plt.savefig(f"src/analyzer/tests/vul_env.pdf", dpi=200, bbox_inches='tight')
     # plt.show()
     # ma.analyze_attack_path(model, "internet:access", "mysql:none", "score")
     # ma.analyze_attack_path(model, "internet:access", "mysql:none", "weight")
@@ -232,9 +263,9 @@ def test_vul_env():
     # ma.analyze_attack_path(model, "internet:access", "workstation:root", "weight")
     # ma.analyze_attack_path(model, "internet:access", "mail_server:user", "score")
     # ma.analyze_attack_path(model, "internet:access", "mail_server:user", "weight")
-    ma.generate_attack_path(model, "internet:access", "neo4j:none", "score")
-    ma.generate_attack_path(model, "internet:access", "neo4j:none", "weight")
+    # ma.generate_attack_path(model, "internet:access", "neo4j:none", "score")
+    # ma.generate_attack_path(model, "internet:access", "neo4j:none", "weight")
     
 if __name__ == '__main__':
-    # test_vul_env()
-    test_random_graph()
+    test_vul_env()
+    # test_random_graph()

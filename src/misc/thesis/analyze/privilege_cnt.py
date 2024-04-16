@@ -5,13 +5,13 @@ import matplotlib.pyplot as plt
 SKIP_FILES = ['CVE-Modified.json', 'CVE-Recent.json', 'product.csv', 'cve.json', 'CVE-2023.json']
 YEAR_REG = re.compile(r'CVE-(\d+).json')
 SAVE_PATH = "myData/thesis/graduation/analyze/false_privilege_entries.csv"
-FIG_PATH = "myData/thesis/graduation/analyze/false_privilege_entries.png"
+FIG_PATH = "myData/thesis/graduation/analyze/false_privilege_entries.pdf"
 
 
 def plot_graph():
     df = pd.read_csv(SAVE_PATH)
     width = 0.4
-    plt.rcParams['font.sans-serif'] = ['SimHei']
+    plt.rcParams['font.sans-serif'] = ['SimSun']
     # plt.rc('font', family='Times New Roman')
 
     year = df['year'].tolist()

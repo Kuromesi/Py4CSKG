@@ -1,5 +1,5 @@
 import sys, os
-BASE_DIR=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR=os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(BASE_DIR)
 
 # from sentence_transformers import SentenceTransformer
@@ -103,7 +103,7 @@ class TextSimilarity():
                 weight = torch.ones(tokens.size(1)).to(self.device)
                 res = self.ner.predict(text)
                 l = res['weight']
-                weight[l] = 10
+                weight[l] = 1000
                 weight = weight.unsqueeze(-1).expand(embedding.size()).float()
                 masked_embeddings = embedding * mask * weight
             else:
@@ -452,8 +452,8 @@ def preprocess(text, NLP):
     return tmp.strip()
 
 def tfidf():
-    # df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
-    df = pd.read_csv('tmp.csv')
+    df = pd.read_csv('./myData/learning/CVE2CAPEC/CVE2CAPEC.csv')
+    # df = pd.read_csv('tmp.csv')
     # df = pd.read_csv('./data/attack/attack.csv')
     corpus = df['description'].tolist()
     bar = trange(len(corpus))
@@ -515,7 +515,7 @@ def comparison_result_single():
     '''
     Generate comparison result between TF-IDF and SBERT
     '''
-    spacy.prefer_gpu()
+    # spacy.prefer_gpu()
     NLP = spacy.load('en_core_web_trf')
     capec_df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
     ts = TextSimilarity(capec_df)
@@ -529,7 +529,7 @@ def comparison_result_single():
     for i in trange(30):
         f1_bert.append(calculate(sim_ts, capec_df, i + 1, true)['f1'])
     df = pd.read_csv('./myData/learning/CVE2CAPEC/comparison.csv')
-    df['bert_weight200'] = f1_bert
+    df['bert_weight1000'] = f1_bert
     df.to_csv('./myData/learning/CVE2CAPEC/comparison.csv', index=False)
 
 if __name__ == '__main__':
@@ -550,7 +550,7 @@ if __name__ == '__main__':
 #     print("Embedding:", embedding)
 #     print("")
     # tfidf()
-    # comparison_result_single()
+    comparison_result_single()
     df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
     # df = pd.read_csv('./data/attack_nlp.csv')
     ts = TextSimilarity(df)
