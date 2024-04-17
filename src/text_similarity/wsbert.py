@@ -1,7 +1,3 @@
-import sys, os
-BASE_DIR=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(BASE_DIR)
-
 from transformers import AutoTokenizer, AutoModel
 import pandas as pd
 import torch
@@ -9,10 +5,12 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 from tqdm import tqdm, trange
-from text_similarity.predict import NERFactory
 import os
 from utils.Config import config
 from utils.Logger import logger
+from ner.models import *
+from ner.bert_crf import *
+from ner.predict import *
 
 class RealTextSimilarity():
     """def __init__(self, docs), docs are dataframe type object, can be CAPEC, ATT&CK etc.
@@ -172,3 +170,13 @@ class TextSimilarity():
     def calculate_similarity(self, query, filter=None):
         res = self.rts.calculate_similarity(query, filter)
         return res
+    
+def NERFactory():
+    config = BERTBiLSTMCRFConfig()
+    model_dir = "./data/deep/trained_models/BERTBiLSTMCRF79"
+    labels = ['O', 'B-cons', 'I-cons', 'B-weak', 'I-weak']
+    # labels = ['O', 'B-cons', 'I-cons']
+    return NERPredict(config, model_dir, labels)
+
+def new_text_similarity() -> TextSimilarity:
+    return TextSimilarity()

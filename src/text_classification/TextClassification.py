@@ -2,6 +2,7 @@ import sys, os
 BASE_DIR=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 
+import torch
 from text_classification.BERT import *
 from text_classification.utils.Dataset import *
 from text_classification.config.BERTConfig import *
@@ -11,7 +12,7 @@ class TextClassification():
     def init_bert(self):
         self.bert = BERT.from_pretrained(config.get("TextClassification", "cve2cwe_path"))
         self.device = config.get("TextClassification", "device")
-        if self.device == "gpu":
+        if self.device == "gpu" and torch.cuda.is_available():
             self.bert.to('cuda')
         bert_config = BERTConfig()
         self.bert_dataset = BERTDataset(bert_config)
@@ -27,6 +28,11 @@ class TextClassification():
         pred = pred.cpu().data
         pred = torch.max(pred, 1)[1]
         return self.bert_labels[pred[0]]
+    
+def new_text_classification() -> TextClassification:
+    cve2cwe = TextClassification()
+    cve2cwe.init_bert()
+    return cve2cwe
 
 if __name__ == "__main__":
     cve2cwe = TextClassification()

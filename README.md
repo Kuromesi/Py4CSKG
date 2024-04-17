@@ -1,2 +1,2 @@
 # Py4CSKG
-This is a python project for creating CyberSecurity Knowledge Graph (CSKG) developed and maintained by Kuromesi, graduate student of School of Systems and Science Engineering, Sun Yat-sen University.
+This is a python project for creating CyberSecurity Knowledge Graph (CSKG) developed and maintained by Kuromesi.

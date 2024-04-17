@@ -4,7 +4,7 @@ sys.path.append(os.path.join(BASE_DIR))
 
 import pandas as pd
 from text_similarity import TextSimilarity
-from service import gdb
+# from service import gdb
 
 def test_wsbert():
     ts = TextSimilarity()
