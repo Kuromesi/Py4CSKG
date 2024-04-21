@@ -186,7 +186,7 @@ class ModelAnalyzer:
         if not paths:
             print("No attack path found.")
             return
-        print(f"SOURCE: {path[0][0]} DESTINATION: {paths[0][-1]}")
+        print(f"SOURCE: {paths[0][0]} DESTINATION: {paths[0][-1]}")
         for path in paths:
             print(f"Attack path[{idx}]")
             print("\t" + " --> ".join(path))

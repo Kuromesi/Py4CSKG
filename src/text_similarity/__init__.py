@@ -1,1 +1,1 @@
-from text_similarity.wsbert import TextSimilarity
+from text_similarity.wsbert import TextSimilarity, new_text_similarity

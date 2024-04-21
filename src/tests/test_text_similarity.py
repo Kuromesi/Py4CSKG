@@ -6,6 +6,14 @@ import pandas as pd
 from text_similarity import TextSimilarity
 # from service import gdb
 
+def test_wsbert_capec():
+    def filter(x):
+        return x == "CAPEC-120"
+    func = lambda x: x == "CAPEC-120"
+    ts = TextSimilarity("myData/thesis/graduation/modeling/tmp.csv", "data/deep/embeddings/query.npy")
+    df = ts.calculate_similarity("ftp server", func)
+    print(df)
+
 def test_wsbert():
     ts = TextSimilarity()
     # res = gdb.sendQuery(f"match (n:Vulnerability)-[]-(w:Weakness)-[]-(p:Technique) where n.id='CVE-2018-1000861' return p.id")
@@ -19,6 +27,8 @@ def test_batch_similarity():
         "ftp server", "web server", "mail merver", "scada monitor", "workstation", "database server",
         "WIFI module", "Imagery Module", "NMEA GPS", "FCS Radio Module", "Pressure sensor"
     ]
+    def filter(x):
+        return x == "CAPEC-120"
     for text in texts:
         tmp_df = ts.calculate_similarity(text)
         for i in range(len(tmp_df)):
@@ -26,4 +36,4 @@ def test_batch_similarity():
     df.to_csv("myData/thesis/graduation/modeling/query.csv", index=False)
 
 if __name__ == '__main__':
-    test_wsbert()
+    test_wsbert_capec()

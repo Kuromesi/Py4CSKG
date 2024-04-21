@@ -15,7 +15,7 @@ tc = TextClassification()
 tc.init_bert()
 
 def classify_cwe(des):
-    return tc.bert_predict(des)
+    return tc.predict(des)
 
 def classify_capec(des, filter) -> list[str]:
     capec_df = ts.calculate_similarity(des, filter)

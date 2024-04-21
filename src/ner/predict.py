@@ -1,9 +1,6 @@
 import torch
-import torch.nn as nn
-from tqdm import trange, tqdm
 from ner.models import *
 from ner.bert_crf import *
-from torchcrf import CRF
 from transformers import AutoTokenizer
 
 class NERPredict():

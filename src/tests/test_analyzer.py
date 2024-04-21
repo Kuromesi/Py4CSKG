@@ -6,9 +6,14 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from analyzer import new_flan_analyzer
 from analyzer.graph_adapters.flan_adpter import FlanAdapter
+from dotenv import load_dotenv
 
 def test_flan_analyzer():
-    ma = new_flan_analyzer("src/analyzer/rules/experiment/rule.yaml")
+    uri = os.getenv("MONGO_URI")
+    port = int(os.getenv("MONGO_PORT"))
+    username = os.getenv("MONGO_USERNAME")
+    password = os.getenv("MONGO_PASSWORD")
+    ma = new_flan_analyzer("src/analyzer/rules/experiment/rule.yaml", mongo_uri=uri, mongo_port=port, mongo_user=username, mongo_password=password)
     # model = ma.load_model(model_path=['data/reports/vul_env/report_2024.02.07-12.32.json'], data_path='data/reports/vul_env/graph.yaml')
     model = ma.load_model(model_path=['shared/analyzer/lab/report.json'])
 
@@ -29,4 +34,5 @@ def test_flan_adpter():
     plt.show()
 
 if __name__ == '__main__':
+    load_dotenv('src/tests/env/mongo_db.env')
     test_flan_analyzer()

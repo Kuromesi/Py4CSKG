@@ -11,11 +11,12 @@ from utils.Logger import logger
 from ner.models import *
 from ner.bert_crf import *
 from ner.predict import *
+from typing import Optional, Callable
 
 class RealTextSimilarity():
     """def __init__(self, docs), docs are dataframe type object, can be CAPEC, ATT&CK etc.
     """    
-    def __init__(self, docs) -> None:
+    def __init__(self, docs: pd.DataFrame) -> None:
         model_name = "sentence-transformers/all-MiniLM-L6-v2" # jackaduma/SecBERT bert-base-uncased roberta-large-nli-stsb-mean-tokens all-MiniLM-L6-v2 bert-large-nli-stsb-mean-tokens
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         # bert_config = BertConfig.from_pretrained(model_name)
@@ -29,11 +30,13 @@ class RealTextSimilarity():
         try:
             self.docs_embedding = np.load(weight_path)
         except Exception as e:
-            logger.info("Embeddings not exists in %s, creating embeddings"%weight_path)
+            logger.info(f"failed to load embedding: {e}")
             self.docs_embedding = self.create_embedding(self.docs, weight_path)
                
-    def init_ner(self):
-        self.ner = NERFactory()
+    def init_ner(self, model_dir: str):
+        config = BERTBiLSTMCRFConfig()
+        labels = ['O', 'B-cons', 'I-cons', 'B-weak', 'I-weak']
+        self.ner = NERPredict(config, model_dir, labels)
 
     def embedding(self, text, weight=None, weighted=False):
         with torch.no_grad():
@@ -121,14 +124,18 @@ class RealTextSimilarity():
         tfidf = tv.idf_
         return {'feature': features, 'tfidf': tfidf}      
     
-    def calculate_similarity(self, query, filter=None):
+    def calculate_similarity(self, query, filter=Optional[Callable]):
         '''
         BERT
         '''
         query_embedding = self.weighted_embedding(query, weighted=True)['embedding'].cpu().detach().numpy()
         df = pd.DataFrame(columns=['id', 'name', 'description', 'similarity'])
         if filter:
-            result = self.docs[self.docs['id'].isin(filter)].index
+            result = []
+            for i in range(len(self.docs)):
+                if filter(self.docs['id'].loc[i]):
+                    result.append(i)
+            # result = self.docs[self.docs['id'].isin(filter)].index
             docs_embedding = self.docs_embedding[result]
         else:
             docs_embedding = self.docs_embedding
@@ -157,26 +164,27 @@ class RealTextSimilarity():
         return docs_embedding
 
 class TextSimilarity():
-    def __init__(self) -> None:
+    def __init__(self, docs_path: str, weight_path: str, ner_path: str) -> None:
         logger.info("Initializing TextSimilarity")
         # df = pd.read_csv('./myData/learning/CVE2CAPEC/capec_nlp.csv')
-        df = pd.read_csv("myData/thesis/graduation/modeling/tmp.csv")
+        logger.info(f"loading docs from: {docs_path}")
+        df = pd.read_csv(docs_path)
         self.rts = RealTextSimilarity(df)
         # doc_weight = config.get("TextSimilarity", "doc_weight")
-        doc_weight = "data/deep/embeddings/query.npy"
-        self.rts.init_weight(doc_weight)
-        self.rts.init_ner()
+        # doc_weight = "data/deep/embeddings/query.npy"
+        logger.info(f"loading weight from: {weight_path}")
+        self.rts.init_weight(weight_path)
+        self.rts.init_ner(ner_path)
 
     def calculate_similarity(self, query, filter=None):
         res = self.rts.calculate_similarity(query, filter)
         return res
     
-def NERFactory():
+def new_ner():
     config = BERTBiLSTMCRFConfig()
     model_dir = "./data/deep/trained_models/BERTBiLSTMCRF79"
     labels = ['O', 'B-cons', 'I-cons', 'B-weak', 'I-weak']
-    # labels = ['O', 'B-cons', 'I-cons']
     return NERPredict(config, model_dir, labels)
 
-def new_text_similarity() -> TextSimilarity:
-    return TextSimilarity()
+def new_text_similarity(docs_path: str, weight_path: str, ner_path: str) -> TextSimilarity:
+    return TextSimilarity(docs_path, weight_path, ner_path)

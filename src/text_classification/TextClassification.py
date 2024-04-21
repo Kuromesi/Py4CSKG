@@ -1,26 +1,37 @@
-import sys, os
-BASE_DIR=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(BASE_DIR)
-
-import torch
+import torch, abc
 from text_classification.BERT import *
-from text_classification.utils.Dataset import *
-from text_classification.config.BERTConfig import *
-from utils.Config import config
+from text_classification.utils.Dataset import BERTDataset, loadLabels
+from text_classification.config.BERTConfig import BERTConfig
+from utils import logger
 
 class TextClassification():
-    def init_bert(self):
-        self.bert = BERT.from_pretrained(config.get("TextClassification", "cve2cwe_path"))
-        self.device = config.get("TextClassification", "device")
-        if self.device == "gpu" and torch.cuda.is_available():
+    @abc.abstractmethod
+    def predict(self, text) -> str:
+        pass
+
+class BERTTextClassification(TextClassification):
+    def __init__(self, device: str, model_path: str, label_path: str) -> None:
+        if torch.cuda.is_available() and device == "cuda":
+            if torch.cuda.is_available():
+                logger.info("use device cuda for text classification")
+                self.device = device
+            else:
+                logger.info("try to use device cuda for text classification, but cuda is not available")
+                self.device = "cpu"
+        else:
+            logger.info("use device cpu for text classification")
+            self.device = "cpu"
+        self.bert = BERT.from_pretrained(model_path)
+        if self.device == "cuda":
             self.bert.to('cuda')
         bert_config = BERTConfig()
         self.bert_dataset = BERTDataset(bert_config)
-        self.bert_labels = loadLabels(bert_config.label_path)
-        
-    def bert_predict(self, text):
+        self.bert_labels = loadLabels(label_path)
+
+    def predict(self, text) -> str:
+        logger.info(f"predict text: {text}")
         text_vec = self.bert_dataset.text2vec(text)
-        if self.device == "gpu":
+        if self.device == "cuda":
             data = {'data': text_vec['input_ids'].cuda(), 'attention_mask': text_vec['attention_mask'].cuda()}
         else:
             data = {'data': text_vec['input_ids'], 'attention_mask': text_vec['attention_mask']}
@@ -29,13 +40,6 @@ class TextClassification():
         pred = torch.max(pred, 1)[1]
         return self.bert_labels[pred[0]]
     
-def new_text_classification() -> TextClassification:
-    cve2cwe = TextClassification()
-    cve2cwe.init_bert()
+def new_bert_text_classification(model_path: str, device: str, label_path: str) -> TextClassification:
+    cve2cwe = BERTTextClassification(device, model_path, label_path)
     return cve2cwe
-
-if __name__ == "__main__":
-    cve2cwe = TextClassification()
-    cve2cwe.init_bert()
-    text = "HTTP request smuggling vulnerability in Sun Java System Proxy Server before 20061130, when used with Sun Java System Application Server or Sun Java System Web Server, allows remote attackers to bypass HTTP request filtering, hijack web sessions, perform cross-site scripting (XSS), and poison web caches via unspecified attack vectors."
-    print(cve2cwe.bert_predict(text))
