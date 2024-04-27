@@ -2,9 +2,11 @@ import sys, os, json
 BASE_DIR=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.join(BASE_DIR))
 
-from data_updater import Updater
+from dotenv import load_dotenv
+from data_updater.updater import new_updater
 
-updater = Updater()
+load_dotenv('src/tests/env/updater.env')
+updater = new_updater(os.getenv("BASE_PATH"))
 def test_full_update():
     updater.update()
 

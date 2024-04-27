@@ -10,6 +10,7 @@ trained_models
 # Data
 data
 *.db
+tmpfiles
 
 # Byte-compiled / optimized / DLL files
 **/__pycache__/

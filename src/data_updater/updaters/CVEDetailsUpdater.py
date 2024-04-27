@@ -115,7 +115,7 @@ class CVEDetailsUpdater():
         except Exception as e:
             logger.error(f"Failed to update CVE details: {e}")
         
-    def update(self):
+    def update(self, base: str):
         logger.info("Starting to update CVE details")
         """Multiprocessing
 
@@ -134,7 +134,7 @@ class CVEDetailsUpdater():
         saver = Saver()
         manager = multiprocessing.Manager()
         q = manager.Queue()
-        p = multiprocessing.Process(target=saver.save, args=(q, ))
+        p = multiprocessing.Process(target=saver.save, args=(q, base))
         p.start()
 
         tasks = []
@@ -152,9 +152,9 @@ class Saver():
         self.fidx = 0
         self.size = 500
 
-    def save(self, queue):
-        base = config.get("KnowledgeGraph", "base_path")
-        path = os.path.join(base, "base/cve_details")
+    def save(self, queue, base: str):
+        # base = config.get("KnowledgeGraph", "base_path")
+        path = os.path.join(base, "cve_details")
         content = {}
         while True:
             try:

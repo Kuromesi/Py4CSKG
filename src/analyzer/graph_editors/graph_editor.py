@@ -65,10 +65,7 @@ class GraphData(BaseModel):
 
 class GraphEditor:
     
-    def edit_graph(self, graph: nx.DiGraph, data_path: str, skip_bad_data=True):
-        with open(data_path, 'r') as f:
-            data = yaml.safe_load(f)
-        data = GraphData(**data)
+    def edit_graph(self, graph: nx.DiGraph, data: GraphData, skip_bad_data=True):
 
         if data.nodes:
             for modify in data.nodes.modify:

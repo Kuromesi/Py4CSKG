@@ -9,7 +9,9 @@ from analyzer.utils.load_rule import load_rule
 from ontologies.modeling import *
 from ontologies.cve import *
 from analyzer.extensions.extension import AnalyzerExtension
-from analyzer.graph_editors.graph_editor import GraphEditor
+from analyzer.graph_editors.graph_editor import GraphData, GraphEditor
+from typing import Optional
+import yaml
 
 SHORTEST_PATH = "shortest"
 MAX_IMPACT_PATH = "impact"
@@ -35,12 +37,22 @@ class ModelAnalyzer:
         self.rules = load_rule(rule_path)
         self.extension = extension
         self.graph_editor = graph_editor
-    
+
+    def load_model_api(self, edit_file: Optional[GraphData]=None, **kwargs) -> tuple[nx.DiGraph, dict]:
+        model = self.extension.load_model(**kwargs)
+        if edit_file:
+            self.graph_editor.edit_graph(model, edit_file)
+        classified_atomic_attacks = self.extension.analyze_model(model)
+        return model, classified_atomic_attacks
+
     def load_model(self, data_path="", **kwargs):
         # GraphAdapter(load graph) --> GraphEditor(edit graph) --> AnalyzerExtension(analyze graph)
-        model = self.extension.load_model(**kwargs)
+        model = self.extension.load_model_from_path(**kwargs)
         if data_path:
-            self.graph_editor.edit_graph(model, data_path)
+            with open(data_path, 'r') as f:
+                data = yaml.safe_load(f)
+            data = GraphData(**data)
+            self.graph_editor.edit_graph(model, data)
         self.extension.analyze_model(model)
         return model
 
@@ -58,7 +70,7 @@ class ModelAnalyzer:
         except Exception as e:
             print(e)
 
-    def generate_attack_graph(self, model: nx.DiGraph) -> nx.DiGraph:
+    def generate_attack_graph(self, model: nx.DiGraph, classified_atomic_attacks: dict) -> nx.DiGraph:
         new_model = nx.DiGraph()
         nodes, edges = [], []
         internal_transitions = self.rules.transitions
@@ -72,7 +84,7 @@ class ModelAnalyzer:
                     trans_src, trans_dst = trans.split(":")
                     edges.append((f"{src_name}:{trans_src}", f"{node_name}:{trans_dst}", {'weight': 0, 'score': 0}))
                 access = edge_prop['access']
-                atomic_attack = self.extension.get_max_pos_atomic_attack(node_name, access, "none")
+                atomic_attack = self.extension.get_max_pos_atomic_attack(node_name, access, "none", classified_atomic_attacks)
                 if atomic_attack is None:
                     continue
                 src_status = f"{src_name}:{self.rules.prerequisites[atomic_attack.require]}"

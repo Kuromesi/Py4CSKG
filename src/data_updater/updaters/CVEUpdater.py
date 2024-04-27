@@ -9,6 +9,7 @@ from data_updater.utils.utils import *
 from utils.Logger import logger
 from utils.Config import config
 from utils import CVE_YEAR_PATTERN
+import tempfile
 
 class CVEUpdater():
     pattern = re.compile(r"/feeds/json/cve/1.1/(.*).zip")
@@ -47,10 +48,10 @@ class CVEUpdater():
         z = zipfile.ZipFile(io.BytesIO(r.content))
         return z.extractall()
 
-    def update(self):
+    def update(self, base: str):
         logger.info("starting to update CVE")
-        base = config.get("KnowledgeGraph", "base_path")
-        cve_loc = os.path.join(base, "base/cve")
+        # base = config.get("KnowledgeGraph", "base_path")
+        cve_loc = os.path.join(base, "cve")
         index = 'https://nvd.nist.gov'
         try:
             cve_links = self.get_cve_links()
@@ -60,10 +61,11 @@ class CVEUpdater():
         
         cve_links = tqdm(cve_links.items())
         cve_links.set_description("Updating CVE data")
+        tmp_dir = tempfile.mkdtemp()
         for cve_name, cve_link in cve_links:
             name = self.pattern.match(cve_link).group(1)
             cve_links.set_postfix(downloading=name)
             link =  index + cve_link
-            download_and_unzip(link)
+            download_and_unzip(link, tmp_dir)
             cf = os.path.join(cve_loc, cve_name + ".json")
-            shutil.move(name, cf)
+            shutil.move(os.path.join(tmp_dir, name), cf)

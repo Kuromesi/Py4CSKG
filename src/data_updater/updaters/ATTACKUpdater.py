@@ -189,7 +189,7 @@ class ATTACKUpdater():
         url_main = "https://attack.mitre.org"
         mt = MultiTask()
         mt.create_pool()
-        base = os.path.join(base, "base/attack")
+        base = os.path.join(base, "attack")
         for kind, url in target_urls.items():
             logger.info("Updating ATT&CK %s techniques"%kind)
             urls = []
@@ -223,7 +223,7 @@ class ATTACKUpdater():
 
     def update_tactic(self, base):
         logger.info("Updating ATT&CK tactics")
-        base = os.path.join(base, "base/attack")
+        base = os.path.join(base, "attack")
         urls = {
             "enterprise": "https://attack.mitre.org/tactics/enterprise/",
             "mobile": "https://attack.mitre.org/tactics/mobile/",
@@ -236,7 +236,7 @@ class ATTACKUpdater():
                 logger.error(f"failed to update ATT&CK tactic: {e}")
                 raise e
             res = etree.HTML(res.content)
-            rows = res.xpath('//*[@id="v-attckmatrix"]/div[2]/div/div/div/div/div[2]/div/table/tbody/tr')
+            rows = res.xpath('//*[@id="v-attckmatrix"]/div[2]/div/div/div/div/div[2]/div/div/table/tbody/tr')
             tactics = {}
             for row in rows:
                 id = text_proc(row.xpath('td[1]/a')[0].text)
@@ -249,7 +249,7 @@ class ATTACKUpdater():
                 json.dump(tactics, f)
 
         
-    def update(self):
+    def update(self, base: str):
         """Multiprocessing
 
         Args:
@@ -258,7 +258,7 @@ class ATTACKUpdater():
         """        
         # init process pool
         logger.info("Starting to update ATT&CK")
-        base = config.get("KnowledgeGraph", "base_path")
+        # base = config.get("KnowledgeGraph", "base_path")
         self.update_tactic(base)
         self.update_technique(base)
 

@@ -8,6 +8,7 @@ from pymongo import MongoClient
 from pydantic import BaseModel
 from database.mongo_updater import MongoUpdater
 from utils import logger
+from threading import Lock
 
 class CVEItem(BaseModel):
     id: str
@@ -20,14 +21,16 @@ def init_mongo_client() -> MongoClient:
     port = int(os.getenv("MONGO_PORT"))
     username = os.getenv("MONGO_USERNAME")
     password = os.getenv("MONGO_PASSWORD")
+    logger.info(f"Connecting to MongoDB at {uri}:{port}")
     mongo_client = MongoClient(uri, port, username=username, password=password)
     return mongo_client
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global mongo_client, mu
+    global mongo_client, mu, lock
     mongo_client = init_mongo_client()
     mu = MongoUpdater(mongo_client)
+    lock = Lock()
     yield
     logger.info("closing mongo client")
     mongo_client.close()
@@ -45,8 +48,12 @@ def get_by_cve_id(item_id: str, identity: str = Depends(check_identity)):
     
 @app.post("/cve/update")
 async def update_cve(identity: str = Depends(check_identity)):
+    if not lock.acquire(blocking=False):
+        raise HTTPException(status_code=409, detail="Update already in progress")
     try:
         last_count, count = mu.update_cve(os.getenv("CVE_DIR"))
+        lock.release()
         return {"total_documents": last_count + count, "updated": count, "last_updated": last_count}
     except Exception as e:
+        lock.release()
         raise HTTPException(status_code=500, detail=str(e))

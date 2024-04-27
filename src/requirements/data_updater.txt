@@ -1,0 +1,8 @@
+beautifulsoup4==4.12.3
+lxml==4.9.3
+Requests==2.31.0
+tqdm==4.66.1
+
+fastapi==0.110.2
+pydantic==1.10.13
+uvicorn==0.20.0
