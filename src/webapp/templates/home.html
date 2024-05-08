@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-3">
+  <div id='write'  class=''><h1 id='py4cskg'><span>Py4CSKG</span></h1><p><span>This is a python project for creating CyberSecurity Knowledge Graph (CSKG) developed and maintained by Kuromesi, graduate student of School of Systems and Science Engineering, Sun Yat-sen University.</span></p><h2 id='usage'><span>USAGE</span></h2><h3 id='some-spacy-commands'><span>SOME SPACY COMMANDS</span></h3><p><code>spacy train config.cfg --output ./output --gpu-id 0</code>
+    <code>spacy convert ./train.conll . -s -n 10</code>
+    <code>spacy evaluate output/model-best/ dev.spacy --gpu-id 0</code></p><h2 id='demonstrations'><span>DEMONSTRATIONS</span></h2><h3 id='find-hidden-relations'><span>FIND HIDDEN RELATIONS</span></h3><p><span>PHP remote file inclusion vulnerabilities CVE-2007</span>
+    <span>CVE-2012-5970</span>
+    <span>obtain sensitive information CVE-2007</span>
+    <span>CVE-2021-0109 Insecure inherited permissions</span></p><h3 id='find-related-attack-patterns'><span>FIND RELATED ATTACK PATTERNS</span></h3><p><span>CVE-2021-36758</span>
+    <span>CVE-2021-21482</span></p><h2 id='find-related-weaknesses'><span>FIND RELATED WEAKNESSES</span></h2><p><span>CVE-2021-0056 Insecure inherited permissions</span>
+    <span>CVE-1999-0003 CWE-119 CVE-1999-0027</span>
+    <span>CVE-2019-5314 CWE-74</span></p><h2 id='neo4j-commands'><span>NEO4J COMMANDS</span></h2><p><span>docker run -it --rm -v /shared/databases/neo4j/data/:/data neo4j:latest \</span>
+    <span>neo4j-admin database import full --overwrite-destination \</span>
+    <span>--nodes=/data/import/capec_pt.csv --nodes=/data/import/capec_misc.csv \</span>
+    <span>--nodes=/data/import/attack_tech.csv --nodes=/data/import/attack_misc.csv \</span>
+    <span>--nodes=/data/import/cwe_wk.csv --nodes=/data/import/cwe_misc.csv \</span>
+    <span>--relationships=/data/import/capec_rel.csv --relationships=/data/import/cwe_rel.csv --relationships=/data/import/attack_rel.csv \</span>
+    <span>--multiline-fields=true --ignore-empty-strings=true --skip-duplicate-nodes=true</span>
+    <span>--skip-bad-relationships=true --skip-duplicate-nodes=true</span></p><p><span>docker run -it --rm -v /shared/databases/neo4j/data/:/data neo4j:latest \</span>
+    <span>neo4j-admin database import full --overwrite-destination \</span>
+    <span>--nodes=/data/import/nodes/capec_pt.csv --nodes=/data/import/nodes/capec_misc.csv \</span>
+    <span>--nodes=/data/import/nodes/attack_tech.csv --nodes=/data/import/nodes/attack_misc.csv \</span>
+    <span>--nodes=/data/import/nodes/cwe_wk.csv --nodes=/data/import/nodes/cwe_misc.csv \</span>
+    <span>--nodes=/data/import/nodes/cve_cve.</span><em><span>.csv --nodes=/data/import/nodes/cve_cpe.</span></em><span>.csv \</span>
+    <span>--relationships=/data/import/relations/.*.csv \</span>
+    <span>--multiline-fields=true --ignore-empty-strings=true --skip-duplicate-nodes=true --skip-bad-relationships=true --auto-skip-subsequent-headers=true</span></p><p><span>docker run -it --rm -v /shared/databases/neo4j/data/:/data neo4j:latest \</span>
+    <span>neo4j-admin database import full --overwrite-destination \</span>
+    <span>--nodes=/data/import/nodes/.</span><em><span>.csv \</span>
+    <span>--relationships=/data/import/relations/.</span></em><span>.csv \</span>
+    <span>--multiline-fields=true --ignore-empty-strings=true --skip-duplicate-nodes=true --skip-bad-relationships=true --auto-skip-subsequent-headers=true</span></p><p><span>docker run -it --rm -v /shared/databases/neo4j/data/:/data neo4j:latest \</span>
+    <span>neo4j-admin database import full --overwrite-destination \</span>
+    <span>--nodes=/data/import/nodes/cve_cve.</span><em><span>.csv --nodes=/data/import/nodes/cve_cpe.</span></em><span>.csv \</span>
+    <span>--multiline-fields=true --ignore-empty-strings=true --skip-duplicate-nodes=true --skip-bad-relationships=true --auto-skip-subsequent-headers=true</span></p><p><span>docker run -it --rm -v /mnt/e/MyCOde/kuromesi.com/Py4CSKG/data/neo4j/data:/data neo4j:latest \</span>
+    <span>neo4j-admin database import full --overwrite-destination \</span>
+    <span>--nodes=&quot;/data/import/nodes/attack_misc.</span><em><span>.csv&quot; --nodes=&quot;/data/import/nodes/attack_tech.</span></em><span>.csv&quot; \</span>
+    <span>--nodes=&quot;/data/import/nodes/capec_misc.csv&quot; --nodes=&quot;/data/import/nodes/capec_pt.csv&quot; \</span>
+    <span>--nodes=&quot;/data/import/nodes/cve_cpe.csv&quot; --nodes=&quot;/data/import/nodes/cve_cve.</span><em><span>.csv&quot; \</span>
+    <span>--nodes=/data/import/nodes/cwe_wk.csv --nodes=/data/import/nodes/cwe_misc.csv \</span>
+    <span>--relationships=&quot;/data/import/relations/.</span></em><span>.csv&quot; \</span>
+    <span>--multiline-fields=true --ignore-empty-strings=true --skip-duplicate-nodes=true \</span>
+    <span>--skip-bad-relationships=true --bad-tolerance=10000 \</span>
+    <span>--auto-skip-subsequent-headers=true neo4j</span></p><p><span>docker run \</span>
+    <span>    --name neo4j \</span>
+    <span>    -p7474:7474 -p7687:7687 \</span>
+    <span>    -itd \</span>
+    <span>    -v /mnt/e/MyCOde/kuromesi.com/Py4CSKG/data/neo4j/data:/data \</span>
+    <span>    -v /mnt/e/MyCOde/kuromesi.com/Py4CSKG/data/neo4j/logs:/logs \</span>
+    <span>    -v /mnt/e/MyCOde/kuromesi.com/Py4CSKG/data/neo4j/import:/var/lib/neo4j/import \</span>
+    <span>    -v /mnt/e/MyCOde/kuromesi.com/Py4CSKG/data/neo4j/plugins:/plugins \</span>
+    <span>    --env NEO4J_AUTH=neo4j/password \</span>
+    <span>    neo4j:latest</span></p><h3 id='full-text-index'><span>FULL-TEXT INDEX</span></h3><p><span>CREATE FULLTEXT INDEX vulDes FOR (n:Vulnerability) ON EACH [n.description]</span></p><p><span>CALL db.index.fulltext.queryNodes(&quot;vulDes&quot;, &quot;sql injection&quot;) YIELD node, score</span>
+    <span>RETURN node.id, node.description, score limit 25</span></p><h3 id='delete-duplicate-relations'><span>DELETE DUPLICATE RELATIONS</span></h3><p><span>match ()-[r]-&gt;() </span>
+    <span>match (s)-[r]-&gt;(e) </span>
+    <span>with s,e,type(r) as typ, tail(collect(r)) as coll </span>
+    <span>foreach(x in coll | delete x)</span></p><h2 id='rules'><span>RULES</span></h2><p><span>[]: represent list</span>
+    <span>(): represent nodes, id etc. e.g. (component), (component.id)</span>
+    <span>    ontology:</span>
+    <span>        component, firmware, hardware, software, os, entry</span>
+    <span>{}: represent functions</span>
+    <span>    </span><span>#</span><span>: defend, this comonent is designed to perform some defensive functions ,e.g. #{component.</span><em><span>} which means restrict access of all nodes</span>
+    <span>    @: compromised, </span>
+    <span>    -&gt;: lead to</span>
+    <span>    &lt;-: require</span>
+    <span>    !: not, disable some functions, e.g. @(software.id)-&gt;!#{component</span></em><span>}</span>
+    <span>    &lt;=&gt;: communicate</span>
+    <span>$: asset, default values are userPrivilege, rootPrivilege, appPrivilege, appCodeExec, systemCodeExec</span></p><p><span>some examples:</span>
+    <span>    (</span><span>$</span><appPrivilege><span>)</span><a href='mailto:-@-' target='_blank' class='url'>-@-</a><span>(:</span><component><span>.</span><firewall><span>)!</span><span>#</span><span>(component.*)</span>
+    <span>    </span><span>#</span><span>(:</span><entry><span>.</span><id><span>)</span></p><h2 id='attack-examples'><span>ATTACK EXAMPLES</span></h2><h3 id='wannacry'><span>wannacry </span></h3><p><span>CVE-2017-0144 System arbitrary code execution </span>
+    <a href='https://success.trendmicro.com/dcx/s/solution/1117391-preventing-wannacry-wcry-ransomware-attacks-using-trend-micro-products?language=en_US&amp;sfdcIFrameOrigin=null' target='_blank' class='url'>https://success.trendmicro.com/dcx/s/solution/1117391-preventing-wannacry-wcry-ransomware-attacks-using-trend-micro-products?language=en_US&sfdcIFrameOrigin=null</a></p><h3 id='stuxnet'><span>Stuxnet</span></h3><p><span>CVE-2010-2568 System arbitrary code execution</span>
+    <span>CVE-2008-4250 System arbitrary code execution</span>
+    <span>CVE-2010-2729 System arbitrary code execution Print spooler</span></p><p><span>CVE-2010-2743 Privilege escalation</span></p><h3 id='ukraine-power-grid'><span>Ukraine power grid</span></h3><p><span>CVE-2014-4114 System arbitrary code execution </span>
+    <a href='https://www.boozallen.com/content/dam/boozallen/documents/2016/09/ukraine-report-when-the-lights-went-out.pdf' target='_blank' class='url'>https://www.boozallen.com/content/dam/boozallen/documents/2016/09/ukraine-report-when-the-lights-went-out.pdf</a></p><h2 id='cve-classification'><span>CVE CLASSIFICATION</span></h2><p><span>CVE-2020-10814 N/N/P Code exec/Application crash </span><a href='https://sourceforge.net/p/codeblocks/tickets/934/' target='_blank' class='url'>https://sourceforge.net/p/codeblocks/tickets/934/</a>
+    <span>CVE-2020-10374 P/P/P Code exec/Chromium engine to create the screenshot </span><a href='https://kb.paessler.com/en/topic/87668-how-can-i-mitigate-cve-2020-10374-until-i-can-update' target='_blank' class='url'>https://kb.paessler.com/en/topic/87668-how-can-i-mitigate-cve-2020-10374-until-i-can-update</a>
+    <span>CVE-2020-10214 C/C/C Code exec/Any code </span><a href='https://github.com/kuc001/IoTFirmware/blob/master/D-Link/vulnerability4.md' target='_blank' class='url'>https://github.com/kuc001/IoTFirmware/blob/master/D-Link/vulnerability4.md</a></p></div></div>
+</div>
+{% endblock %}

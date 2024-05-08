@@ -1,8 +1,8 @@
 {
     "neo4j": {
-        "server": "bolt://192.168.9.10:30005",
+        "server": "bolt://127.0.0.1:7687",
         "username": "neo4j",
-        "password": "pmy991110"
+        "password": "password"
     },
 
     "redis": {

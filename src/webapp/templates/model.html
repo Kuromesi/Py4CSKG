@@ -1,246 +1,339 @@
-<html>
-<meta name="viewport"
-    content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+{% extends 'base.html' %}
 
-<head>
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.css" type="text/css" />
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis-network.min.js"> </script> -->
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css"
-        integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/navigation.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/template.css') }}">
-    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
-    <script src="https://cdn.staticfile.org/vue/2.7.0/vue.min.js"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous">
-    </script>
-    <script src="{{ url_for('static',filename='js/utils.js') }}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js"
-        integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-</head>
+{% block script %}
+<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.7.0/vue.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="{{ url_for('static',filename='js/utils.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js"
+    integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/model.css') }}">
+<style>
+    .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none
+    }
 
-<body>
-    <div class="nav">
-        <div class="page">
-            <nav class="page__menu menu">
-                <ul class="menu__list r-list">
-                    <li class="menu__group"><a href="/kuromesi" class="menu__link r-link text-underlined">KUROMESI</a></li>
-                    <li class="menu__group"><a href="/model" class="menu__link r-link text-underlined">MODELING</a></li>
-                    <li class="menu__group"><a href="/predict" class="menu__link r-link text-underlined">QUERY</a></li>
-                    <li class="menu__group"><a href="http://192.168.9.10:30004" class="menu__link r-link text-underlined">EXPLORE</a>
-                    </li>
-                </ul>
-            </nav>
+    @media (min-width:768px) {
+        .bd-placeholder-img-lg {
+            font-size: 3.5rem
+        }
+    }
+
+    .b-example-divider {
+        height: 3rem;
+        background-color: rgba(0, 0, 0, .1);
+        border: solid rgba(0, 0, 0, .15);
+        border-width: 0;
+        box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15)
+    }
+
+    .bi {
+        vertical-align: -.125em;
+        fill: currentColor
+    }
+
+    .opacity-50 {
+        opacity: .5
+    }
+
+    .opacity-75 {
+        opacity: .75
+    }
+
+    .list-group {
+        width: auto;
+        max-width: 460px;
+        margin: 0 auto
+    }
+
+    .form-check-input:checked+.form-checked-content {
+        opacity: .5
+    }
+
+    .form-check-input-placeholder {
+        pointer-events: none;
+        border-style: dashed
+    }
+
+    [contenteditable]:focus {
+        outline: 0
+    }
+
+    .list-group-checkable {
+        display: grid;
+        gap: .5rem;
+        border: 0
+    }
+
+    .list-group-checkable .list-group-item {
+        cursor: pointer;
+        border-radius: .5rem
+    }
+
+    .list-group-item-check {
+        position: absolute;
+        clip: rect(0, 0, 0, 0);
+        pointer-events: none
+    }
+
+    .list-group-item-check:hover+.list-group-item {
+        background-color: var(--bs-light)
+    }
+
+    .list-group-item-check:checked+.list-group-item {
+        color: #fff;
+        background-color: var(--bs-blue)
+    }
+
+    .list-group-item-check[disabled]+.list-group-item,
+    .list-group-item-check:disabled+.list-group-item {
+        pointer-events: none;
+        filter: none;
+        opacity: .5
+    }
+
+    #product-recommendation:hover {
+        background-color: var(--bs-light)
+    }
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="container" id="network-container">
+    <div class="row" style="height: 400px;">
+        <div class="col-sm-9" id="mynetwork" @click="click"></div>
+        <div class="col-sm-3" id="network_info">
+            <h1>Information</h1>
+            <div>
+                <div v-for="(v, k) in content">
+                    <h2>{[ k ]}</h2>
+                    <p>{[ v ]}</p>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="main">
-        <div id="network">
-            <div id="mynetwork" @click="click"></div>
-            <div id="network_info">
-                <h1>Information</h1>
-                <div>
-                    <div v-for="(v, k) in content">
-                        <h2>{[ k ]}</h2>
-                        <p>{[ v ]}</p>
-                    </div>
-                </div>
+</div>
+<div class="container mt-3" id="control-panel-container">
+    <div class="row" id="node-control">
+        <div class="col-md-4" id="node-details">
+            <div>
+                <label>Name</label>
+                <input class="form-control" type="text" name="name" v-model="cur_node['name']">
             </div>
-        </div>
-        <div id="interaction">
-            <div id="modeling"
-                style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-between;">
-                <div id="model_info"
-                    style="display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-                    <!-- <div v-if="type==0">
-                        <h1>Control panel</h1>
-                    </div>
-                    <div v-if="type=='Component' || type=='Entry'">
-                        <div class="group">
-                            <input id="modeling" type="text" required v-model="cur_node['name']">
-                            <span class="highlight"></span>
-                            <span class="bar"></span>
-                            <label id="modeling">Name</label>
-                        </div>
-                        <div class="group">
-                            <input id="modeling" type="text" required v-model="cur_node['description']">
-                            <span class="highlight"></span>
-                            <span class="bar"></span>
-                            <label id="modeling">Description</label>
-                        </div>
-                        <div id="buttons" style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-around;">
-                            <button @click="add_node">Add Node</button>
-                            <button @click="delete_node">Delete Node</button>
-                            <button @click="modify_node">Modify Node</button>
-                        </div>
-                    </div>
-                    <div v-if="type=='Software' || type=='Hardware' || type=='OS' || type=='Firmware'">
-                        <div class="group">
-                            <input id="modeling" type="text" required v-model="cur_node['name']">
-                            <span class="highlight"></span>
-                            <span class="bar"></span>
-                            <label id="modeling">Name</label>
-                        </div>
-                        <div class="group">
-                            <input id="modeling" type="text" required v-model="cur_node['description']">
-                            <span class="highlight"></span>
-                            <span class="bar"></span>
-                            <label id="modeling">Description</label>
-                        </div>
-                        <div class="group">
-                            <input id="modeling" type="text" required v-model="cur_node['product']">
-                            <span class="highlight"></span>
-                            <span class="bar"></span>
-                            <label id="modeling">Product</label>
-                        </div>
-                        <div style="overflow: auto;" v-if="if_recommend">
-                            <p id="file_link" v-for="recom in recommendations"  @click="fill_product(recom)">{[ recom ]}</p>
-                        </div>
-                        <div class="group">
-                            <input id="modeling" type="text" required v-model="cur_node['version']">
-                            <span class="highlight"></span>
-                            <span class="bar"></span>
-                            <label id="modeling">Version</label>
-                        </div>
-                        <div id="buttons" style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-around;">
-                            <button @click="add_node">Add Node</button>
-                            <button @click="delete_node">Delete Node</button>
-                            <button @click="modify_node">Modify Node</button>
-                        </div>
-                    </div> -->
-                    <div>
-                        <!-- <div class="group">
-                            <input id="modeling" type="text" required v-model="cur_component.product">
-                            <span class="highlight"></span>
-                            <span class="bar"></span>
-                            <label id="modeling">test</label>
-                        </div>
-                        <p>{[ cur_component.product ]}</p> -->
-                        <div v-for="(v, k) in cur_component">
-                            <div class="group" v-if="k == 'product'">
-                                <input id="modeling" type="text" required v-model="product">
-                                <span class="highlight"></span>
-                                <span class="bar"></span>
-                                <label id="modeling">product</label>
-                            </div>
-                            <div class="group" v-else>
-                                <input id="modeling" type="text" required v-model="cur_component[k]">
-                                <span class="highlight"></span>
-                                <span class="bar"></span>
-                                <label id="modeling">{[ k ]}</label>
-                            </div>
-                            <div style="overflow: auto;" v-if="if_recommend && k == 'product'">
-                                <p id="file_link" v-for="recom in recommendations"  @click="fill_product(recom)">{[ recom ]}</p>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <input v-model="key">
-                            <button @click="add_attribute">Add/Delete Attribute</button>
-                        </div>
-                        <div id="buttons" style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-around;">
-                            <button @click="add_node">Add Node</button>
-                            <button @click="delete_node">Delete Node</button>
-                            <button @click="modify_node">Modify Node</button>
-                        </div>
-                    </div>
-                </div>
-                <div id="edge_control">
-                    <div style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-between;">
-                        <div class="group">
-                            <input id="modeling" type="text" required :value="cur_edge.source">
-                            <span class="highlight"></span>
-                            <span class="bar"></span>
-                            <label id="modeling">Source</label>
-                        </div>
-                        <button @click="select_node('source')">Select Node</button>
-                    </div>
-                    <div style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-between;">
-                        <div class="group">
-                            <input id="modeling" type="text" required :value="cur_edge.dest">
-                            <span class="highlight"></span>
-                            <span class="bar"></span>
-                            <label id="modeling">Destination</label>
-                        </div>
-                        <button @click="select_node('dest')">Select Node</button>
-                    </div>
-                    <div class="group">
-                        <input id="modeling" type="text" required v-model="cur_edge.protocol">
-                        <span class="highlight"></span>
-                        <span class="bar"></span>
-                        <label id="modeling">Protocol</label>
-                    </div>
-                    <div id="buttons" style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-around;">
-                        <button @click="add_edge">Add Edge</button>
-                        <button @click="modify_edge">Modify Edge</button>
-                    </div>
-                </div>
-                <div id="misc" style="height: 100%;">
-                    <details class="custom-select">
-                        <summary class="radios">
-                            <input type="radio" name="item" id="default" title="Select component type" checked>
-                            <input type="radio" name="item" id="item1" title="Component">
-                            <input type="radio" name="item" id="item2" title="Software">
-                            <input type="radio" name="item" id="item3" title="Hardware">
-                            <input type="radio" name="item" id="item4" title="Firmware">
-                            <input type="radio" name="item" id="item5" title="Operating system">
-                            <input type="radio" name="item" id="item6" title="Entry">
-                            <input type="radio" name="item" id="item7" title="Defender">
-                        </summary>
-                        <ul class="list" id="selection">
-                            <li id="selection">
-                                <label for="item1" @click="component_click('component')">Component</label>
-                            </li>
-                            <li id="selection">
-                                <label for="item7" @click="component_click('defender')">Defender</label>
-                            </li>
-                            <li id="selection">
-                                <label for="item2" @click="component_click('software')">Software</label>
-                            </li>
-                            <li id="selection">
-                                <label for="item3" @click="component_click('hardware')">Hardware</label>
-                            </li>
-                            <li id="selection">
-                                <label for="item4" @click="component_click('firmware')">Firmware</label>
-                            </li>
-                            <li id="selection">
-                                <label for="item5" @click="component_click('os')">Operating system</label>
-                            </li>
-                            <li id="selection">
-                                <label for="item6" @click="component_click('entry')">Entry</label>
-                            </li>
-                        </ul>
-                    </details>
-                    <div style="margin-top: 10%;">
-                        <div style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-around;">
-                            <input v-model="cur_project">
-                            <button @click="save_graph">Save Graph</button>
-                        </div>
-                        <div style="overflow: auto;">
-                            <h2>Projects</h2>
-                            <div v-for="v in files">
-                                <div :id="v">
-                                    <p id="file_link" @click="load_project(v)">{[ v ]}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <button @click="list_files">List</button>
-                    </div>
-                </div>
-                
+            <div>
+                <label>Group</label>
+                <input class="form-control" type="text" name="group" v-model="cur_node['group']">
             </div>
-            
+            <div>
+                <label>Description</label>
+                <textarea class="form-control" type="text" name="description"
+                    v-model="cur_node['description']"></textarea>
+            </div>
+            <div class="dropdown mt-3">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                    {[ component_type ]}
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" @click="select_component('os')">OS</a></li>
+                    <li><a class="dropdown-item" @click="select_component('software')">Software</a></li>
+                    <li><a class="dropdown-item" @click="select_component('firmware')">Firmware</a></li>
+                    <li><a class="dropdown-item" @click="select_component('hardware')">Hardware</a></li>
+                    <li><a class="dropdown-item" @click="select_component('cve')">CVE</a></li>
+                    <li><a class="dropdown-item" @click="select_component('entry')">Entry</a></li>
+                </ul>
+            </div>
+            <div class="mt-3" id="buttons">
+                <button @click="add_node" class="btn btn-outline-primary">Add Node</button>
+                <button @click="delete_node" class="btn btn-outline-primary">Delete Node</button>
+                <button @click="modify_node" class="btn btn-outline-primary">Modify Node</button>
+            </div>
         </div>
         
+        <div class="col-md-4 pre-scrollable" id="cve-list" v-if="component_type == 'cve'">
+            <label>CVEs</label>
+            <div class="list-group list-group-checkable" style="overflow-y: auto; max-height: 280px;">
+                <div v-for="(v, k) in cur_node['component'][component_type]">
+                    <input class="list-group-item-check" type="radio" name="listGroupCheckableRadios" :id="k" value=""
+                        checked @click="check_component_details(k)">
+                    <label class="list-group-item py-3" :for="k">
+                        {[ v["cve"] ]}
+                        <span class="d-block small opacity-50">{[ v["cve"] ]}</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 pre-scrollable" id="entry-list" v-else-if="component_type == 'entry'">
+            <label>Entry</label>
+            <div class="list-group list-group-checkable" style="overflow-y: auto; max-height: 280px;">
+                <div v-for="(v, k) in cur_node['entry']">
+                    <input class="list-group-item-check" type="radio" name="listGroupCheckableRadios" :id="k" value=""
+                        checked @click="check_component_details(k)">
+                    <label class="list-group-item py-3" :for="k">
+                        {[ v["entry"] ]}
+                        <span class="d-block small opacity-50">{[ v["entry"] ]}</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 pre-scrollable" id="product-list" v-else>
+            <label>Products</label>
+            <div class="list-group list-group-checkable" style="overflow-y: auto; max-height: 280px;">
+                <div v-for="(v, k) in cur_node['component'][component_type]">
+                    <input class="list-group-item-check" type="radio" name="listGroupCheckableRadios" :id="k" value=""
+                        checked @click="check_component_details(k)">
+                    <label class="list-group-item py-3" :for="k">
+                        {[ v["product"] ]}
+                        <span class="d-block small opacity-50">{[ v["product"] ]}-{[ v["version"] ]}-{[ v["access"]
+                            ]}-{[ v["privilege"] ]}</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4" id="cve-details" v-if="component_type == 'cve'">
+            <div class="row mt-3">
+                <label>CVE</label>
+                <input class="form-control" type="text" name="cve" v-model="selected_cve['cve']">
+            </div>
+            <div class="row mt-3">
+                <label>Description</label>
+                <input class="form-control" type="text" name="description" v-model="selected_cve['description']">
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-outline-primary" @click="add_component">Add</button>
+                <button class="btn btn-outline-primary" @click="delete_component">Delete</button>
+            </div>
+        </div>
+
+        <div class="col-md-4" id="entry-details" v-else-if="component_type == 'entry'">
+            <div class="row mt-3">
+                <label>Entry</label>
+                <input class="form-control" type="text" name="entry" v-model="selected_entry['entry']">
+            </div>
+            <div class="row mt-3">
+                <label>Description</label>
+                <input class="form-control" type="text" name="description" v-model="selected_entry['description']">
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-outline-primary" @click="add_component">Add</button>
+                <button class="btn btn-outline-primary" @click="delete_component">Delete</button>
+            </div>
+        </div>
+
+        <div class="col-md-4" id="product-details" v-else>
+            <div>
+                <label>Product</label>
+                <input class="form-control" type="text" name="product" v-model="selected_product['product']"
+                    @focus="product_on_focus" @blur="product_on_blur">
+                <ul class="list-group" style="position: absolute; z-index: 9999; overflow-y: auto; max-height: 250px; max-width: 480px;"
+                    v-if="if_recommend">
+                    <li class="list-group-item" id="product-recommendation" v-for="recom in recommended_products" @mousedown="fill_product(recom)">{[ recom ]}</li>
+                </ul>
+            </div>
+            <div>
+                <label>Version</label>
+                <input class="form-control" type="text" name="version" v-model="selected_product['version']">
+            </div>
+            <div class="row">
+                <label>Access</label>
+                <div class="col-md-8">
+                    <input class="form-control" type="text" name="access" readonly v-model="selected_product['access']">
+                </div>
+
+                <div class="dropdown col-md-4">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                        Access
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'NETWORK')">network</a>
+                        </li>
+                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'ADJACENT_NETWORK')">adjacent</a>
+                        </li>
+                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'LOCAL')">local</a></li>
+                        <li><a class="dropdown-item" @click="set_product_attributes('access', 'PHYSICAL')">physical</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="row">
+                <label>Privilege</label>
+                <div class="col-md-8">
+                    <input class="form-control" type="text" name="privilege" required readonly
+                        v-model="selected_product['privilege']">
+                </div>
+
+                <div class="dropdown col-md-4">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                        Privilege
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" @click="set_product_attributes('privilege', 'user')">user</a></li>
+                        <li><a class="dropdown-item" @click="set_product_attributes('privilege', 'root')">root</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-outline-primary" @click="add_component">Add product</button>
+                <button class="btn btn-outline-primary" @click="delete_component">Delete product</button>
+            </div>
+        </div>
     </div>
-    <script src="{{ url_for('static',filename='js/graph.js') }}"></script>
-    <script src="{{ url_for('static',filename='js/modeling.js') }}"></script>
+    <div class="row mt-3" id="edge-control">
+        <button class="btn btn-outline-primary col-md-1" @click="select_node('src')">Source</button>
+        <input class="form-control col" type="text" name="privilege" required readonly :value="selected_edge.src.name">
+        <button class="btn btn-outline-primary col-md-1" @click="select_node('dst')">Destination</button>
+        <input class="form-control col" type="text" name="privilege" required readonly :value="selected_edge.dst.name">
+        <button class="btn btn-outline-primary col-md-1" @click="add_edge">Add</button>
+        <div class="dropdown col-md-2">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                {[ edge_type ]}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" @click="set_edge_type('directed')">directed</a></li>
+                <li><a class="dropdown-item" @click="set_edge_type('undirected')">undirected</a></li>
+            </ul>
+        </div>
+        <button class="btn btn-outline-primary col-md-1" @click="delete_edge">Delete</button>
+    </div>
+</div>
+<div class="container mt-3" id="project-control">
+    <div class="row">
+        <div class="col-sm-9">
+            <div>
+            </div>
+            <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas"
+                data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling"
+                @click="list_files">List</button>
+        </div>
 
-</body>
-
-</html>
+    </div>
+    <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1"
+        id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasScrollingLabel">PROJECT PANEL</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <h3>Local Projects</h3>
+            <div class="pre-scrollable" style="max-height: 60%;" v-for="v in files">
+                <div :id="v">
+                    <p id="file_link" @click="load_project(v)">{[ v ]}</p>
+                </div>
+            </div>
+            <input type="text" class="form-control mt-3" placeholder="PROJECT NAME" v-model="cur_project">
+            <button type="button" class="btn btn-outline-primary mt-3" @click="save_graph">Save Graph</button>
+            <button type="button" class="btn btn-outline-primary mt-3" @click="new_graph">New Graph</button>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static',filename='js/graph.js') }}"></script>
+<script src="{{ url_for('static',filename='js/modeling.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,110 @@
+:history
+
+CALL gds.nodeSimilarity.filtered.stream('my-graph-projection', {sourceNodeFilter:304018 , targetNodeFilter:'Vulnerability' } )
+YIELD node1, node2, similarity
+RETURN gds.util.asNode(node1).id AS Vul1, gds.util.asNode(node2).id AS Vul2, gds.util.asNode(node1).description AS Vul1Des, gds.util.asNode(node2).description AS Vul2Des, similarity
+ORDER BY similarity DESCENDING, Vul1, Vul2;
+
+CALL gds.nodeSimilarity.filtered.stream('my-graph-projection', {sourceNodeFilter:304018 , targetNodeFilter:'Vulnerability' } )
+YIELD node1, node2, similarity
+RETURN gds.util.asNode(node1).id AS Vul1, gds.util.asNode(node2).id AS Vul2, gds.util.asNode(node1).description AS Vul1Des, gds.util.asNode(node2).description AS Vul2Des, similarity
+ORDER BY similarity DESCENDING, Person1, Person2;
+
+CALL gds.nodeSimilarity.filtered.stream('my-graph-projection', {sourceNodeFilter:304018 , targetNodeFilter:'Vulnerability' } )
+YIELD node1, node2, similarity
+RETURN gds.util.asNode(node1).id AS Vul1, gds.util.asNode(node2).id AS Person2, gds.util.asNode(node1).description AS Vul1Des, gds.util.asNode(node2).description AS Vul2Des, similarity
+ORDER BY similarity DESCENDING, Person1, Person2;
+
+CALL gds.nodeSimilarity.filtered.stream('my-graph-projection', {sourceNodeFilter:304018 , targetNodeFilter:'Vulnerability' } )
+YIELD node1, node2, similarity
+RETURN gds.util.asNode(node1).id AS Person1, gds.util.asNode(node2).id AS Person2, similarity
+ORDER BY similarity DESCENDING, Person1, Person2;
+
+MATCH (n:Vulnerability) WHERE n.id="CVE-2010-2568" RETURN n LIMIT 25;
+
+CALL gds.nodeSimilarity.filtered.stream('my-graph-projection', {sourceNodeFilter:254709 , targetNodeFilter:'Vulnerability' } )
+YIELD node1, node2, similarity
+RETURN gds.util.asNode(node1).id AS Person1, gds.util.asNode(node2).id AS Person2, similarity
+ORDER BY similarity DESCENDING, Person1, Person2;
+
+MATCH (n:Vulnerability) RETURN n LIMIT 25;
+
+MATCH (p:Person)-[:LIKES]->(cuisine) WITH {item:id(p), categories: collect(id(cuisine))} as userData WITH collect(userData) as data CALL algo.similarity.jaccard.stream(data) YIELD item1, item2, count1, count2, intersection, similarity RETURN algo.getNodeById(item1).name AS from, algo.getNodeById(item2).name AS to, intersection, similarity ORDER BY similarity DESC;
+
+CALL gds.nodeSimilarity.filtered.stream('my-graph-projection', {sourceNodeFilter:'Vulnerability' , targetNodeFilter:'Vulnerability' } )
+YIELD node1, node2, similarity
+RETURN gds.util.asNode(node1).id AS Person1, gds.util.asNode(node2).id AS Person2, similarity
+ORDER BY similarity DESCENDING, Person1, Person2;
+
+CALL gds.nodeSimilarity.filtered.stream('my-graph-projection', {sourceNodeFilter:'Weakness' , targetNodeFilter:'Weakness' } )
+YIELD node1, node2, similarity
+RETURN gds.util.asNode(node1).id AS Person1, gds.util.asNode(node2).id AS Person2, similarity
+ORDER BY similarity DESCENDING, Person1, Person2;
+
+CALL gds.graph.project('my-graph-projection', ['Vulnerability','Weakness', 'Platform'], ['Observed_Example', 'Has_Platform']);
+
+CALL gds.graph.project('my-graph-projection', ['Vulnerability','Weakness', 'Platform'], 'Observed_Example', 'Has_Platform');
+
+MATCH (n:Platform) RETURN n LIMIT 25;
+
+CALL gds.graph.drop('my-graph-projection');
+
+CALL gds.nodeSimilarity.filtered.stream('my-graph-projection', {sourceNodeFilter:'Weakness' , targetNodeFilter:'Weakness' } )
+YIELD node1, node2, similarity
+RETURN gds.util.asNode(node1).id AS Person1, gds.util.asNode(node2).id AS Person2, similarity
+ORDER BY similarity DESCENDING, Person1, Person2;
+
+CALL gds.nodeSimilarity.filtered.stream('my-graph-projection', {sourceNodeFilter:'Weakness' , targetNodeFilter:'Weankness' } )
+YIELD node1, node2, similarity
+RETURN gds.util.asNode(node1).id AS Person1, gds.util.asNode(node2).id AS Person2, similarity
+ORDER BY similarity DESCENDING, Person1, Person2;
+
+CALL gds.nodeSimilarity.filtered.stream('my-graph-projection', {sourceNodeFilter:'Weakness' , targetNodeFilter:'Vulnerability' } )
+YIELD node1, node2, similarity
+RETURN gds.util.asNode(node1).id AS Person1, gds.util.asNode(node2).id AS Person2, similarity
+ORDER BY similarity DESCENDING, Person1, Person2;
+
+CALL gds.nodeSimilarity.filtered.stream('my-graph-projection', {sourceNodeFilter:'Weakness' , targetNodeFilter:'Weakness' } )
+YIELD node1, node2, similarity
+RETURN gds.util.asNode(node1).id AS Person1, gds.util.asNode(node2).id AS Person2, similarity
+ORDER BY similarity DESCENDING, Person1, Person2;
+
+CALL gds.nodeSimilarity.filtered.stream('my-graph-projection', {sourceNodeFilter:'Vulnerability' , targetNodeFilter:'Vulnerability' } )
+YIELD node1, node2, similarity
+RETURN gds.util.asNode(node1).id AS Person1, gds.util.asNode(node2).id AS Person2, similarity
+ORDER BY similarity DESCENDING, Person1, Person2;
+
+MATCH (n:Vulnerability) RETURN n LIMIT 25;
+
+CALL gds.nodeSimilarity.filtered.stream('my-graph-projection', {sourceNodeFilter:'Vulnerability' , targetNodeFilter:'Weakness' } )
+YIELD node1, node2, similarity
+RETURN gds.util.asNode(node1).name AS Person1, gds.util.asNode(node2).name AS Person2, similarity
+ORDER BY similarity DESCENDING, Person1, Person2;
+
+CALL gds.nodeSimilarity.filtered.stream('my-graph-projection', {sourceNodeFilter:'Vulnerability' , targetNodeFilter:'Weankness' } )
+YIELD node1, node2, similarity
+RETURN gds.util.asNode(node1).name AS Person1, gds.util.asNode(node2).name AS Person2, similarity
+ORDER BY similarity DESCENDING, Person1, Person2;
+
+CALL gds.nodeSimilarity.stream('my-graph-projection')
+YIELD node1, node2, similarity
+RETURN gds.util.asNode(node1).name AS Person1, gds.util.asNode(node2).name AS Person2, similarity
+ORDER BY similarity DESCENDING, Person1, Person2;
+
+CALL gds.graph.list()
+YIELD graphName, nodeCount, relationshipCount
+RETURN graphName, nodeCount, relationshipCount
+ORDER BY graphName ASC;
+
+CALL gds.graph.project('my-graph-projection', ['Vulnerability','Weakness'], 'Observed_Example');
+
+CALL gds.graph.drop('my-graph-projection');
+
+CALL gds.graph.project('my-graph-projection', ['Vulnerability','Weakness'], 'Observed_Example');
+
+CALL gds.graph.list()
+YIELD graphName, nodeCount, relationshipCount
+RETURN graphName, nodeCount, relationshipCount
+ORDER BY graphName ASC;
+
+CALL gds.graph.project('my-graph-projection', ['Vulnerability','Weakness'], 'Has_Example');

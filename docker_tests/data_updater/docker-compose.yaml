@@ -1,0 +1,9 @@
+services:
+  app:
+    image: kuromesi/dataupdater:v0.1
+    volumes:
+      - ./tmpfiles:/shared
+    ports:
+      - 8000:8000
+    environment:
+      - BASE_PATH=/shared

@@ -1,0 +1,10 @@
+#mynetwork {
+    height: 100%;
+    background-color: #ffffff;
+    border: 10px solid lightgray;
+}
+
+#network_info {
+    height: 100%;
+    overflow: auto;
+}

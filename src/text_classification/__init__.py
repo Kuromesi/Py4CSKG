@@ -1,0 +1,1 @@
+from text_classification.TextClassification import TextClassification, new_bert_text_classification

@@ -1,0 +1,35 @@
+version: '3.5'
+services:
+  jenkins:
+    image: vulhub/jenkins:2.46.1
+    init: true
+    network_mode: "container:workstation-host"
+    ipc: "container:workstation-host"
+    pid: "container:workstation-host"
+  polkit:
+    image: vulhub/polkit:0.105
+    network_mode: "container:workstation-host"
+    ipc: "container:workstation-host"
+    pid: "container:workstation-host"
+  neo4j:
+    image: vulhub/neo4j:3.4.18
+    # ports:
+    #   - "7474:7474"
+    #   - "7687:7687"
+    #   - "1337:1337"
+    #   - "34444:34444"
+    environment:
+      NEO4J_AUTH: "neo4j/vulhub"
+      JAVA_OPTS: "-Djava.rmi.server.hostname=${TARGET_IP:-127.0.0.1}"
+    network_mode: "container:workstation-host"
+    ipc: "container:workstation-host"
+    pid: "container:workstation-host"
+  sshd:
+    build: .
+    environment: 
+      - ROOT_PASSWORD=vulhub
+    # ports:
+    #   - "20022:22"
+    network_mode: "container:workstation-host"
+    ipc: "container:workstation-host"
+    pid: "container:workstation-host"

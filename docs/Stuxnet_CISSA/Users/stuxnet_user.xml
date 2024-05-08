@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<model xmlns:uml="uri:1" id="0" name="Data">
+  <packagedElement name="Users" id="1">
+    <node>
+      <id>10</id>
+      <Des>
+        <Name>Contractor</Name>
+        <Role>External vendor</Role>
+      </Des>
+      <Mapping>
+        <Device>Any computer in the network</Device>
+        <Data>Project source files</Data>
+      </Mapping>
+    </node>
+    <node>
+      <id>11</id>
+      <Des>
+        <Name>HMI Operator</Name>
+        <Role>User</Role>
+      </Des>
+      <Mapping>
+        <Device>HMI components such as WinCC Client,OS Web Client,etc</Device>
+        <Data>Process alarms,messages and status</Data>
+      </Mapping>
+    </node>
+    <node>
+      <id>12</id>
+      <Des>
+        <Name>Engineering support/maintenance staff</Name>
+        <Role>non privileged user</Role>
+      </Des>
+      <Mapping>
+        <Device>SCADA systems in control network</Device>
+        <Data>SCADA software, debug routines, programs</Data>
+      </Mapping>
+    </node>
+    <node>
+      <id>13</id>
+      <Des>
+        <Name>Employee in Office network</Name>
+        <Role>non privileged user</Role>
+      </Des>
+      <Mapping>
+        <Device>Web clients in office network </Device>
+        <Data>Historian logs, archives</Data>
+      </Mapping>
+    </node>
+  </packagedElement>
+</model>

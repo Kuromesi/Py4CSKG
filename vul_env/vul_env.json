@@ -1,0 +1,789 @@
+{
+    "nodes": {
+        "monitor": {
+            "name": "monitor",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": []
+        },
+        "database": {
+            "name": "database",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": []
+        },
+        "workstation": {
+            "name": "workstation",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": []
+        },
+        "ftp_server": {
+            "name": "ftp_server",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": []
+        },
+        "web_server": {
+            "name": "web_server",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": []
+        },
+        "mail_server": {
+            "name": "mail_server",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": []
+        },
+        "work_zone": {
+            "name": "work_zone",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": []
+        },
+        "scada_zone": {
+            "name": "scada_zone",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": []
+        },
+        "dmz_zone": {
+            "name": "dmz_zone",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": []
+        },
+        "internet": {
+            "name": "internet",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": []
+        },
+        "ruby": {
+            "name": "ruby",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": [
+                {
+                    "name": "CVE-2017-17405",
+                    "access": "ACCESS_NETWORK",
+                    "gain": "PRIV_ROOT",
+                    "require": "None",
+                    "score": 9.3
+                }
+            ]
+        },
+        "gitlab": {
+            "name": "gitlab",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": [
+                {
+                    "name": "CVE-2016-9086",
+                    "access": "ACCESS_NETWORK",
+                    "gain": "CIA_LOSS",
+                    "require": "None",
+                    "score": 4.0
+                }
+            ]
+        },
+        "oracle": {
+            "name": "oracle",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": [
+                {
+                    "name": "CVE-2023-21839",
+                    "access": "ACCESS_NETWORK",
+                    "gain": "CIA_LOSS",
+                    "require": "None",
+                    "score": 7.5
+                }
+            ]
+        },
+        "git_shell": {
+            "name": "git-shell",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": [
+                {
+                    "name": "CVE-2017-8386",
+                    "access": "ACCESS_NETWORK",
+                    "gain": "PRIV_USER",
+                    "require": "None",
+                    "score": 6.5
+                }
+            ]
+        },
+        "opensmtpd": {
+            "name": "opensmtpd",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": [
+                {
+                    "name": "CVE-2020-7247",
+                    "access": "ACCESS_NETWORK",
+                    "gain": "PRIV_ROOT",
+                    "require": "None",
+                    "score": 10.0
+                }
+            ]
+        },
+        "phpmailer": {
+            "name": "phpmailer",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": [
+                {
+                    "name": "CVE-2017-5223",
+                    "access": "ACCESS_LOCAL",
+                    "gain": "CIA_LOSS",
+                    "require": "None",
+                    "score": 2.1
+                }
+            ]
+        },
+        "jenkins": {
+            "name": "jenkins",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": [
+                {
+                    "name": "CVE-2017-1000353",
+                    "access": "ACCESS_NETWORK",
+                    "gain": "PRIV_USER",
+                    "require": "None",
+                    "score": 7.5
+                }
+            ]
+        },
+        "neo4j": {
+            "name": "neo4j",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": [
+                {
+                    "name": "CVE-2021-34371",
+                    "access": "ACCESS_NETWORK",
+                    "gain": "PRIV_USER",
+                    "require": "None",
+                    "score": 7.5
+                }
+            ]
+        },
+        "openssh": {
+            "name": "openssh",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": [
+                {
+                    "name": "CVE-2018-15473",
+                    "access": "ACCESS_NETWORK",
+                    "gain": "CIA_LOSS",
+                    "require": "None",
+                    "score": 5.0
+                }
+            ]
+        },
+        "polkit": {
+            "name": "polkit",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": [
+                {
+                    "name": "CVE-2021-4034",
+                    "access": "ACCESS_LOCAL",
+                    "gain": "PRIV_ROOT",
+                    "require": "None",
+                    "score": 7.2
+                }
+            ]
+        },
+        "kibana": {
+            "name": "kibana",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": [
+                {
+                    "name": "CVE-2018-17246",
+                    "access": "ACCESS_NETWORK",
+                    "gain": "PRIV_USER",
+                    "require": "None",
+                    "score": 7.5
+                }
+            ]
+        },
+        "phpmyadmin": {
+            "name": "phpmyadmin",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": [
+                {
+                    "name": "CVE-2016-5734",
+                    "access": "ACCESS_NETWORK",
+                    "gain": "PRIV_USER",
+                    "require": "None",
+                    "score": 7.5
+                }
+            ]
+        },
+        "mysql": {
+            "name": "mysql",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": [
+                {
+                    "name": "CVE-2012-2122",
+                    "access": "ACCESS_NETWORK",
+                    "gain": "CIA_LOSS",
+                    "require": "None",
+                    "score": 5.1
+                }
+            ]
+        },
+        "mail_expose": {
+            "name": "mail_expose",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": []
+        },
+        "workstation_expose": {
+            "name": "workstation_expose",
+            "os": [],
+            "software": [],
+            "hardware": [],
+            "firmware": [],
+            "atomic_attacks": []
+        }
+    },
+    "edges": [
+        {
+            "source": "web_server",
+            "target": "oracle",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:user",
+                    "root:root",
+                    "user:access"
+                ]
+            }
+        },
+        {
+            "source": "oracle",
+            "target": "web_server",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:access",
+                    "root:root"
+                ]
+            }
+        },
+        {
+            "source": "web_server",
+            "target": "gitlab",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:user",
+                    "root:root",
+                    "user:access"
+                ]
+            }
+        },
+        {
+            "source": "gitlab",
+            "target": "web_server",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:access",
+                    "root:root"
+                ]
+            }
+        },
+        {
+            "source": "web_server",
+            "target": "git_shell",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:user",
+                    "root:root",
+                    "user:access"
+                ]
+            }
+        },
+        {
+            "source": "git_shell",
+            "target": "web_server",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:access",
+                    "root:root"
+                ]
+            }
+        },
+        {
+            "source": "ftp_server",
+            "target": "ruby",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:user",
+                    "root:root",
+                    "user:access"
+                ]
+            }
+        },
+        {
+            "source": "ruby",
+            "target": "ftp_server",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:access",
+                    "root:root"
+                ]
+            }
+        },
+        {
+            "source": "mail_server",
+            "target": "opensmtpd",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:user",
+                    "root:root",
+                    "user:access"
+                ]
+            }
+        },
+        {
+            "source": "opensmtpd",
+            "target": "mail_server",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:access",
+                    "root:root"
+                ]
+            }
+        },
+        {
+            "source": "mail_server",
+            "target": "phpmailer",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:user",
+                    "root:root",
+                    "user:access"
+                ]
+            }
+        },
+        {
+            "source": "phpmailer",
+            "target": "mail_server",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:access",
+                    "root:root"
+                ]
+            }
+        },
+        {
+            "source": "workstation",
+            "target": "jenkins",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:user",
+                    "root:root",
+                    "user:access"
+                ]
+            }
+        },
+        {
+            "source": "jenkins",
+            "target": "workstation",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:access",
+                    "root:root"
+                ]
+            }
+        },
+        {
+            "source": "workstation",
+            "target": "openssh",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:user",
+                    "root:root",
+                    "user:access"
+                ]
+            }
+        },
+        {
+            "source": "openssh",
+            "target": "workstation",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:access",
+                    "root:root"
+                ]
+            }
+        },
+        {
+            "source": "workstation",
+            "target": "neo4j",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:user",
+                    "root:root",
+                    "user:access"
+                ]
+            }
+        },
+        {
+            "source": "neo4j",
+            "target": "workstation",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:access",
+                    "root:root"
+                ]
+            }
+        },
+        {
+            "source": "workstation",
+            "target": "polkit",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:user",
+                    "root:root",
+                    "user:access"
+                ]
+            }
+        },
+        {
+            "source": "polkit",
+            "target": "workstation",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:access",
+                    "root:root"
+                ]
+            }
+        },
+        {
+            "source": "monitor",
+            "target": "kibana",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:user",
+                    "root:root",
+                    "user:access"
+                ]
+            }
+        },
+        {
+            "source": "kibana",
+            "target": "monitor",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:access",
+                    "root:root"
+                ]
+            }
+        },
+        {
+            "source": "monitor",
+            "target": "phpmyadmin",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:user",
+                    "root:root",
+                    "user:access"
+                ]
+            }
+        },
+        {
+            "source": "phpmyadmin",
+            "target": "monitor",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:access",
+                    "root:root"
+                ]
+            }
+        },
+        {
+            "source": "database",
+            "target": "mysql",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:user",
+                    "root:root",
+                    "user:access"
+                ]
+            }
+        },
+        {
+            "source": "mysql",
+            "target": "database",
+            "property": {
+                "access": "ACCESS_LOCAL",
+                "transitions": [
+                    "user:access",
+                    "root:root"
+                ]
+            }
+        },
+        {
+            "source": "mail_expose",
+            "target": "opensmtpd",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": []
+            }
+        },
+        {
+            "source": "mail_expose",
+            "target": "phpmailer",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": []
+            }
+        },
+        {
+            "source": "workstation_expose",
+            "target": "jenkins",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": []
+            }
+        },
+        {
+            "source": "workstation_expose",
+            "target": "openssh",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": []
+            }
+        },
+        {
+            "source": "workstation_expose",
+            "target": "neo4j",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": []
+            }
+        },
+        {
+            "source": "dmz_zone",
+            "target": "workstation_expose",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": [
+                    "access:access"
+                ]
+            }
+        },
+        {
+            "source": "dmz_zone",
+            "target": "mail_expose",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": [
+                    "access:access"
+                ]
+            }
+        },
+        {
+            "source": "dmz_zone",
+            "target": "ruby",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": []
+            }
+        },
+        {
+            "source": "scada_zone",
+            "target": "kibana",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": []
+            }
+        },
+        {
+            "source": "internet",
+            "target": "gitlab",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": []
+            }
+        },
+        {
+            "source": "internet",
+            "target": "git_shell",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": []
+            }
+        },
+        {
+            "source": "monitor",
+            "target": "mysql",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": []
+            }
+        },
+        {
+            "source": "scada_zone",
+            "target": "work_zone",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": [
+                    "access:access"
+                ]
+            }
+        },
+        {
+            "source": "work_zone",
+            "target": "scada_zone",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": [
+                    "access:access"
+                ]
+            }
+        },
+        {
+            "source": "workstation",
+            "target": "work_zone",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": [
+                    "access:access"
+                ]
+            }
+        },
+        {
+            "source": "workstation",
+            "target": "dmz_zone",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": [
+                    "access:access"
+                ]
+            }
+        },
+        {
+            "source": "mail_server",
+            "target": "dmz_zone",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": [
+                    "access:access"
+                ]
+            }
+        },
+        {
+            "source": "ftp_server",
+            "target": "dmz_zone",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": [
+                    "access:access"
+                ]
+            }
+        },
+        {
+            "source": "web_server",
+            "target": "dmz_zone",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": [
+                    "access:access"
+                ]
+            }
+        },
+        {
+            "source": "monitor",
+            "target": "scada_zone",
+            "property": {
+                "access": "ACCESS_ADJACENT",
+                "transitions": [
+                    "access:access"
+                ]
+            }
+        }
+    ]
+}

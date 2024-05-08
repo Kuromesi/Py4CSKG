@@ -1,6 +1,7 @@
 # Configuration files
 .idea
 .vscode
+test_data
 
 # Saved models
 ckpts
@@ -8,6 +9,8 @@ trained_models
 
 # Data
 data
+*.db
+tmpfiles
 
 # Byte-compiled / optimized / DLL files
 **/__pycache__/

@@ -1,0 +1,59 @@
+1,"execCode(workstation,jenkins)","OR",0
+2,"RULE 2 (remote exploit of a server program)","AND",0
+3,"netAccess(workstation,tcp,jenkins_port)","OR",0
+4,"RULE 5 (multi-hop access)","AND",0
+5,"hacl(ftpServer,workstation,tcp,jenkins_port)","LEAF",1
+6,"execCode(ftpServer,ruby)","OR",0
+7,"RULE 2 (remote exploit of a server program)","AND",0
+8,"netAccess(ftpServer,tcp,ruby_port)","OR",0
+9,"RULE 5 (multi-hop access)","AND",0
+10,"hacl(mailServer,ftpServer,tcp,ruby_port)","LEAF",1
+11,"execCode(mailServer,opensmtpd)","OR",0
+12,"RULE 2 (remote exploit of a server program)","AND",0
+13,"netAccess(mailServer,tcp,opensmtpd_port)","OR",0
+14,"RULE 5 (multi-hop access)","AND",0
+15,"hacl(ftpServer,mailServer,tcp,opensmtpd_port)","LEAF",1
+16,"RULE 5 (multi-hop access)","AND",0
+17,"hacl(webServer,mailServer,tcp,opensmtpd_port)","LEAF",1
+18,"execCode(webServer,git_shell)","OR",0
+19,"RULE 2 (remote exploit of a server program)","AND",0
+20,"netAccess(webServer,tcp,git_shell_port)","OR",0
+21,"RULE 6 (direct network access)","AND",0
+22,"hacl(internet,webServer,tcp,git_shell_port)","LEAF",1
+23,"attackerLocated(internet)","LEAF",1
+24,"networkServiceInfo(webServer,git_shell,tcp,git_shell_port,git_shell)","LEAF",1
+25,"vulExists(webServer,'CVE-2017-8386',git_shell,remoteExploit,privEscalation)","LEAF",1
+26,"networkServiceInfo(mailServer,opensmtpd,tcp,opensmtpd_port,opensmtpd)","LEAF",1
+27,"vulExists(mailServer,'CVE-2020-7247',opensmtpd,remoteExploit,privEscalation)","LEAF",1
+28,"RULE 5 (multi-hop access)","AND",0
+29,"hacl(webServer,ftpServer,tcp,ruby_port)","LEAF",1
+30,"networkServiceInfo(ftpServer,ruby,tcp,ruby_port,ruby)","LEAF",1
+31,"vulExists(ftpServer,'CVE-2017-17405',ruby,remoteExploit,privEscalation)","LEAF",1
+32,"RULE 5 (multi-hop access)","AND",0
+33,"hacl(mailServer,workstation,tcp,jenkins_port)","LEAF",1
+34,"RULE 5 (multi-hop access)","AND",0
+35,"hacl(webServer,workstation,tcp,jenkins_port)","LEAF",1
+36,"networkServiceInfo(workstation,jenkins,tcp,jenkins_port,jenkins)","LEAF",1
+37,"vulExists(workstation,'CVE-2020-7247',jenkins,remoteExploit,privEscalation)","LEAF",1
+38,"netAccess(databaseServer,tcp,mysql_port)","OR",0
+39,"RULE 5 (multi-hop access)","AND",0
+40,"hacl(monitor,databaseServer,tcp,mysql_port)","LEAF",1
+41,"execCode(monitor,kibana)","OR",0
+42,"RULE 2 (remote exploit of a server program)","AND",0
+43,"netAccess(monitor,tcp,kibana_port)","OR",0
+44,"RULE 5 (multi-hop access)","AND",0
+45,"hacl(workstation,monitor,tcp,kibana_port)","LEAF",1
+46,"networkServiceInfo(monitor,kibana,tcp,kibana_port,kibana)","LEAF",1
+47,"vulExists(monitor,'CVE-2018-17246',kibana,remoteExploit,privEscalation)","LEAF",1
+48,"RULE 5 (multi-hop access)","AND",0
+49,"execCode(monitor,phpmyadmin)","OR",0
+50,"RULE 2 (remote exploit of a server program)","AND",0
+51,"networkServiceInfo(monitor,phpmyadmin,tcp,kibana_port,phpmyadmin)","LEAF",1
+52,"vulExists(monitor,'CVE-2016-5734',phpmyadmin,remoteExploit,privEscalation)","LEAF",1
+53,"netAccess(workstation,tcp,neo4j_port)","OR",0
+54,"RULE 5 (multi-hop access)","AND",0
+55,"hacl(ftpServer,workstation,tcp,neo4j_port)","LEAF",1
+56,"RULE 5 (multi-hop access)","AND",0
+57,"hacl(mailServer,workstation,tcp,neo4j_port)","LEAF",1
+58,"RULE 5 (multi-hop access)","AND",0
+59,"hacl(webServer,workstation,tcp,neo4j_port)","LEAF",1

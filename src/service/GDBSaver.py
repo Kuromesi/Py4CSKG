@@ -1,13 +1,12 @@
 from neo4j import GraphDatabase
 
-from service.ConfReader import ConfReader
-
+from service.conf_reader import ConfReader
+from utils.Logger import logger
 
 class GDBSaver:
 
-    def __init__(self):
-        database = ConfReader.readConf()
-        self.driver = GraphDatabase.driver(database['neo4j']['server'], auth=(database['neo4j']['username'], database['neo4j']['password']))
+    def __init__(self, uri, auth):
+        self.driver = GraphDatabase.driver(uri, auth=auth)
 
     def _exec(self, tx, query):
         result = tx.run(query)
@@ -17,10 +16,11 @@ class GDBSaver:
             return 0
     
     def _result(self, tx, query):
-        result = tx.run(query)
         try:
+            result = tx.run(query)
             return result.values()
-        except:
+        except Exception as e:
+            logger.error(e)
             return 0
         
     def addSlashes(self, string):
@@ -67,9 +67,18 @@ class GDBSaver:
             session.write_transaction(self._exec, query)
 
     def sendQuery(self, query):
-        with self.driver.session() as session:
-            res = session.write_transaction(self._result, query)
+        if isinstance(query, list):
+            res = []
+            with self.driver.session() as session:
+                for q in query:
+                    res.append(session.write_transaction(self._result, q))
+        else:
+            with self.driver.session() as session:
+                res = session.write_transaction(self._result, query)
         return res
+
+database = ConfReader.readConf()
+gdb = GDBSaver(database['neo4j']['server'], auth=(database['neo4j']['username'], database['neo4j']['password']))
 
 if __name__=="__main__":
     gdb = GDBSaver()

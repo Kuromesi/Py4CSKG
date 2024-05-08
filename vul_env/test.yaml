@@ -1,0 +1,18 @@
+version: '2'
+services:
+  ssh:
+    image: kuromesi/ubuntu:18.04
+    networks:
+    - dmz-net
+    - work-net
+    - scada-net
+networks:
+  dmz-net:
+    name: dmz-net
+    external: true
+  work-net:
+    name: work-net
+    external: true
+  scada-net:
+    name: scada-net
+    external: true

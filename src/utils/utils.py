@@ -3,7 +3,7 @@ from tqdm import tqdm
 import pandas as pd
 import numpy as np
 from service.GDBSaver import *
-from utils.NLP import *
+from misc.NLP import *
 import json
 from NER.predict import *
 from tqdm import tqdm, trange

@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<model xmlns:uml="uri:1" id="0" name="Stuxnet">
+  <packagedElement name="Enterprise Control Network" id="1001">
+    <Vertex>WinCC Web Client<id>1</id><Labelling><Vulnerability>CVE-2010-2549,CVE-2010-2743,CVE-2010-2744,CVE-2010-3338,CVE-2008-4250,CVE-2010-2568,CVE-2010-2729</Vulnerability><Properties><OS>Microsoft OS</OS></Properties></Labelling></Vertex>
+    <Vertex>Historian Web Client<id>2</id><Labelling><Vulnerability>CVE-2010-2549,CVE-2010-2743,CVE-2010-2744,CVE-2010-3338,CVE-2008-4250,CVE-2010-2568,CVE-2010-2729</Vulnerability><Properties><OS>Microsoft OS</OS></Properties></Labelling></Vertex>
+    <Vertex>ECN Servers<id>3</id><Labelling><Vulnerability>CVE-2010-2549,CVE-2010-2743,CVE-2010-2744,CVE-2010-3338,CVE-2008-4250,CVE-2010-2568,CVE-2010-2729</Vulnerability><Properties><OS>Microsoft OS</OS></Properties></Labelling></Vertex>
+    <Vertex>Employee Workstation<id>4</id><Labelling><Vulnerability>CVE-2010-2549,CVE-2010-2743,CVE-2010-2744,CVE-2010-3338,CVE-2008-4250,CVE-2010-2568,CVE-2010-2729</Vulnerability><Properties><OS>Microsoft OS</OS></Properties></Labelling></Vertex>
+    <Vertex>Firewall<id>5</id><Labelling><Vulnerability></Vulnerability><Properties><OS>Microsoft OS</OS></Properties></Labelling></Vertex>
+    <Edge>
+      <id>6</id>
+      <source>
+        <name>WinCC Web Client</name>
+      </source>
+      <target>
+        <name>ECN Server</name>
+      </target>
+      <Labelling>
+        <Protocol>TCP/IP</Protocol>
+      </Labelling>
+    </Edge>
+    <Edge>
+      <id>7</id>
+      <source>
+        <name>WinCC Web Client</name>
+      </source>
+      <target>
+        <name>Employee Workstation</name>
+      </target>
+      <Labelling>
+        <Protocol>TCP/IP</Protocol>
+      </Labelling>
+    </Edge>
+    <Edge>
+      <id>8</id>
+      <source>
+        <name>Employee Workstation</name>
+      </source>
+      <target>
+        <name>ECN Server</name>
+      </target>
+      <Labelling>
+        <Protocol>TCP/IP</Protocol>
+      </Labelling>
+    </Edge>
+    <Edge>
+      <id>9</id>
+      <source>
+        <name>Historian Web Client</name>
+      </source>
+      <target>
+        <name>ECN Server</name>
+      </target>
+      <Labelling>
+        <Protocol>TCP/IP</Protocol>
+      </Labelling>
+    </Edge>
+  </packagedElement>
+  <packagedElement name="Perimeter Network" id="1002">
+    <Vertex>WebNav Server<id>9</id><Labelling><Vulnerability>CVE-2010-2549,CVE-2010-2743,CVE-2010-2744,CVE-2010-3338,CVE-2008-4250,CVE-2010-2568,CVE-2010-2729</Vulnerability><Properties><OS>Microsoft OS</OS></Properties></Labelling></Vertex>
+    <Vertex>CAS Server<id>10</id><Labelling><Vulnerability>CVE-2010-2549,CVE-2010-2743,CVE-2010-2744,CVE-2010-3338,CVE-2008-4250,CVE-2010-2568,CVE-2010-2729</Vulnerability><Properties><OS>Microsoft OS</OS></Properties></Labelling></Vertex>
+    <Vertex>Firewall<id>12</id><Labelling><Vulnerability></Vulnerability><Properties><OS>Microsoft OS</OS></Properties></Labelling></Vertex>
+    <Edge>
+      <id>13</id>
+      <source>
+        <name>WebNav Server</name>
+      </source>
+      <target>
+        <name>CAS Server</name>
+      </target>
+      <Labelling>
+        <Protocol>Network Share</Protocol>
+      </Labelling>
+    </Edge>
+  </packagedElement>
+  <packagedElement name="Process Control Network" id="1001">
+    <Vertex>OS Server<id>14</id><Labelling><Vulnerability></Vulnerability><Properties><OS>Microsoft OS</OS></Properties></Labelling></Vertex>
+    <Vertex>WinCC Server<id>15</id><Labelling><Vulnerability></Vulnerability><Properties><OS>Microsoft OS</OS></Properties></Labelling></Vertex>
+    <Vertex>Engineering workstation<id>16</id><Labelling><Vulnerability></Vulnerability><Properties><OS>Microsoft OS</OS></Properties></Labelling></Vertex>
+    <Edge>
+      <id>17</id>
+      <source>
+        <name>OS Server</name>
+      </source>
+      <target>
+        <name>WinCC Server</name>
+      </target>
+      <Labelling>
+        <Protocol>Network Share</Protocol>
+      </Labelling>
+    </Edge>
+    <Edge>
+      <id>18</id>
+      <source>
+        <name>WinCC Server</name>
+      </source>
+      <target>
+        <name>Engineering workstation</name>
+      </target>
+      <Labelling>
+        <Protocol>Network Share</Protocol>
+      </Labelling>
+    </Edge>
+    <Edge>
+      <id>19</id>
+      <source>
+        <name>OS Server</name>
+      </source>
+      <target>
+        <name>Engineering Workstation</name>
+      </target>
+      <Labelling>
+        <Protocol>Network Share</Protocol>
+      </Labelling>
+    </Edge>
+    <Edge>
+      <id>20</id>
+      <source>
+        <name>OS Server</name>
+      </source>
+      <target>
+        <name>PLC</name>
+      </target>
+      <Labelling>
+        <Protocol>MODBUS</Protocol>
+      </Labelling>
+    </Edge>
+    <Edge>
+      <id>21</id>
+      <source>
+        <name>WinCC Server</name>
+      </source>
+      <target>
+        <name>PLC</name>
+      </target>
+      <Labelling>
+        <Protocol>MODBUS</Protocol>
+      </Labelling>
+    </Edge>
+    <Edge>
+      <id>22</id>
+      <source>
+        <name>Engineering workstation</name>
+      </source>
+      <target>
+        <name>PLC</name>
+      </target>
+      <Labelling>
+        <Protocol>MODBUS</Protocol>
+      </Labelling>
+    </Edge>
+  </packagedElement>
+</model>
