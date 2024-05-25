@@ -561,7 +561,7 @@ if __name__ == '__main__':
     ts.init_weight(df)
     ts.calculate_similarity(text)
     # precision_test()
-    # calculate_precision()
+    calculate_precision()
     # tfidf()
     # print()
     # comparison_result()

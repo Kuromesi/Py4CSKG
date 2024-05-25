@@ -8,10 +8,10 @@ from text_similarity import TextSimilarity
 
 def test_wsbert_capec():
     def filter(x):
-        return x == "CAPEC-120"
-    func = lambda x: x == "CAPEC-120"
-    ts = TextSimilarity("myData/thesis/graduation/modeling/tmp.csv", "data/deep/embeddings/query.npy")
-    df = ts.calculate_similarity("ftp server", func)
+        return "CAPEC" in x
+    func = lambda x: "CAPEC" in x
+    ts = TextSimilarity("myData/thesis/graduation/modeling/tmp.csv", "data/deep/embeddings/query.npy", "./data/deep/trained_models/BERTBiLSTMCRF79")
+    df = ts.calculate_similarity("The Net Direct client for Linux before 6.0.5 in Nortel Application Switch 2424, VPN 3050 and 3070, and SSL VPN Module 1000 extracts and executes files with insecure permissions, which allows local users to exploit a race condition to replace a world-writable file in /tmp/NetClient and cause another user to execute arbitrary code when attempting to execute this client, as demonstrated by replacing /tmp/NetClient/client.", func)
     print(df)
 
 def test_wsbert():

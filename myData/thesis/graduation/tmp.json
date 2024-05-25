@@ -1,0 +1,11 @@
+{
+    "OpenSSH 7.7 (cpe:/a:openbsd:openssh:7.7) ": 15,
+    "OpenSSH 8.2p1 Ubuntu 4 (cpe:/a:openbsd:openssh:8.2p1) (cpe:/o:linux:linux_kernel) ": 14,
+    "Jenkins httpd 2.46.1 (cpe:/a:jenkins:jenkins:2.46.1) ": 272,
+    "Apache httpd 2.4.10 (cpe:/a:apache:http_server:2.4.10) ": 61,
+    "Elasticsearch Kibana 5.6.12 (cpe:/a:elasticsearch:kibana:5.6.12) ": 6,
+    "OpenSSH 7.9p1 Debian 10+deb10u2 (cpe:/a:openbsd:openssh:7.9p1) (cpe:/o:linux:linux_kernel) ": 11,
+    "PostgreSQL DB 11.6 - 11.7 (cpe:/a:alpinelinux:alpine_linux:-) ": 2,
+    "Redis key-value store 4.0.14 (cpe:/a:redislabs:redis:4.0.14) ": 4,
+    "WEBrick httpd 1.3.1 (cpe:/a:ruby-lang:ruby:2.4.1) ": 44
+}
