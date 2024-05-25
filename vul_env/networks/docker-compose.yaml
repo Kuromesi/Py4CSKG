@@ -11,9 +11,18 @@ networks:
   work-net:
     driver: bridge
     name: work-net
+    ipam:
+      config:
+      - subnet: 10.150.0.0/24
   dmz-net:
     driver: bridge
     name: dmz-net
+    ipam:
+      config:
+      - subnet: 10.150.1.0/24
   scada-net:
     driver: bridge
     name: scada-net
+    ipam:
+      config:
+      - subnet: 10.150.2.0/24
