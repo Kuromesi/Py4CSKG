@@ -1,3 +1,5 @@
+# data updater can update cve, cwe, capec and att&ck data in BASE_PATH directory.
+
 services:
   app:
     image: kuromesi/dataupdater:v0.1

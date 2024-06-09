@@ -1,3 +1,6 @@
+# this is a client to query mongodb for cve data
+# the cve data should be located in CVE_DIR
+
 services:
   app:
     image: kuromesi/mongoclient:v0.1
