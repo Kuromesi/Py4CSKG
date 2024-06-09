@@ -1,0 +1,16 @@
+# this is a client to query mongodb for cve data
+# the cve data should be located in CVE_DIR
+
+services:
+  app:
+    image: kuromesi/tc:test
+    volumes:
+      - ../../data/deep/trained_models:/models
+      - ../../myData:/myData
+    ports:
+      - 8000:8000
+    environment:
+      - MODEL_PATH=/models/cve2cwe/BERTBiLSTMCRF
+      - DEVICE=gpu
+      - LABEL_PATH=/myData/learning/CVE2CWE/classification.labels
+   

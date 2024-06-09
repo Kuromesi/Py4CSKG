@@ -1,0 +1,15 @@
+# this is a client to query mongodb for cve data
+# the cve data should be located in CVE_DIR
+
+services:
+  app:
+    image: kuromesi/ts:test
+    volumes:
+      - ../../data:/data
+      - ../../myData:/myData
+    ports:
+      - 8000:8000
+    environment:
+      - DOCS_PATH=/myData/thesis/graduation/modeling/tmp.csv
+      - WEIGHT_PATH=/data/deep/embeddings/query.npy
+      - NER_PATH=/data/deep/trained_models/BERTBiLSTMCRF79
