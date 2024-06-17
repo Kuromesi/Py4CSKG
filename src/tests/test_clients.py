@@ -31,9 +31,15 @@ def test_analyzer_client():
     from clients.analyzer_client import app as an_app
     uvicorn.run(an_app, host="127.0.0.1", port=8000)
 
+def test_traversers_client():
+    load_dotenv('src/tests/env/knowledge_graph.env')
+    from clients.traversers_client import app as tra_app
+    uvicorn.run(tra_app, host="127.0.0.1", port=8000)
+
 if __name__ == "__main__":
     # test_tc_client()
     # test_ts_client()
     # test_mongo_client()
     # test_updater_client()
-    test_analyzer_client()
+    # test_analyzer_client()
+    test_traversers_client()

@@ -216,9 +216,8 @@ class CVETraverser():
                                     rel_df.loc[len(rel_df.index)] = [sum[1][platform]['uri'], sum[0][product]['uri'], "And"]
         return cve_df, cpe_df, rel_df
 
-    def traverse_single(self, items: dict, tag: str, cve_details: dict=None):
+    def traverse_single(self, base, items: dict, tag: str, cve_details: dict=None):
         cve_df, cpe_df, rel_df = self.convert_json_to_csv(items, cve_details)
-        base = config.get("KnowledgeGraph", "base_path")
         cve_df = cve_df.drop_duplicates()
         cve_df.to_csv(os.path.join(base, f'neo4j/nodes/cve_cve_{tag}.csv'), index=False)
         cpe_df = cpe_df.drop_duplicates()
@@ -226,31 +225,34 @@ class CVETraverser():
         rel_df = rel_df.drop_duplicates()
         rel_df.to_csv(os.path.join(base, f'neo4j/relations/cve_rel_{tag}.csv'), index=False)
     
-    def traverse(self):
+    def traverse(self, path=""):
         logger.info("staring to traverse cve")
+        if path == "":
+            raise Exception("need path to traverse cve")
+        base = path
         mt = MultiTask()
-        cves = self.get_cves()
+        cves = self.get_cves(path)
         mt.create_pool(32)
-        base = config.get("KnowledgeGraph", "base_path")
-        path = os.path.join(base, "base/cve_details/impact.json")
+        path = os.path.join(path, "cve_details/impact.json")
         try:
             with open(path, 'r') as f:
                 cve_details = json.load(f)
         except Exception as e:
             logger.error(f"failed to load cve details: {e}")
             cve_details = None
-        tasks = [(json.load(open(cve, 'r')), id, cve_details) for id, cve in enumerate(cves)]
+        tasks = [(base, json.load(open(cve, 'r')), id, cve_details) for id, cve in enumerate(cves)]
         mt.apply_task(self.traverse_single, tasks)
         mt.delete_pool() 
     
-    def get_cves(self):
+    def get_cves(self, path=""):
         """get paths of cve in json format
 
         Returns:
             _type_: _description_
         """        
-        base = config.get("KnowledgeGraph", "base_path")
-        path = os.path.join(base, "base/cve")
+        if path == "":
+            raise Exception("need path to load cves")
+        path = os.path.join(path, "cve")
         cves = os.listdir(path)
         not_included = ["CVE-Modified.json", "CVE-Recent.json", "cve.json"]
         ret = []

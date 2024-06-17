@@ -1,0 +1,11 @@
+# traverser can traverse cve, cwe, capec and att&ck data in BASE_PATH directory.
+
+services:
+  app:
+    image: kuromesi/traverser:test
+    volumes:
+      - ../../../data/base_copy:/shared
+    ports:
+      - 8000:8000
+    environment:
+      - BASE_PATH=/shared

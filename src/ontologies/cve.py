@@ -141,7 +141,7 @@ class CVEEntry():
             cvss2 = json.loads(record['baseMetricV2'])
             self.access = cvss2['cvssV2']['accessVector']
             self.score = cvss2['cvssV2']['baseScore']
-            if cvss2['cvssV2']['authentication'] is "Single" or cvss2['cvssV2']['authentication'] is "Multiple":
+            if cvss2['cvssV2']['authentication'] == "Single" or cvss2['cvssV2']['authentication'] == "Multiple":
                 self.privileges_required = "Low"
             else:
                 self.privileges_required = "None"

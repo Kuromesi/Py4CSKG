@@ -27,59 +27,65 @@ class KGBuilder():
         self.attack_traverser = ATTACKTraverser()
         self.cwe_traverser = CWETraverser()
 
-    def traverse_cve(self) -> bool:
+    def traverse_cve(self, path="") -> tuple[bool, Exception]:
         try:
-            self.cve_traverser.traverse()
+            self.cve_traverser.traverse(path)
         except Exception as e:
             logger.error(f"failed to traverse cve: {e}")
-            return False
-        return True
+            return False, e
+        return True, None
     
-    def traverse_capec(self) -> bool:
+    def traverse_capec(self, path="") -> tuple[bool, Exception]:
         try:
-            self.capec_traverser.traverse()
+            self.capec_traverser.traverse(path)
         except Exception as e:
             logger.error(f"failed to traverse capec: {e}")
-            return False
-        return True
+            return False, e
+        return True, None
     
-    def traverse_attack(self) -> bool:
+    def traverse_attack(self, path="") -> tuple[bool, Exception]:
         try:
-            self.attack_traverser.traverse()
+            self.attack_traverser.traverse(path)
         except Exception as e:
             logger.error(f"failed to traverse attack: {e}")
-            return False
-        return True
+            return False, e
+        return True, None
     
-    def traverse_cwe(self) -> bool:
+    def traverse_cwe(self, path="") -> tuple[bool, Exception]:
         try:
-            self.cwe_traverser.traverse()
+            self.cwe_traverser.traverse(path)
         except Exception as e:
             logger.error(f"failed to traverse cwe: {e}")
-            return False
-        return True
+            return False, e
+        return True, None
 
-    def traverse_all(self):
-        base = config.get("KnowledgeGraph", "base_path")
+    def traverse_all(self, path="") -> tuple[bool, Exception]:
+        if path == "":
+            return False, Exception("need path to traverse")
         logger.info("starting to convert raw data into neo4j csv format")
-        if not os.path.exists(os.path.join(base, "neo4j/nodes")):
-            os.makedirs(os.path.join(base, "neo4j/nodes"))
-        if not os.path.exists(os.path.join(base, "neo4j/relations")):
-            os.makedirs(os.path.join(base, "neo4j/relations"))
+        if not os.path.exists(os.path.join(path, "neo4j/nodes")):
+            os.makedirs(os.path.join(path, "neo4j/nodes"))
+        if not os.path.exists(os.path.join(path, "neo4j/relations")):
+            os.makedirs(os.path.join(path, "neo4j/relations"))
         total, success = 4, 4
         failed_list = []
-        if not self.traverse_capec():
+        if not self.traverse_capec(path):
             success -= 1
             failed_list.append("capec")
-        if not self.traverse_attack():
+        if not self.traverse_attack(path):
             success -= 1
             failed_list.append("att&ck")
-        if not self.traverse_cwe():
+        if not self.traverse_cwe(path):
             success -= 1
             failed_list.append("cwe")
-        if not self.traverse_cve():
+        if not self.traverse_cve(path):
             success -= 1
             failed_list.append("cve")
         logger.info(f"{success}/{total} traversal success")
         if failed_list:
             logger.warning(f"failed to traverse [{' '.join(failed_list)}]")
+            return False, Exception(f"failed to traverse [{' '.join(failed_list)}]")
+        return True, None
+
+def new_kg_builder() -> KGBuilder:
+    return KGBuilder()
