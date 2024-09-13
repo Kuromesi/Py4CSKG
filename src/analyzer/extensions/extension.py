@@ -2,7 +2,6 @@ import json, abc
 import networkx as nx
 from networkx import DiGraph
 
-from analyzer.utils.knowledge_query import KGQuery
 from analyzer.graph_adapters.flan_adpter import FlanAdapter
 from ontologies.modeling import *
 from ontologies.cve import *

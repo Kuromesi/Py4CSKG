@@ -3,9 +3,20 @@
 
 services:
   app:
-    image: kuromesi/mongoclient:v0.1
+    image: kuromesi/analyzer:test
     volumes:
       - ./tmpfiles:/shared
+    ports:
+      - 8001:8000
+    environment:
+      - MONGO_URI=mongodb://mongo/
+      - MONGO_PORT=27017
+      - MONGO_USERNAME=root
+      - MONGO_PASSWORD=example
+  mongoclient:
+    image: kuromesi/mongoclient:v0.1
+    volumes:
+      - ../mongo_client/tmpfiles:/shared
     ports:
       - 8000:8000
     environment:
@@ -22,4 +33,5 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+   
    

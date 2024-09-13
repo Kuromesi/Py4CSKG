@@ -5,7 +5,6 @@ sys.path.append(os.path.join(BASE_DIR))
 from ontologies.modeling import AtomicAttack
 from ontologies.constants import *
 from ontologies.cve import CVEEntry
-from service import gdb
 import requests, re, json
 from utils.Logger import logger
 

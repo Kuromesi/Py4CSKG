@@ -31,7 +31,7 @@ async def lifespan(app: FastAPI):
     port = int(os.getenv("MONGO_PORT"))
     username = os.getenv("MONGO_USERNAME")
     password = os.getenv("MONGO_PASSWORD")
-    model_analyzer = new_flan_analyzer("src/analyzer/rules/experiment/rule.yaml", mongo_uri=uri, mongo_port=port, mongo_user=username, mongo_password=password)
+    model_analyzer = new_flan_analyzer("analyzer/rules/experiment/rule.yaml", mongo_uri=uri, mongo_port=port, mongo_user=username, mongo_password=password)
     yield
 
 app = new_client(lifespan=lifespan)

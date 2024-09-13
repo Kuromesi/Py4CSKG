@@ -1,9 +1,11 @@
 FROM python:3.10-slim
 
+COPY src /app
+COPY dist/swagger-ui /app/dist
 WORKDIR /app
-COPY . .
-RUN pip install --no-cache-dir -r analyzer/requirements.txt
 
-ENV CONF_PATH ""
+RUN pip install -r requirements/analyzer.txt
+RUN sed -i 's|"https.*swagger-ui.css"|"/static/swagger-ui.css"|g' /usr/local/lib/python3.10/site-packages/fastapi/openapi/docs.py &&\
+    sed -i 's|"https.*swagger-ui-bundle.js"|"/static/swagger-ui-bundle.js"|g' /usr/local/lib/python3.10/site-packages/fastapi/openapi/docs.py
 
-CMD python flan_analyzer.py -c ${CONF_PATH}
+CMD ["python", "run_clients.py", "-c", "analyzer"]
