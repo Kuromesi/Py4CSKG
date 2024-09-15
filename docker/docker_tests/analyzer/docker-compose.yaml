@@ -2,8 +2,8 @@
 # the cve data should be located in CVE_DIR
 
 services:
-  app:
-    image: kuromesi/analyzer:test
+  analyzer:
+    image: kuromesi/analyzer:v0.1
     volumes:
       - ./tmpfiles:/shared
     ports:
@@ -16,6 +16,7 @@ services:
   mongoclient:
     image: kuromesi/mongoclient:v0.1
     volumes:
+      # ../mongo_client/tmpfiles/cve/CVE-*.json
       - ../mongo_client/tmpfiles:/shared
     ports:
       - 8000:8000
